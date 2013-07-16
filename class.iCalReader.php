@@ -125,6 +125,10 @@ class ICal
                                                         $keyword, 
                                                         $value) 
     {
+        if (strstr($keyword, ';')) {
+          // Ignore everything in keyword after a ; (things like Language, etc)
+          $keyword = substr($keyword, 0, strpos($keyword, ";"));
+        }
         if ($keyword == false) { 
             $keyword = $this->last_keyword; 
             switch ($component) {
