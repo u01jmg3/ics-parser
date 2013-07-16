@@ -216,7 +216,7 @@ class ICal
      * Processes recurrences
      *
      * @author John Grogg <john.grogg@gmail.com>
-     * @return NULL
+     * @return {array}
      */
     public function process_recurrences() 
     {
@@ -261,7 +261,7 @@ class ICal
                 $weekdays = array('SU','MO','TU','WE','TH','FR','SA');
                 $bydays = (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') ? explode(',', $rrules['BYDAY']) : array('SU','MO','TU','WE','TH','FR','SA');
                 // Get timestamp of first day of start week
-                $week_recurring_timestamp = (date('w', $start_timestamp) == 0) ? $start_timestamp : strtotime('last Sunday', $start_timestamp);
+                $week_recurring_timestamp = (date('w', $start_timestamp) == 0) ? $start_timestamp : strtotime('last Sunday '.date('H:i:s',$start_timestamp), $start_timestamp);
                 // Step through weeks
                 while ($week_recurring_timestamp <= $until) {
                   // Add events for bydays
@@ -303,7 +303,7 @@ class ICal
                   $day_cardinals = array(1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth');
                   $weekdays = array('SU' => 'sunday','MO' => 'monday','TU' => 'tuesday','WE' => 'wednesday','TH' => 'thursday','FR' => 'friday','SA' => 'saturday');
                   while ($recurring_timestamp <= $until) {
-                    $event_start_desc = "{$day_cardinals[$day_number]} {$weekdays[$week_day]} of ".date('F',$recurring_timestamp)." ".date('Y',$recurring_timestamp);
+                    $event_start_desc = "{$day_cardinals[$day_number]} {$weekdays[$week_day]} of ".date('F',$recurring_timestamp)." ".date('Y',$recurring_timestamp)." ".date('H:i:s',$recurring_timestamp);
                     $event_start_timestamp = strtotime($event_start_desc);
                     if ($event_start_timestamp > $start_timestamp && $event_start_timestamp < $until) {
                       $anEvent['DTSTART'] = date('Ymd\T',$event_start_timestamp).$start_time;
@@ -331,7 +331,7 @@ class ICal
                   $day_cardinals = array(1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth');
                   $weekdays = array('SU' => 'sunday','MO' => 'monday','TU' => 'tuesday','WE' => 'wednesday','TH' => 'thursday','FR' => 'friday','SA' => 'saturday');
                   while ($recurring_timestamp <= $until) {
-                    $event_start_desc = "{$day_cardinals[$day_number]} {$weekdays[$month_day]} of {$month_names[$rrules['BYMONTH']]} ".date('Y',$recurring_timestamp);
+                    $event_start_desc = "{$day_cardinals[$day_number]} {$weekdays[$month_day]} of {$month_names[$rrules['BYMONTH']]} ".date('Y',$recurring_timestamp)." ".date('H:i:s',$recurring_timestamp);
                     $event_start_timestamp = strtotime($event_start_desc);
                     if ($event_start_timestamp > $start_timestamp && $event_start_timestamp < $until) {
                       $anEvent['DTSTART'] = date('Ymd\T',$event_start_timestamp).$start_time;
@@ -345,7 +345,7 @@ class ICal
                   $day = date('d',$start_timestamp);
                   // Step throuhg years adding specific month dates
                   while ($recurring_timestamp <= $until) {
-                    $event_start_desc = "$day {$month_names[$rrules['BYMONTH']]} ".date('Y',$recurring_timestamp);
+                    $event_start_desc = "$day {$month_names[$rrules['BYMONTH']]} ".date('Y',$recurring_timestamp)." ".date('H:i:s',$recurring_timestamp);
                     $event_start_timestamp = strtotime($event_start_desc);
                     if ($event_start_timestamp > $start_timestamp && $event_start_timestamp < $until) {
                       $anEvent['DTSTART'] = date('Ymd\T',$event_start_timestamp).$start_time;
