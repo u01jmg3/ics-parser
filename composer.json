@@ -1,0 +1,13 @@
+{
+    "name": "johngrogg/ics-parser",
+    "description": "Ics file parser",
+    "authors": [
+    {
+    	"name": "Martin Thoma <info@martin-thoma.de>",
+    	"email": "<info@martin-thoma.de>"
+    }
+    ], 
+    "autoload": {
+        "classmap": ["class.iCalReader.php"]
+    }
+}
