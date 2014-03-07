@@ -5,6 +5,10 @@
     {
     	"name": "Martin Thoma <info@martin-thoma.de>",
     	"email": "<info@martin-thoma.de>"
+    },
+    {
+    	"name": "John Grogg <john.grogg@gmail.com>",
+    	"email": "<john.grogg@gmail.com>"
     }
     ], 
     "autoload": {
