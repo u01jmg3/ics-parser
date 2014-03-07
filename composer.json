@@ -4,13 +4,13 @@
     "keywords": ["ics", "ical"],
     "authors": [
         {
-        	"name": "Martin Thoma <info@martin-thoma.de>",
-        	"email": "<info@martin-thoma.de>",
+        	"name": "Martin Thoma",
+        	"email": "info@martin-thoma.de",
         	"role": "Original Developer"
         },
         {
-        	"name": "John Grogg <john.grogg@gmail.com>",
-        	"email": "<john.grogg@gmail.com>",
+        	"name": "John Grogg",
+        	"email": "john.grogg@gmail.com",
         	"role": "Developer"
         }
     ], 
