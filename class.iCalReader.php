@@ -60,11 +60,11 @@ class ICal
         }
         
         if (is_array($filename)){
-	        $lines = $filename;
-	    } else {
-        	$lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-		}
-		
+            $lines = $filename;
+        } else {
+            $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        }
+        
         if (stristr($lines[0], 'BEGIN:VCALENDAR') === false) {
             return false;
         } else {
@@ -91,13 +91,13 @@ class ICal
                     $this->event_count++;
                     $type = "VEVENT"; 
                     break;
-				
-				// http://www.kanzaki.com/docs/ical/vfreebusy.html
-				case "BEGIN:VFREEBUSY": 
+                
+                // http://www.kanzaki.com/docs/ical/vfreebusy.html
+                case "BEGIN:VFREEBUSY": 
                     $this->freebusy_count++;
                     $type = "VFREEBUSY"; 
                     break;
-				
+                
                 //all other special strings
                 case "BEGIN:VCALENDAR": 
                 case "BEGIN:DAYLIGHT": 
