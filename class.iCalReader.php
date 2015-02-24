@@ -294,7 +294,13 @@ class ICal
                         $offset = "+$interval week";
                         // Build list of days of week to add events
                         $weekdays = array('SU','MO','TU','WE','TH','FR','SA');
-                        $bydays = (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') ? explode(',', $rrules['BYDAY']) : array('SU','MO','TU','WE','TH','FR','SA');
+                        if(isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
+                            $bydays = explode(',', $rrules['BYDAY']);
+                        } else {
+                            $weekTemp = array('SU','MO','TU','WE','TH','FR','SA');
+                            $findDay = $weekTemp[date('w',$start_timestamp)];
+                            $bydays = array($findDay);
+                        }
                         // Get timestamp of first day of start week
                         $week_recurring_timestamp = (date('w', $start_timestamp) == 0) ? $start_timestamp : strtotime('last Sunday '.date('H:i:s',$start_timestamp), $start_timestamp);
                         // Step through weeks
