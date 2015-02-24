@@ -36,6 +36,9 @@ class ICal
 
     /* How many events are in this ical? */
     public  /** @type {int} */ $event_count = 0; 
+    
+    /* How many freebusy are in this ical? */
+    public  /** @type {int} */ $freebusy_count = 0; 
 
     /* The parsed calendar */
     public /** @type {Array} */ $cal;
@@ -46,7 +49,7 @@ class ICal
     /** 
      * Creates the iCal-Object
      * 
-     * @param {string} $filename The path to the iCal-file
+     * @param {mixed} $filename The path to the iCal-file or an array of lines from an iCal file
      *
      * @return Object The iCal-Object
      */ 
@@ -55,8 +58,12 @@ class ICal
         if (!$filename) {
             return false;
         }
-        
-        $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        if (is_array($filename)){
+            $lines = $filename;
+        } else {
+            $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        }
         	
         return $this->initLines($lines);
     }
@@ -86,37 +93,44 @@ class ICal
                 list($keyword, $value) = $add;
 
                 switch ($line) {
-                // http://www.kanzaki.com/docs/ical/vtodo.html
-                case "BEGIN:VTODO": 
-                    $this->todo_count++;
-                    $type = "VTODO"; 
-                    break; 
+                    // http://www.kanzaki.com/docs/ical/vtodo.html
+                    case "BEGIN:VTODO": 
+                        $this->todo_count++;
+                        $type = "VTODO"; 
+                        break; 
 
-                // http://www.kanzaki.com/docs/ical/vevent.html
-                case "BEGIN:VEVENT": 
-                    $this->event_count++;
-                    $type = "VEVENT"; 
-                    break; 
-
-                //all other special strings
-                case "BEGIN:VCALENDAR": 
-                case "BEGIN:DAYLIGHT": 
-                    // http://www.kanzaki.com/docs/ical/vtimezone.html
-                case "BEGIN:VTIMEZONE": 
-                case "BEGIN:STANDARD": 
-                    $type = $value;
-                    break; 
-                case "END:VTODO": // end special text - goto VCALENDAR key 
-                case "END:VEVENT": 
-                case "END:VCALENDAR": 
-                case "END:DAYLIGHT": 
-                case "END:VTIMEZONE": 
-                case "END:STANDARD": 
-                    $type = "VCALENDAR"; 
-                    break; 
-                default:
-                    $this->addCalendarComponentWithKeyAndValue($type, $keyword, $value);
-                    break; 
+                    // http://www.kanzaki.com/docs/ical/vevent.html
+                    case "BEGIN:VEVENT":
+                        $this->event_count++;
+                        $type = "VEVENT"; 
+                        break;
+                    
+                    // http://www.kanzaki.com/docs/ical/vfreebusy.html
+                    case "BEGIN:VFREEBUSY": 
+                        $this->freebusy_count++;
+                        $type = "VFREEBUSY"; 
+                        break;
+                    
+                    //all other special strings
+                    case "BEGIN:VCALENDAR": 
+                    case "BEGIN:DAYLIGHT": 
+                        // http://www.kanzaki.com/docs/ical/vtimezone.html
+                    case "BEGIN:VTIMEZONE": 
+                    case "BEGIN:STANDARD": 
+                        $type = $value;
+                        break; 
+                    case "END:VTODO": // end special text - goto VCALENDAR key 
+                    case "END:VEVENT": 
+                    case "END:VFREEBUSY": 
+                    case "END:VCALENDAR": 
+                    case "END:DAYLIGHT": 
+                    case "END:VTIMEZONE": 
+                    case "END:STANDARD": 
+                        $type = "VCALENDAR"; 
+                        break; 
+                    default:
+                        $this->addCalendarComponentWithKeyAndValue($type, $keyword, $value);
+                        break; 
                 } 
             }
             $this->process_recurrences();
@@ -142,12 +156,15 @@ class ICal
         if ($keyword == false) { 
             $keyword = $this->last_keyword; 
             switch ($component) {
-            case 'VEVENT': 
-                $value = $this->cal[$component][$this->event_count - 1][$keyword].$value;
-                break;
-            case 'VTODO' : 
-                $value = $this->cal[$component][$this->todo_count - 1][$keyword].$value;
-                break;
+                case 'VEVENT': 
+                    $value = $this->cal[$component][$this->event_count - 1][$keyword].$value;
+                    break;
+                case 'VTODO' : 
+                    $value = $this->cal[$component][$this->todo_count - 1][$keyword].$value;
+                    break;
+                case 'VFREEBUSY' : 
+                    $value = $this->cal[$component][$this->freebusy_count - 1][$keyword].$value;
+                    break;
             }
         }
         
@@ -157,20 +174,22 @@ class ICal
         }
 
         switch ($component) { 
-        case "VTODO": 
-            $this->cal[$component][$this->todo_count - 1][$keyword] = $value;
-            //$this->cal[$component][$this->todo_count]['Unix'] = $unixtime;
-            break; 
-        case "VEVENT": 
-            $this->cal[$component][$this->event_count - 1][$keyword] = $value;
-            if (!isset($this->cal[$component][$this->event_count - 1][$keyword . "_array"])) {
-                $this->cal[$component][$this->event_count - 1][$keyword . "_array"] = array();
-            }
-            $this->cal[$component][$this->event_count - 1][$keyword . "_array"][] = $value;
-            break; 
-        default: 
-            $this->cal[$component][$keyword] = $value; 
-            break; 
+            case "VTODO": 
+                $this->cal[$component][$this->todo_count - 1][$keyword] = $value;
+                break; 
+            case "VEVENT": 
+                $this->cal[$component][$this->event_count - 1][$keyword] = $value;
+                if (!isset($this->cal[$component][$this->event_count - 1][$keyword . "_array"])) {
+                    $this->cal[$component][$this->event_count - 1][$keyword . "_array"] = array();
+                }
+                $this->cal[$component][$this->event_count - 1][$keyword . "_array"][] = $value;
+                break; 
+            case "VFREEBUSY": 
+                $this->cal[$component][$this->freebusy_count - 1][$keyword] = $value; 
+                break; 
+            default: 
+                $this->cal[$component][$keyword] = $value; 
+                break; 
         } 
         $this->last_keyword = $keyword; 
     }
