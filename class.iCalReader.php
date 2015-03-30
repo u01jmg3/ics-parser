@@ -427,6 +427,18 @@ class ICal
     }
 
     /**
+     * Returns an array of arrays with all free/busy events. Every event is 
+     * an associative array and each property is an element it.
+     *
+     * @return {array}
+     */
+    public function freeBusyEvents()
+    {
+        $array = $this->cal;
+        return $array['VFREEBUSY'];
+    }
+
+    /**
      * Returns a boolean value whether thr current calendar has events or not
      *
      * @return {boolean}
