@@ -117,8 +117,10 @@ class ICal
                         // http://www.kanzaki.com/docs/ical/vtimezone.html
                     case 'BEGIN:VTIMEZONE':
                     case 'BEGIN:STANDARD':
+                    case 'BEGIN:VALARM':
                         $type = $value;
                         break;
+                    case 'END:VALARM':
                     case 'END:VTODO': // end special text - goto VCALENDAR key
                     case 'END:VEVENT':
                     case 'END:VFREEBUSY':
@@ -203,7 +205,7 @@ class ICal
      */
     public function keyValueFromString($text)
     {
-        preg_match('/([^:]+)[:]([\w\W]*)/', $text, $matches);
+        preg_match('/([A-Z-;=^:]+)[:]([\w\W]*)/', $text, $matches);
         if (count($matches) == 0) {
             return false;
         }
@@ -320,7 +322,7 @@ class ICal
                                 // Move forward a day
                                 $day_recurring_timestamp = strtotime('+1 day', $day_recurring_timestamp);
                             }
-                            // Move forward $interaval weeks
+                            // Move forward $interval weeks
                             $week_recurring_timestamp = strtotime($offset, $week_recurring_timestamp);
                         }
                         break;
@@ -344,7 +346,8 @@ class ICal
                             $start_time = date('His', $start_timestamp);
                             // Deal with BYDAY
                             $day_number = substr($rrules['BYDAY'], 0, 1);
-                            $week_day = substr($rrules['BYDAY'], 1);
+                            $day_number = is_numeric($day_number) ? $day_number : 1;
+                            $week_day = substr($rrules['BYDAY'], -2);
                             $day_cardinals = array(1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth');
                             $weekdays = array('SU' => 'sunday', 'MO' => 'monday', 'TU' => 'tuesday', 'WE' => 'wednesday', 'TH' => 'thursday', 'FR' => 'friday', 'SA' => 'saturday');
                             while ($recurring_timestamp <= $until) {
@@ -366,7 +369,7 @@ class ICal
                         // Create offset
                         $offset = "+$interval year";
                         $recurring_timestamp = strtotime($offset, $start_timestamp);
-                        $month_names = array(1 => 'January', 2 => 'Februrary', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December');
+                        $month_names = array(1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December');
                         // HACK: Exchange doesn't set a correct UNTIL for yearly events, so just go 2 years out
                         $until = strtotime('+2 year', $start_timestamp);
                         // Check if BYDAY rule exists
@@ -374,7 +377,8 @@ class ICal
                             $start_time = date('His', $start_timestamp);
                             // Deal with BYDAY
                             $day_number = substr($rrules['BYDAY'], 0, 1);
-                            $month_day = substr($rrules['BYDAY'], 1);
+                            $day_number = is_numeric($day_number) ? $day_number : 1;
+                            $month_day = substr($rrules['BYDAY'], -2);
                             $day_cardinals = array(1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth');
                             $weekdays = array('SU' => 'sunday', 'MO' => 'monday', 'TU' => 'tuesday', 'WE' => 'wednesday', 'TH' => 'thursday', 'FR' => 'friday', 'SA' => 'saturday');
                             while ($recurring_timestamp <= $until) {
@@ -392,7 +396,7 @@ class ICal
                             }
                         } else {
                             $day = date('d', $start_timestamp);
-                            // Step throuhg years adding specific month dates
+                            // Step through years adding specific month dates
                             while ($recurring_timestamp <= $until) {
                                 $event_start_desc = "$day {$month_names[$rrules['BYMONTH']]} " . date('Y', $recurring_timestamp) . ' ' . date('H:i:s', $recurring_timestamp);
                                 $event_start_timestamp = strtotime($event_start_desc);
@@ -427,7 +431,7 @@ class ICal
     }
 
     /**
-     * Returns a boolean value whether thr current calendar has events or not
+     * Returns a boolean value whether the current calendar has events or not
      *
      * @return {boolean}
      */
@@ -486,7 +490,7 @@ class ICal
     }
 
     /**
-     * Returns a boolean value whether thr current calendar has events or not
+     * Returns a boolean value whether the current calendar has events or not
      *
      * @param {array} $events    An array with events.
      * @param {array} $sortOrder Either SORT_ASC, SORT_DESC, SORT_REGULAR,
