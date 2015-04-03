@@ -32,13 +32,13 @@
 class ICal
 {
     /* How many ToDos are in this ical? */
-    public  /** @type {int} */ $todo_count = 0;
+    public /** @type {int} */ $todo_count = 0;
 
     /* How many events are in this ical? */
-    public  /** @type {int} */ $event_count = 0;
+    public /** @type {int} */ $event_count = 0;
 
     /* How many freebusy are in this ical? */
-    public  /** @type {int} */ $freebusy_count = 0;
+    public /** @type {int} */ $freebusy_count = 0;
 
     /* The parsed calendar */
     public /** @type {Array} */ $cal;
@@ -69,7 +69,7 @@ class ICal
     }
 
 
-	/**
+    /**
      * Initializes lines from file
      *
      * @param {array} $lines The lines to initialize
@@ -94,39 +94,39 @@ class ICal
 
                 switch ($line) {
                     // http://www.kanzaki.com/docs/ical/vtodo.html
-                    case "BEGIN:VTODO":
+                    case 'BEGIN:VTODO':
                         $this->todo_count++;
-                        $type = "VTODO";
+                        $type = 'VTODO';
                         break;
 
                     // http://www.kanzaki.com/docs/ical/vevent.html
-                    case "BEGIN:VEVENT":
+                    case 'BEGIN:VEVENT':
                         $this->event_count++;
-                        $type = "VEVENT";
+                        $type = 'VEVENT';
                         break;
 
                     // http://www.kanzaki.com/docs/ical/vfreebusy.html
-                    case "BEGIN:VFREEBUSY":
+                    case 'BEGIN:VFREEBUSY':
                         $this->freebusy_count++;
-                        $type = "VFREEBUSY";
+                        $type = 'VFREEBUSY';
                         break;
 
                     //all other special strings
-                    case "BEGIN:VCALENDAR":
-                    case "BEGIN:DAYLIGHT":
+                    case 'BEGIN:VCALENDAR':
+                    case 'BEGIN:DAYLIGHT':
                         // http://www.kanzaki.com/docs/ical/vtimezone.html
-                    case "BEGIN:VTIMEZONE":
-                    case "BEGIN:STANDARD":
+                    case 'BEGIN:VTIMEZONE':
+                    case 'BEGIN:STANDARD':
                         $type = $value;
                         break;
-                    case "END:VTODO": // end special text - goto VCALENDAR key
-                    case "END:VEVENT":
-                    case "END:VFREEBUSY":
-                    case "END:VCALENDAR":
-                    case "END:DAYLIGHT":
-                    case "END:VTIMEZONE":
-                    case "END:STANDARD":
-                        $type = "VCALENDAR";
+                    case 'END:VTODO': // end special text - goto VCALENDAR key
+                    case 'END:VEVENT':
+                    case 'END:VFREEBUSY':
+                    case 'END:VCALENDAR':
+                    case 'END:DAYLIGHT':
+                    case 'END:VTIMEZONE':
+                    case 'END:STANDARD':
+                        $type = 'VCALENDAR';
                         break;
                     default:
                         $this->addCalendarComponentWithKeyAndValue($type, $keyword, $value);
@@ -151,40 +151,40 @@ class ICal
     {
         if (strstr($keyword, ';')) {
             // Ignore everything in keyword after a ; (things like Language, etc)
-            $keyword = substr($keyword, 0, strpos($keyword, ";"));
+            $keyword = substr($keyword, 0, strpos($keyword, ';'));
         }
         if ($keyword == false) {
             $keyword = $this->last_keyword;
             switch ($component) {
                 case 'VEVENT':
-                    $value = $this->cal[$component][$this->event_count - 1][$keyword].$value;
+                    $value = $this->cal[$component][$this->event_count - 1][$keyword] . $value;
                     break;
-                case 'VTODO' :
-                    $value = $this->cal[$component][$this->todo_count - 1][$keyword].$value;
+                case 'VTODO':
+                    $value = $this->cal[$component][$this->todo_count - 1][$keyword] . $value;
                     break;
-                case 'VFREEBUSY' :
-                    $value = $this->cal[$component][$this->freebusy_count - 1][$keyword].$value;
+                case 'VFREEBUSY':
+                    $value = $this->cal[$component][$this->freebusy_count - 1][$keyword] . $value;
                     break;
             }
         }
 
-        if (stristr($keyword, "DTSTART") or stristr($keyword, "DTEND") or stristr($keyword, "EXDATE")) {
-            $keyword = explode(";", $keyword);
+        if (stristr($keyword, 'DTSTART') or stristr($keyword, 'DTEND') or stristr($keyword, 'EXDATE')) {
+            $keyword = explode(';', $keyword);
             $keyword = $keyword[0];
         }
 
         switch ($component) {
-            case "VTODO":
+            case 'VTODO':
                 $this->cal[$component][$this->todo_count - 1][$keyword] = $value;
                 break;
-            case "VEVENT":
+            case 'VEVENT':
                 $this->cal[$component][$this->event_count - 1][$keyword] = $value;
-                if (!isset($this->cal[$component][$this->event_count - 1][$keyword . "_array"])) {
-                    $this->cal[$component][$this->event_count - 1][$keyword . "_array"] = array();
+                if (!isset($this->cal[$component][$this->event_count - 1][$keyword . '_array'])) {
+                    $this->cal[$component][$this->event_count - 1][$keyword . '_array'] = array();
                 }
-                $this->cal[$component][$this->event_count - 1][$keyword . "_array"][] = $value;
+                $this->cal[$component][$this->event_count - 1][$keyword . '_array'][] = $value;
                 break;
-            case "VFREEBUSY":
+            case 'VFREEBUSY':
                 $this->cal[$component][$this->freebusy_count - 1][$keyword] = $value;
                 break;
             default:
@@ -203,7 +203,7 @@ class ICal
      */
     public function keyValueFromString($text)
     {
-        preg_match("/([^:]+)[:]([\w\W]*)/", $text, $matches);
+        preg_match('/([^:]+)[:]([\w\W]*)/', $text, $matches);
         if (count($matches) == 0) {
             return false;
         }
@@ -239,7 +239,7 @@ class ICal
         // Unix timestamps after 03:14:07 UTC 2038-01-19 might cause an overflow
         // if 32 bit integers are used.
         $timestamp = mktime((int)$date[4], (int)$date[5], (int)$date[6], (int)$date[2], (int)$date[3], (int)$date[1]);
-        return  $timestamp;
+        return $timestamp;
     }
 
     /**
@@ -256,9 +256,9 @@ class ICal
             if (isset($anEvent['RRULE']) && $anEvent['RRULE'] != '') {
                 // Recurring event, parse RRULE and add appropriate duplicate events
                 $rrules = array();
-                $rrule_strings = explode(';',$anEvent['RRULE']);
+                $rrule_strings = explode(';', $anEvent['RRULE']);
                 foreach ($rrule_strings as $s) {
-                    list($k,$v) = explode('=', $s);
+                    list($k, $v) = explode('=', $s);
                     $rrules[$k] = $v;
                 }
                 // Get Start timestamp
@@ -269,7 +269,7 @@ class ICal
                 $interval = (isset($rrules['INTERVAL']) && $rrules['INTERVAL'] != '') ? $rrules['INTERVAL'] : 1;
                 // Get Until
                 if (!isset($rrules['UNTIL'])) {
-                    $rrules['UNTIL'] = date("Ymd", strtotime(" + 4 year")) . 'T235900';	// 20150506T233000
+                    $rrules['UNTIL'] = date('Ymd', strtotime(' + 4 year')) . 'T235900';    // 20150506T233000
                 }
                 $until = $this->iCalDateToUnixTimestamp($rrules['UNTIL']);
                 // Decide how often to add events and do so
@@ -280,29 +280,29 @@ class ICal
                         $recurring_timestamp = strtotime($offset, $start_timestamp);
                         while ($recurring_timestamp <= $until) {
                             // Add event
-                            $anEvent['DTSTART'] = date('Ymd\THis',$recurring_timestamp);
-                            $anEvent['DTEND'] = date('Ymd\THis',$recurring_timestamp+$event_timestmap_offset);
+                            $anEvent['DTSTART'] = date('Ymd\THis', $recurring_timestamp);
+                            $anEvent['DTEND'] = date('Ymd\THis', $recurring_timestamp + $event_timestmap_offset);
                             if (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array'])) {
                                 $events[] = $anEvent;
                             }
                             // Move forward
-                            $recurring_timestamp = strtotime($offset,$recurring_timestamp);
+                            $recurring_timestamp = strtotime($offset, $recurring_timestamp);
                         }
                         break;
                     case 'WEEKLY':
                         // Create offset
                         $offset = "+$interval week";
                         // Build list of days of week to add events
-                        $weekdays = array('SU','MO','TU','WE','TH','FR','SA');
+                        $weekdays = array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA');
                         if(isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
                             $bydays = explode(',', $rrules['BYDAY']);
                         } else {
-                            $weekTemp = array('SU','MO','TU','WE','TH','FR','SA');
-                            $findDay = $weekTemp[date('w',$start_timestamp)];
+                            $weekTemp = array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA');
+                            $findDay = $weekTemp[date('w', $start_timestamp)];
                             $bydays = array($findDay);
                         }
                         // Get timestamp of first day of start week
-                        $week_recurring_timestamp = (date('w', $start_timestamp) == 0) ? $start_timestamp : strtotime('last Sunday '.date('H:i:s',$start_timestamp), $start_timestamp);
+                        $week_recurring_timestamp = (date('w', $start_timestamp) == 0) ? $start_timestamp : strtotime('last Sunday ' . date('H:i:s', $start_timestamp), $start_timestamp);
                         // Step through weeks
                         while ($week_recurring_timestamp <= $until) {
                             // Add events for bydays
@@ -311,17 +311,17 @@ class ICal
                                 // Check if day should be added
                                 if (in_array($day, $bydays) && $day_recurring_timestamp > $start_timestamp && $day_recurring_timestamp <= $until) {
                                     // Add event to day
-                                    $anEvent['DTSTART'] = date('Ymd\THis',$day_recurring_timestamp);
-                                    $anEvent['DTEND'] = date('Ymd\THis',$day_recurring_timestamp+$event_timestmap_offset);
+                                    $anEvent['DTSTART'] = date('Ymd\THis', $day_recurring_timestamp);
+                                    $anEvent['DTEND'] = date('Ymd\THis', $day_recurring_timestamp + $event_timestmap_offset);
                                     if (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array'])) {
                                         $events[] = $anEvent;
                                     }
                                 }
                                 // Move forward a day
-                                $day_recurring_timestamp = strtotime('+1 day',$day_recurring_timestamp);
+                                $day_recurring_timestamp = strtotime('+1 day', $day_recurring_timestamp);
                             }
                             // Move forward $interaval weeks
-                            $week_recurring_timestamp = strtotime($offset,$week_recurring_timestamp);
+                            $week_recurring_timestamp = strtotime($offset, $week_recurring_timestamp);
                         }
                         break;
                     case 'MONTHLY':
@@ -332,33 +332,33 @@ class ICal
                             // Deal with BYMONTHDAY
                             while ($recurring_timestamp <= $until) {
                                 // Add event
-                                $anEvent['DTSTART'] = date('Ym'.sprintf('%02d',$rrules['BYMONTHDAY']).'\THis',$recurring_timestamp);
-                                $anEvent['DTEND'] = date('Ymd\THis',$this->iCalDateToUnixTimestamp($anEvent['DTSTART'])+$event_timestmap_offset);
+                                $anEvent['DTSTART'] = date('Ym' . sprintf('%02d', $rrules['BYMONTHDAY']) . '\THis', $recurring_timestamp);
+                                $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset);
                                 if (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array'])) {
                                     $events[] = $anEvent;
                                 }
                                 // Move forward
-                                $recurring_timestamp = strtotime($offset,$recurring_timestamp);
+                                $recurring_timestamp = strtotime($offset, $recurring_timestamp);
                             }
-                        } elseif (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
-                            $start_time = date('His',$start_timestamp);
+                        } else if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
+                            $start_time = date('His', $start_timestamp);
                             // Deal with BYDAY
                             $day_number = substr($rrules['BYDAY'], 0, 1);
                             $week_day = substr($rrules['BYDAY'], 1);
                             $day_cardinals = array(1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth');
-                            $weekdays = array('SU' => 'sunday','MO' => 'monday','TU' => 'tuesday','WE' => 'wednesday','TH' => 'thursday','FR' => 'friday','SA' => 'saturday');
+                            $weekdays = array('SU' => 'sunday', 'MO' => 'monday', 'TU' => 'tuesday', 'WE' => 'wednesday', 'TH' => 'thursday', 'FR' => 'friday', 'SA' => 'saturday');
                             while ($recurring_timestamp <= $until) {
-                                $event_start_desc = "{$day_cardinals[$day_number]} {$weekdays[$week_day]} of ".date('F',$recurring_timestamp)." ".date('Y',$recurring_timestamp)." ".date('H:i:s',$recurring_timestamp);
+                                $event_start_desc = "{$day_cardinals[$day_number]} {$weekdays[$week_day]} of " . date('F', $recurring_timestamp) . ' ' . date('Y', $recurring_timestamp) . ' ' . date('H:i:s', $recurring_timestamp);
                                 $event_start_timestamp = strtotime($event_start_desc);
                                 if ($event_start_timestamp > $start_timestamp && $event_start_timestamp < $until) {
-                                    $anEvent['DTSTART'] = date('Ymd\T',$event_start_timestamp).$start_time;
-                                    $anEvent['DTEND'] = date('Ymd\THis',$this->iCalDateToUnixTimestamp($anEvent['DTSTART'])+$event_timestmap_offset);
+                                    $anEvent['DTSTART'] = date('Ymd\T', $event_start_timestamp) . $start_time;
+                                    $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset);
                                     if (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array'])) {
                                         $events[] = $anEvent;
                                     }
                                 }
                                 // Move forward
-                                $recurring_timestamp = strtotime($offset,$recurring_timestamp);
+                                $recurring_timestamp = strtotime($offset, $recurring_timestamp);
                             }
                         }
                         break;
@@ -366,45 +366,45 @@ class ICal
                         // Create offset
                         $offset = "+$interval year";
                         $recurring_timestamp = strtotime($offset, $start_timestamp);
-                        $month_names = array(1=>"January", 2=>"Februrary", 3=>"March", 4=>"April", 5=>"May", 6=>"June", 7=>"July", 8=>"August", 9=>"September", 10=>"October", 11=>"November", 12=>"December");
+                        $month_names = array(1 => 'January', 2 => 'Februrary', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December');
                         // HACK: Exchange doesn't set a correct UNTIL for yearly events, so just go 2 years out
-                        $until = strtotime('+2 year',$start_timestamp);
+                        $until = strtotime('+2 year', $start_timestamp);
                         // Check if BYDAY rule exists
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
-                            $start_time = date('His',$start_timestamp);
+                            $start_time = date('His', $start_timestamp);
                             // Deal with BYDAY
                             $day_number = substr($rrules['BYDAY'], 0, 1);
                             $month_day = substr($rrules['BYDAY'], 1);
                             $day_cardinals = array(1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth');
-                            $weekdays = array('SU' => 'sunday','MO' => 'monday','TU' => 'tuesday','WE' => 'wednesday','TH' => 'thursday','FR' => 'friday','SA' => 'saturday');
+                            $weekdays = array('SU' => 'sunday', 'MO' => 'monday', 'TU' => 'tuesday', 'WE' => 'wednesday', 'TH' => 'thursday', 'FR' => 'friday', 'SA' => 'saturday');
                             while ($recurring_timestamp <= $until) {
-                                $event_start_desc = "{$day_cardinals[$day_number]} {$weekdays[$month_day]} of {$month_names[$rrules['BYMONTH']]} ".date('Y',$recurring_timestamp)." ".date('H:i:s',$recurring_timestamp);
+                                $event_start_desc = "{$day_cardinals[$day_number]} {$weekdays[$month_day]} of {$month_names[$rrules['BYMONTH']]} " . date('Y', $recurring_timestamp) . ' ' . date('H:i:s', $recurring_timestamp);
                                 $event_start_timestamp = strtotime($event_start_desc);
                                 if ($event_start_timestamp > $start_timestamp && $event_start_timestamp < $until) {
-                                    $anEvent['DTSTART'] = date('Ymd\T',$event_start_timestamp).$start_time;
-                                    $anEvent['DTEND'] = date('Ymd\THis',$this->iCalDateToUnixTimestamp($anEvent['DTSTART'])+$event_timestmap_offset);
+                                    $anEvent['DTSTART'] = date('Ymd\T', $event_start_timestamp) . $start_time;
+                                    $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset);
                                     if (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array'])) {
                                         $events[] = $anEvent;
                                     }
                                 }
                                 // Move forward
-                                $recurring_timestamp = strtotime($offset,$recurring_timestamp);
+                                $recurring_timestamp = strtotime($offset, $recurring_timestamp);
                             }
                         } else {
-                            $day = date('d',$start_timestamp);
+                            $day = date('d', $start_timestamp);
                             // Step throuhg years adding specific month dates
                             while ($recurring_timestamp <= $until) {
-                                $event_start_desc = "$day {$month_names[$rrules['BYMONTH']]} ".date('Y',$recurring_timestamp)." ".date('H:i:s',$recurring_timestamp);
+                                $event_start_desc = "$day {$month_names[$rrules['BYMONTH']]} " . date('Y', $recurring_timestamp) . ' ' . date('H:i:s', $recurring_timestamp);
                                 $event_start_timestamp = strtotime($event_start_desc);
                                 if ($event_start_timestamp > $start_timestamp && $event_start_timestamp < $until) {
-                                    $anEvent['DTSTART'] = date('Ymd\T',$event_start_timestamp).$start_time;
-                                    $anEvent['DTEND'] = date('Ymd\THis',$this->iCalDateToUnixTimestamp($anEvent['DTSTART'])+$event_timestmap_offset);
+                                    $anEvent['DTSTART'] = date('Ymd\T', $event_start_timestamp) . $start_time;
+                                    $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset);
                                     if (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array'])) {
                                         $events[] = $anEvent;
                                     }
                                 }
                                 // Move forward
-                                $recurring_timestamp = strtotime($offset,$recurring_timestamp);
+                                $recurring_timestamp = strtotime($offset, $recurring_timestamp);
                             }
                         }
                         break;
@@ -433,7 +433,7 @@ class ICal
      */
     public function hasEvents()
     {
-        return ( count($this->events()) > 0 ? true : false );
+        return (count($this->events()) > 0) ? true : false;
     }
 
     /**
@@ -474,8 +474,6 @@ class ICal
         $rangeStart = $rangeStart->format('U');
         $rangeEnd   = $rangeEnd->format('U');
 
-
-
         // loop through all events by adding two new elements
         foreach ($events as $anEvent) {
             $timestamp = $this->iCalDateToUnixTimestamp($anEvent['DTSTART']);
@@ -507,7 +505,7 @@ class ICal
             }
 
             if (!array_key_exists('REAL_DATETIME', $anEvent)) {
-                $anEvent['REAL_DATETIME'] = date("d.m.Y", $anEvent['UNIX_TIMESTAMP']);
+                $anEvent['REAL_DATETIME'] = date('d.m.Y', $anEvent['UNIX_TIMESTAMP']);
             }
 
             $extendedEvents[] = $anEvent;
