@@ -13,7 +13,7 @@
         	"email": "john.grogg@gmail.com",
         	"role": "Developer"
         }
-    ], 
+    ],
     "autoload": {
         "classmap": ["class.iCalReader.php"]
     }

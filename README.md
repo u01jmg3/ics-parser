@@ -15,6 +15,6 @@ It was modified by John Grogg to properly handle recurring events (specifically 
   * Include class.iCalReader.php to your project
 
 ### Credits
-  Martin Thoma (programming, bug-fixing, project management)  
-  Frank Gregor (programming, feedback, testing)  
+  Martin Thoma (programming, bug-fixing, project management)
+  Frank Gregor (programming, feedback, testing)
   John Grogg (programming, addition of event recurrence handling)

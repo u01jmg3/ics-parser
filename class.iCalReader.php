@@ -59,7 +59,7 @@ class ICal
             return false;
         }
 
-        if (is_array($filename)){
+        if (is_array($filename)) {
             $lines = $filename;
         } else {
             $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -254,7 +254,7 @@ class ICal
     {
         $array = $this->cal;
         $events = $array['VEVENT'];
-        if(empty($events))
+        if (empty($events))
             return false;
         foreach ($array['VEVENT'] as $anEvent) {
             if (isset($anEvent['RRULE']) && $anEvent['RRULE'] != '') {
@@ -298,7 +298,7 @@ class ICal
                         $offset = "+$interval week";
                         // Build list of days of week to add events
                         $weekdays = array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA');
-                        if(isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
+                        if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
                             $bydays = explode(',', $rrules['BYDAY']);
                         } else {
                             $weekTemp = array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA');
@@ -433,7 +433,7 @@ class ICal
     }
 
     /**
-     * Returns an array of arrays with all free/busy events. Every event is 
+     * Returns an array of arrays with all free/busy events. Every event is
      * an associative array and each property is an element it.
      *
      * @return {array}
