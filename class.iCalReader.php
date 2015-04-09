@@ -271,11 +271,19 @@ class ICal
                 $event_timestmap_offset = $end_timestamp - $start_timestamp;
                 // Get Interval
                 $interval = (isset($rrules['INTERVAL']) && $rrules['INTERVAL'] != '') ? $rrules['INTERVAL'] : 1;
-                // Get Until
-                if (!isset($rrules['UNTIL'])) {
-                    $rrules['UNTIL'] = date('Ymd', strtotime(' + 4 year')) . 'T235900';    // 20150506T233000
+
+                $until = $start_timestamp;
+                if (isset($rrules['UNTIL'])) {
+                    // Get Until
+                    $until = $this->iCalDateToUnixTimestamp($rrules['UNTIL']);
+                } else if (isset($rrules['COUNT'])) {
+                    $frequency_conversion = array('DAILY' => 'day', 'WEEKLY' => 'week', 'MONTHLY' => 'month', 'YEARLY' => 'year');
+                    $count = (is_numeric($rrules['COUNT']) && $rrules['COUNT'] > 1) ? ($rrules['COUNT'] - 1) : 0;
+                    $offset = "+$count " . $frequency_conversion[$rrules['FREQ']];
+                    $until = strtotime($offset, $start_timestamp);
+                    unset($offset);
                 }
-                $until = $this->iCalDateToUnixTimestamp($rrules['UNTIL']);
+
                 // Decide how often to add events and do so
                 switch ($rrules['FREQ']) {
                     case 'DAILY':
