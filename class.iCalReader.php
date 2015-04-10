@@ -279,6 +279,7 @@ class ICal
                 } else if (isset($rrules['COUNT'])) {
                     $frequency_conversion = array('DAILY' => 'day', 'WEEKLY' => 'week', 'MONTHLY' => 'month', 'YEARLY' => 'year');
                     $count = (is_numeric($rrules['COUNT']) && $rrules['COUNT'] > 1) ? ($rrules['COUNT'] - 1) : 0;
+                    $count += ($count > 0) ? $count * ($interval - 1) : 0;
                     $offset = "+$count " . $frequency_conversion[$rrules['FREQ']];
                     $until = strtotime($offset, $start_timestamp);
                     unset($offset);
