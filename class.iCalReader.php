@@ -356,10 +356,10 @@ class ICal
                         } else if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
                             $start_time = date('His', $start_timestamp);
                             // Deal with BYDAY
-                            $day_number = substr($rrules['BYDAY'], 0, 1);
-                            $day_number = is_numeric($day_number) ? $day_number : 1;
+                            $day_number = intval($rrules['BYDAY']);
+                            $day_number = $day_number == -1 ? 0 : 1;
                             $week_day = substr($rrules['BYDAY'], -2);
-                            $day_cardinals = array(1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth');
+                            $day_cardinals = array(0 => 'last', 1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth');
                             $weekdays = array('SU' => 'sunday', 'MO' => 'monday', 'TU' => 'tuesday', 'WE' => 'wednesday', 'TH' => 'thursday', 'FR' => 'friday', 'SA' => 'saturday');
                             while ($recurring_timestamp <= $until) {
                                 $event_start_desc = "{$day_cardinals[$day_number]} {$weekdays[$week_day]} of " . date('F', $recurring_timestamp) . ' ' . date('Y', $recurring_timestamp) . ' ' . date('H:i:s', $recurring_timestamp);
@@ -387,10 +387,10 @@ class ICal
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
                             $start_time = date('His', $start_timestamp);
                             // Deal with BYDAY
-                            $day_number = substr($rrules['BYDAY'], 0, 1);
-                            $day_number = is_numeric($day_number) ? $day_number : 1;
+                            $day_number = intval($rrules['BYDAY']);
+                            $day_number = $day_number == -1 ? 0 : 1;
                             $month_day = substr($rrules['BYDAY'], -2);
-                            $day_cardinals = array(1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth');
+                            $day_cardinals = array(0 => 'last', 1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth');
                             $weekdays = array('SU' => 'sunday', 'MO' => 'monday', 'TU' => 'tuesday', 'WE' => 'wednesday', 'TH' => 'thursday', 'FR' => 'friday', 'SA' => 'saturday');
                             while ($recurring_timestamp <= $until) {
                                 $event_start_desc = "{$day_cardinals[$day_number]} {$weekdays[$month_day]} of {$month_names[$rrules['BYMONTH']]} " . date('Y', $recurring_timestamp) . ' ' . date('H:i:s', $recurring_timestamp);
