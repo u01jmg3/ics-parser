@@ -358,7 +358,7 @@ class ICal
                             $start_time = date('His', $start_timestamp);
                             // Deal with BYDAY
                             $day_number = intval($rrules['BYDAY']);
-                            $day_number = $day_number == -1 ? 0 : 1;
+                            $day_number = ($day_number == -1) ? 0 : 1;
                             $week_day = substr($rrules['BYDAY'], -2);
                             $day_cardinals = array(0 => 'last', 1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth');
                             $weekdays = array('SU' => 'sunday', 'MO' => 'monday', 'TU' => 'tuesday', 'WE' => 'wednesday', 'TH' => 'thursday', 'FR' => 'friday', 'SA' => 'saturday');
@@ -389,7 +389,7 @@ class ICal
                             $start_time = date('His', $start_timestamp);
                             // Deal with BYDAY
                             $day_number = intval($rrules['BYDAY']);
-                            $day_number = $day_number == -1 ? 0 : 1;
+                            $day_number = ($day_number == -1) ? 0 : 1;
                             $month_day = substr($rrules['BYDAY'], -2);
                             $day_cardinals = array(0 => 'last', 1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth');
                             $weekdays = array('SU' => 'sunday', 'MO' => 'monday', 'TU' => 'tuesday', 'WE' => 'wednesday', 'TH' => 'thursday', 'FR' => 'friday', 'SA' => 'saturday');
@@ -425,7 +425,7 @@ class ICal
                         }
                         break;
                 }
-                $events = isset($count_orig) && sizeof($events) > $count_orig ? array_slice($events, 0, $count_orig) : $events; // Ensure we abide by COUNT if defined
+                $events = (isset($count_orig) && sizeof($events) > $count_orig) ? array_slice($events, 0, $count_orig) : $events; // Ensure we abide by COUNT if defined
             }
         }
         $this->cal['VEVENT'] = $events;
