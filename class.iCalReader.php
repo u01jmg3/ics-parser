@@ -278,7 +278,8 @@ class ICal
                     $until = $this->iCalDateToUnixTimestamp($rrules['UNTIL']);
                 } else if (isset($rrules['COUNT'])) {
                     $frequency_conversion = array('DAILY' => 'day', 'WEEKLY' => 'week', 'MONTHLY' => 'month', 'YEARLY' => 'year');
-                    $count = (is_numeric($rrules['COUNT']) && $rrules['COUNT'] > 1) ? ($rrules['COUNT'] - 1) : 0;
+                    $count_orig = (is_numeric($rrules['COUNT']) && $rrules['COUNT'] > 1) ? $rrules['COUNT'] : 0;
+                    $count = ($count_orig - 1); // Remove one to exclude the one that initialises the rule
                     $count += ($count > 0) ? $count * ($interval - 1) : 0;
                     $offset = "+$count " . $frequency_conversion[$rrules['FREQ']];
                     $until = strtotime($offset, $start_timestamp);
@@ -424,6 +425,7 @@ class ICal
                         }
                         break;
                 }
+                $events = isset($count_orig) && sizeof($events) > $count_orig ? array_slice($events, 0, $count_orig) : $events; // Ensure we abide by COUNT if defined
             }
         }
         $this->cal['VEVENT'] = $events;
