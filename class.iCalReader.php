@@ -444,6 +444,16 @@ class ICal
     }
 
     /**
+     * Returns the calendar name
+     *
+     * @return {calendar name}
+     */
+    public function calendarName()
+    {
+        return $this->cal['VCALENDAR']['X-WR-CALNAME'];
+    }
+
+    /**
      * Returns an array of arrays with all free/busy events. Every event is
      * an associative array and each property is an element it.
      *
