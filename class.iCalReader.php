@@ -1,30 +1,20 @@
 <?php
 /**
- * This PHP-Class should only read a iCal-File (*.ics), parse it and give an
+ * This PHP class should only read an iCal file (*.ics), parse it and return an
  * array with its content.
  *
  * PHP Version 5
  *
  * @category Parser
- * @package  Ics-parser
+ * @package  ics-parser
  * @author   Martin Thoma <info@martin-thoma.de>
- * @license  http://www.opensource.org/licenses/mit-license.php  MIT License
- * @version  SVN: <svn_id>
- * @link     http://code.google.com/p/ics-parser/
- * @example  $ical = new ical('MyCal.ics');
- *           print_r( $ical->events() );
+ * @license  http://www.opensource.org/licenses/mit-license.php MIT License
+ * @link     https://github.com/MartinThoma/ics-parser/
+ * @example  $ical = new ical('MyCal.ics'); print_r($ical->events());
  */
 
-// error_reporting(E_ALL);
-
 /**
- * This is the iCal-class
- *
- * @category Parser
- * @package  Ics-parser
- * @author   Martin Thoma <info@martin-thoma.de>
- * @license  http://www.opensource.org/licenses/mit-license.php  MIT License
- * @link     http://code.google.com/p/ics-parser/
+ * This is the ICal class
  *
  * @param {string} filename The name of the file which should be parsed
  * @constructor
@@ -47,11 +37,11 @@ class ICal
     private /** @type {string} */ $_lastKeyWord;
 
     /**
-     * Creates the iCal-Object
+     * Creates the iCal Object
      *
      * @param {mixed} $filename The path to the iCal-file or an array of lines from an iCal file
      *
-     * @return Object The iCal-Object
+     * @return Object The iCal Object
      */
     public function __construct($filename)
     {
@@ -74,7 +64,7 @@ class ICal
      *
      * @param {array} $lines The lines to initialize
      *
-     * @return Object The iCal-Object
+     * @return Object The iCal Object
      */
     public function initLines($lines)
     {
@@ -279,7 +269,7 @@ class ICal
                 } else if (isset($rrules['COUNT'])) {
                     $frequency_conversion = array('DAILY' => 'day', 'WEEKLY' => 'week', 'MONTHLY' => 'month', 'YEARLY' => 'year');
                     $count_orig = (is_numeric($rrules['COUNT']) && $rrules['COUNT'] > 1) ? $rrules['COUNT'] : 0;
-                    $count = ($count_orig - 1); // Remove one to exclude the one that initialises the rule
+                    $count = ($count_orig - 1); // Remove one to exclude the occurrence that initialises the rule
                     $count += ($count > 0) ? $count * ($interval - 1) : 0;
                     $offset = "+$count " . $frequency_conversion[$rrules['FREQ']];
                     $until = strtotime($offset, $start_timestamp);
@@ -360,10 +350,10 @@ class ICal
                             $day_number = intval($rrules['BYDAY']);
                             $day_number = ($day_number == -1) ? 0 : 1;
                             $week_day = substr($rrules['BYDAY'], -2);
-                            $day_cardinals = array(0 => 'last', 1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth');
+                            $day_ordinals = array(0 => 'last', 1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth');
                             $weekdays = array('SU' => 'sunday', 'MO' => 'monday', 'TU' => 'tuesday', 'WE' => 'wednesday', 'TH' => 'thursday', 'FR' => 'friday', 'SA' => 'saturday');
                             while ($recurring_timestamp <= $until) {
-                                $event_start_desc = "{$day_cardinals[$day_number]} {$weekdays[$week_day]} of " . date('F', $recurring_timestamp) . ' ' . date('Y', $recurring_timestamp) . ' ' . date('H:i:s', $recurring_timestamp);
+                                $event_start_desc = "{$day_ordinals[$day_number]} {$weekdays[$week_day]} of " . date('F Y H:i:s', $recurring_timestamp);
                                 $event_start_timestamp = strtotime($event_start_desc);
                                 if ($event_start_timestamp > $start_timestamp && $event_start_timestamp < $until) {
                                     $anEvent['DTSTART'] = date('Ymd\T', $event_start_timestamp) . $start_time;
@@ -391,10 +381,10 @@ class ICal
                             $day_number = intval($rrules['BYDAY']);
                             $day_number = ($day_number == -1) ? 0 : 1;
                             $month_day = substr($rrules['BYDAY'], -2);
-                            $day_cardinals = array(0 => 'last', 1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth');
+                            $day_ordinals = array(0 => 'last', 1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth');
                             $weekdays = array('SU' => 'sunday', 'MO' => 'monday', 'TU' => 'tuesday', 'WE' => 'wednesday', 'TH' => 'thursday', 'FR' => 'friday', 'SA' => 'saturday');
                             while ($recurring_timestamp <= $until) {
-                                $event_start_desc = "{$day_cardinals[$day_number]} {$weekdays[$month_day]} of {$month_names[$rrules['BYMONTH']]} " . date('Y', $recurring_timestamp) . ' ' . date('H:i:s', $recurring_timestamp);
+                                $event_start_desc = "{$day_ordinals[$day_number]} {$weekdays[$month_day]} of {$month_names[$rrules['BYMONTH']]} " . date('Y H:i:s', $recurring_timestamp);
                                 $event_start_timestamp = strtotime($event_start_desc);
                                 if ($event_start_timestamp > $start_timestamp && $event_start_timestamp < $until) {
                                     $anEvent['DTSTART'] = date('Ymd\T', $event_start_timestamp) . $start_time;
@@ -410,7 +400,7 @@ class ICal
                             $day = date('d', $start_timestamp);
                             // Step through years adding specific month dates
                             while ($recurring_timestamp <= $until) {
-                                $event_start_desc = "$day {$month_names[$rrules['BYMONTH']]} " . date('Y', $recurring_timestamp) . ' ' . date('H:i:s', $recurring_timestamp);
+                                $event_start_desc = "$day {$month_names[$rrules['BYMONTH']]} " . date('Y H:i:s', $recurring_timestamp);
                                 $event_start_timestamp = strtotime($event_start_desc);
                                 if ($event_start_timestamp > $start_timestamp && $event_start_timestamp < $until) {
                                     $anEvent['DTSTART'] = date('Ymd\T', $event_start_timestamp) . $start_time;
