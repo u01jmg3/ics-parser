@@ -34,7 +34,7 @@ class ICal
     public /** @type {Array} */ $cal;
 
     /* Which keyword has been added to cal at last? */
-    private /** @type {string} */ $_lastKeyWord;
+    private /** @type {string} */ $last_keyword;
 
     /**
      * Creates the iCal Object
@@ -414,8 +414,9 @@ class ICal
                             }
                         }
                         break;
+
+                    $events = (isset($count_orig) && sizeof($events) > $count_orig) ? array_slice($events, 0, $count_orig) : $events; // Ensure we abide by COUNT if defined
                 }
-                $events = (isset($count_orig) && sizeof($events) > $count_orig) ? array_slice($events, 0, $count_orig) : $events; // Ensure we abide by COUNT if defined
             }
         }
         $this->cal['VEVENT'] = $events;
