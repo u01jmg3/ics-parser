@@ -334,12 +334,15 @@ class ICal
                         $recurring_timestamp = strtotime($offset, $start_timestamp);
                         if (isset($rrules['BYMONTHDAY']) && $rrules['BYMONTHDAY'] != '') {
                             // Deal with BYMONTHDAY
+                            $monthdays = explode(',', $rrules['BYMONTHDAY']);
                             while ($recurring_timestamp <= $until) {
-                                // Add event
-                                $anEvent['DTSTART'] = date('Ym' . sprintf('%02d', $rrules['BYMONTHDAY']) . '\THis', $recurring_timestamp);
-                                $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset);
-                                if ((!isset($anEvent['EXDATE_array'])) || (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array']))) {
-                                    $events[] = $anEvent;
+                                foreach ($monthdays as $monthday) {
+                                    // Add event
+                                    $anEvent['DTSTART'] = date('Ym' . sprintf('%02d', $monthday) . '\THis', $recurring_timestamp);
+                                    $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset);
+                                    if ((!isset($anEvent['EXDATE_array'])) || (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array']))) {
+                                        $events[] = $anEvent;
+                                    }
                                 }
                                 // Move forward
                                 $recurring_timestamp = strtotime($offset, $recurring_timestamp);
