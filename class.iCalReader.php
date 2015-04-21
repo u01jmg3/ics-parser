@@ -36,6 +36,9 @@ class ICal
     /* Which keyword has been added to cal at last? */
     private /** @type {string} */ $last_keyword;
 
+    /* The value in years to use for indefinite, recurring events */
+    public /** @type {int} */ $default_span = 2;
+
     /**
      * Creates the iCal Object
      *
@@ -262,7 +265,11 @@ class ICal
                 // Get Interval
                 $interval = (isset($rrules['INTERVAL']) && $rrules['INTERVAL'] != '') ? $rrules['INTERVAL'] : 1;
 
-                $until = $start_timestamp;
+                $until_default = date_create('now');
+                $until_default->modify($this->default_span . ' year');
+                $until_default->setTime(23, 59, 59); // End of the day
+                $until_default = date_format($until_default, 'Ymd\THis');
+
                 if (isset($rrules['UNTIL'])) {
                     // Get Until
                     $until = $this->iCalDateToUnixTimestamp($rrules['UNTIL']);
@@ -274,6 +281,8 @@ class ICal
                     $offset = "+$count " . $frequency_conversion[$rrules['FREQ']];
                     $until = strtotime($offset, $start_timestamp);
                     unset($offset);
+                } else {
+                    $until = $this->iCalDateToUnixTimestamp($until_default);
                 }
 
                 // Decide how often to add events and do so
@@ -375,8 +384,6 @@ class ICal
                         $offset = "+$interval year";
                         $recurring_timestamp = strtotime($offset, $start_timestamp);
                         $month_names = array(1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December');
-                        // HACK: Exchange doesn't set a correct UNTIL for yearly events, so just go 2 years out
-                        $until = strtotime('+2 year', $start_timestamp);
                         // Check if BYDAY rule exists
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
                             $start_time = date('His', $start_timestamp);
