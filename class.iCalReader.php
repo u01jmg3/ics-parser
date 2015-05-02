@@ -198,7 +198,7 @@ class ICal
      */
     public function keyValueFromString($text)
     {
-        preg_match('/([A-Z-;=^:]+)[:]([\w\W]*)/', $text, $matches);
+        preg_match('/([A-Za-z-\/;=^:]+)[:]([\w\W]*)/', $text, $matches);
         if (count($matches) == 0) {
             return false;
         }
