@@ -21,13 +21,13 @@
  */
 class ICal
 {
-    /* How many ToDos are in this ical? */
+    /* How many ToDos are in this iCal? */
     public /** @type {int} */ $todo_count = 0;
 
-    /* How many events are in this ical? */
+    /* How many events are in this iCal? */
     public /** @type {int} */ $event_count = 0;
 
-    /* How many freebusy are in this ical? */
+    /* How many freebusy are in this iCal? */
     public /** @type {int} */ $freebusy_count = 0;
 
     /* The parsed calendar */
@@ -74,58 +74,75 @@ class ICal
         if (stristr($lines[0], 'BEGIN:VCALENDAR') === false) {
             return false;
         } else {
-            // TODO: Fix multiline-description problem (see http://tools.ietf.org/html/rfc2445#section-4.8.1.5)
             foreach ($lines as $line) {
-                $line = trim($line);
+                $line = rtrim($line); // Trim trailing whitespace
                 $add  = $this->keyValueFromString($line);
+
                 if ($add === false) {
-                    $this->addCalendarComponentWithKeyAndValue($type, false, $line);
+                    $this->addCalendarComponentWithKeyAndValue($component, false, $line);
                     continue;
                 }
 
-                list($keyword, $value) = $add;
+                $keyword = $add[0];
+                $values = $add[1]; // Could be an array containing multiple values
 
-                switch ($line) {
-                    // http://www.kanzaki.com/docs/ical/vtodo.html
-                    case 'BEGIN:VTODO':
-                        $this->todo_count++;
-                        $type = 'VTODO';
-                        break;
+                if (!is_array($values)) {
+                    if (!empty($values)) {
+                        $values = array($values); // Make an array as not already
+                        $blank_array = array(); // Empty placeholder array
+                        array_push($values, $blank_array);
+                    } else {
+                        $values = array(); // Use blank array to ignore this line
+                    }
+                } else if(empty($values[0])) {
+                    $values = array(); // Use blank array to ignore this line
+                }
 
-                    // http://www.kanzaki.com/docs/ical/vevent.html
-                    case 'BEGIN:VEVENT':
-                        $this->event_count++;
-                        $type = 'VEVENT';
-                        break;
+                $values = array_reverse($values); // Reverse so that our array of properties is processed first
 
-                    // http://www.kanzaki.com/docs/ical/vfreebusy.html
-                    case 'BEGIN:VFREEBUSY':
-                        $this->freebusy_count++;
-                        $type = 'VFREEBUSY';
-                        break;
+                foreach ($values as $value) {
+                    switch ($line) {
+                        // http://www.kanzaki.com/docs/ical/vtodo.html
+                        case 'BEGIN:VTODO':
+                            $this->todo_count++;
+                            $component = 'VTODO';
+                            break;
 
-                    //all other special strings
-                    case 'BEGIN:VCALENDAR':
-                    case 'BEGIN:DAYLIGHT':
-                        // http://www.kanzaki.com/docs/ical/vtimezone.html
-                    case 'BEGIN:VTIMEZONE':
-                    case 'BEGIN:STANDARD':
-                    case 'BEGIN:VALARM':
-                        $type = $value;
-                        break;
-                    case 'END:VALARM':
-                    case 'END:VTODO': // end special text - goto VCALENDAR key
-                    case 'END:VEVENT':
-                    case 'END:VFREEBUSY':
-                    case 'END:VCALENDAR':
-                    case 'END:DAYLIGHT':
-                    case 'END:VTIMEZONE':
-                    case 'END:STANDARD':
-                        $type = 'VCALENDAR';
-                        break;
-                    default:
-                        $this->addCalendarComponentWithKeyAndValue($type, $keyword, $value);
-                        break;
+                        // http://www.kanzaki.com/docs/ical/vevent.html
+                        case 'BEGIN:VEVENT':
+                            $this->event_count++;
+                            $component = 'VEVENT';
+                            break;
+
+                        // http://www.kanzaki.com/docs/ical/vfreebusy.html
+                        case 'BEGIN:VFREEBUSY':
+                            $this->freebusy_count++;
+                            $component = 'VFREEBUSY';
+                            break;
+
+                        // All other special strings
+                        case 'BEGIN:VCALENDAR':
+                        case 'BEGIN:DAYLIGHT':
+                            // http://www.kanzaki.com/docs/ical/vtimezone.html
+                        case 'BEGIN:VTIMEZONE':
+                        case 'BEGIN:STANDARD':
+                        case 'BEGIN:VALARM':
+                            $component = $value;
+                            break;
+                        case 'END:VALARM':
+                        case 'END:VTODO': // End special text - goto VCALENDAR key
+                        case 'END:VEVENT':
+                        case 'END:VFREEBUSY':
+                        case 'END:VCALENDAR':
+                        case 'END:DAYLIGHT':
+                        case 'END:VTIMEZONE':
+                        case 'END:STANDARD':
+                            $component = 'VCALENDAR';
+                            break;
+                        default:
+                            $this->addCalendarComponentWithKeyAndValue($component, $keyword, $value);
+                            break;
+                    }
                 }
             }
             $this->process_recurrences();
@@ -144,28 +161,8 @@ class ICal
      */
     public function addCalendarComponentWithKeyAndValue($component, $keyword, $value)
     {
-        if (strstr($keyword, ';')) {
-            // Ignore everything in keyword after a ; (things like Language, etc)
-            $keyword = substr($keyword, 0, strpos($keyword, ';'));
-        }
         if ($keyword == false) {
             $keyword = $this->last_keyword;
-            switch ($component) {
-                case 'VEVENT':
-                    $value = $this->cal[$component][$this->event_count - 1][$keyword] . $value;
-                    break;
-                case 'VTODO':
-                    $value = $this->cal[$component][$this->todo_count - 1][$keyword] . $value;
-                    break;
-                case 'VFREEBUSY':
-                    $value = $this->cal[$component][$this->freebusy_count - 1][$keyword] . $value;
-                    break;
-            }
-        }
-
-        if (stristr($keyword, 'DTSTART') or stristr($keyword, 'DTEND') or stristr($keyword, 'EXDATE')) {
-            $keyword = explode(';', $keyword);
-            $keyword = $keyword[0];
         }
 
         switch ($component) {
@@ -173,11 +170,30 @@ class ICal
                 $this->cal[$component][$this->todo_count - 1][$keyword] = $value;
                 break;
             case 'VEVENT':
-                $this->cal[$component][$this->event_count - 1][$keyword] = $value;
                 if (!isset($this->cal[$component][$this->event_count - 1][$keyword . '_array'])) {
-                    $this->cal[$component][$this->event_count - 1][$keyword . '_array'] = array();
+                    $this->cal[$component][$this->event_count - 1][$keyword . '_array'] = array(); // Create array()
                 }
-                $this->cal[$component][$this->event_count - 1][$keyword . '_array'][] = $value;
+
+                if (is_array($value)) {
+                    array_push($this->cal[$component][$this->event_count - 1][$keyword . '_array'], $value); // Add array of properties to the end
+                } else {
+                    if (!isset($this->cal[$component][$this->event_count - 1][$keyword])) {
+                        $this->cal[$component][$this->event_count - 1][$keyword] = $value;
+                    }
+
+                    $this->cal[$component][$this->event_count - 1][$keyword . '_array'][] = $value;
+
+                    // Glue back together for multi-line content
+                    if ($this->cal[$component][$this->event_count - 1][$keyword] != $value) {
+                        $value = ($value[0] == ' ') ? substr($value, 1) : $value; // Only trim the first character if it is a space
+
+                        if(is_array($this->cal[$component][$this->event_count - 1][$keyword . '_array'][1])){ // Account for multiple definitions of current keyword (e.g. ATTENDEE)
+                            $this->cal[$component][$this->event_count - 1][$keyword] .= ';' . $value; // Concat value *with separator* as content spans multiple lines
+                        } else {
+                            $this->cal[$component][$this->event_count - 1][$keyword] .= $value; // Concat value as content spans multiple lines
+                        }
+                    }
+                }
                 break;
             case 'VFREEBUSY':
                 $this->cal[$component][$this->freebusy_count - 1][$keyword] = $value;
@@ -198,16 +214,53 @@ class ICal
      */
     public function keyValueFromString($text)
     {
-        preg_match('/([A-Za-z-\/;=^:]+)[:]([\w\W]*)/', $text, $matches);
+        // Match colon separator outside of quoted substrings
+        // Fallback to nearest semicolon outside of quoted substrings, if colon cannot be found
+        // Do not try and match within the value paired with the keyword
+        preg_match('/(.*?)(?::(?=(?:[^"]*"[^"]*")*[^"]*$)|;(?=[^:]*$))([\w\W]*)/', $text, $matches);
+
         if (count($matches) == 0) {
             return false;
         }
-        $matches = array_splice($matches, 1, 2);
-        return $matches;
+
+        if (preg_match('/^([A-Z-]+)([;][\w\W]*)?$/', $matches[1])) {
+            $matches = array_splice($matches, 1, 2); // Remove first match and re-align ordering
+
+            // Process properties
+            if (preg_match('/([A-Z-]+)[;]([\w\W]*)/', $matches[0], $properties)) {
+                array_shift($properties); // Remove first match
+                $matches[0] = $properties[0]; // Fix to ignore everything in keyword after a ; (e.g. Language, TZID, etc.)
+                array_shift($properties); // Repeat removing first match
+
+                $formatted = array();
+                foreach ($properties as $property) {
+                    preg_match_all('~[^\r\n";]+(?:"[^"\\\]*(?:\\\.[^"\\\]*)*"[^\r\n";]*)*~', $property, $attributes); // Match semicolon separator outside of quoted substrings
+                    $attributes = (sizeof($attributes) == 0) ? array($property) : reset($attributes); // Remove multi-dimensional array and use the first key
+
+                    foreach ($attributes as $attribute) {
+                        preg_match_all('~[^\r\n"=]+(?:"[^"\\\]*(?:\\\.[^"\\\]*)*"[^\r\n"=]*)*~', $attribute, $values); // Match equals sign separator outside of quoted substrings
+                        $values = (sizeof($values) == 0) ? NULL : reset($values); // Remove multi-dimensional array and use the first key
+
+                        if (is_array($values)) {
+                            $formatted[$values[0]] = trim($values[1], '"'); // Remove double quotes from beginning and end only
+                        }
+                    }
+                }
+
+                $properties[0] = $formatted; // Assign the keyword property information
+
+                array_unshift($properties, $matches[1]); // Add match to beginning of array
+                $matches[1] = $properties;
+            }
+
+            return $matches;
+        } else {
+            return false; // Ignore this match
+        }
     }
 
     /**
-     * Return Unix timestamp from ical date time format
+     * Return Unix timestamp from iCal date time format
      *
      * @param {string} $icalDate A Date in the format YYYYMMDD[T]HHMMSS[Z] or
      *                           YYYYMMDD[T]HHMMSS
@@ -535,7 +588,7 @@ class ICal
         $rangeStart = $rangeStart->format('U');
         $rangeEnd   = $rangeEnd->format('U');
 
-        // loop through all events by adding two new elements
+        // Loop through all events by adding two new elements
         foreach ($events as $anEvent) {
             $timestamp = $this->iCalDateToUnixTimestamp($anEvent['DTSTART']);
             if ($timestamp >= $rangeStart && $timestamp <= $rangeEnd) {
@@ -559,7 +612,7 @@ class ICal
     {
         $extendedEvents = array();
 
-        // loop through all events by adding two new elements
+        // Loop through all events by adding two new elements
         foreach ($events as $anEvent) {
             if (!array_key_exists('UNIX_TIMESTAMP', $anEvent)) {
                 $anEvent['UNIX_TIMESTAMP'] = $this->iCalDateToUnixTimestamp($anEvent['DTSTART']);
