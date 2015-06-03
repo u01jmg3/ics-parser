@@ -111,7 +111,9 @@ class ICal
 
                         // http://www.kanzaki.com/docs/ical/vevent.html
                         case 'BEGIN:VEVENT':
-                            $this->event_count++;
+                            if (!is_array($value)) {
+                                $this->event_count++;
+                            }
                             $component = 'VEVENT';
                             break;
 
