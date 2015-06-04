@@ -188,7 +188,11 @@ class ICal
 
                     // Glue back together for multi-line content
                     if ($this->cal[$component][$this->event_count - 1][$keyword] != $value) {
-                        $value = ($value[0] == ' ') ? substr($value, 1) : $value; // Only trim the first character if it is a space
+                        $ord = (isset($value[0])) ? ord($value[0]) : NULL; // First char
+
+                        if(in_array($ord, array(9, 32))){ // Is space or tab?
+                            $value = substr($value, 1); // Only trim the first character
+                        }
 
                         if(is_array($this->cal[$component][$this->event_count - 1][$keyword . '_array'][1])){ // Account for multiple definitions of current keyword (e.g. ATTENDEE)
                             $this->cal[$component][$this->event_count - 1][$keyword] .= ';' . $value; // Concat value *with separator* as content spans multiple lines
@@ -242,10 +246,10 @@ class ICal
 
                     foreach ($attributes as $attribute) {
                         preg_match_all('~[^\r\n"=]+(?:"[^"\\\]*(?:\\\.[^"\\\]*)*"[^\r\n"=]*)*~', $attribute, $values); // Match equals sign separator outside of quoted substrings
-                        $values = (sizeof($values) == 0) ? NULL : reset($values); // Remove multi-dimensional array and use the first key
+                        $value = (sizeof($values) == 0) ? NULL : reset($values); // Remove multi-dimensional array and use the first key
 
-                        if (is_array($values)) {
-                            $formatted[$values[0]] = trim($values[1], '"'); // Remove double quotes from beginning and end only
+                        if (is_array($value) && isset($value[1])) {
+                            $formatted[$value[0]] = trim($value[1], '"'); // Remove double quotes from beginning and end only
                         }
                     }
                 }
