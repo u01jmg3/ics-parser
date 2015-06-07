@@ -470,7 +470,13 @@ class ICal
                         // Create offset
                         $offset = "+$interval year";
                         $recurring_timestamp = strtotime($offset, $start_timestamp);
-                        $month_names = array(1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December');
+												$month_names = array(1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December');
+
+												//fix missing bymonth
+	                    	if ( !isset($rrules['BYMONTH'])) {
+													$rrules['BYMONTH']=12;
+												}
+
                         // Check if BYDAY rule exists
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
                             $start_time = date('His', $start_timestamp);
@@ -489,6 +495,7 @@ class ICal
                             }
                         } else {
                             $day = date('d', $start_timestamp);
+                            $start_time = date('His', $start_timestamp);
                             // Step through years adding specific month dates
                             while ($recurring_timestamp <= $until) {
                                 $event_start_desc = "$day {$month_names[$rrules['BYMONTH']]} " . date('Y H:i:s', $recurring_timestamp);
