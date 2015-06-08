@@ -384,14 +384,17 @@ class ICal
                         // Simply add a new event each interval of days until UNTIL is reached
                         $offset = "+$interval day";
                         $recurring_timestamp = strtotime($offset, $start_timestamp);
+
                         while ($recurring_timestamp <= $until) {
                             // Add event
                             $anEvent['DTSTART'] = date('Ymd\THis', $recurring_timestamp);
                             $anEvent['DTEND'] = date('Ymd\THis', $recurring_timestamp + $event_timestmap_offset);
+
                             if ((!isset($anEvent['EXDATE_array'])) || (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array']))) {
                                 $events[] = $anEvent;
                             }
-                            // Move forward
+
+                            // Move forwards
                             $recurring_timestamp = strtotime($offset, $recurring_timestamp);
                         }
                         break;
@@ -400,6 +403,7 @@ class ICal
                         $offset = "+$interval week";
                         // Build list of days of week to add events
                         $weekdays = array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA');
+
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
                             $bydays = explode(',', $rrules['BYDAY']);
                         } else {
@@ -407,26 +411,33 @@ class ICal
                             $findDay = $weekTemp[date('w', $start_timestamp)];
                             $bydays = array($findDay);
                         }
+
                         // Get timestamp of first day of start week
                         $week_recurring_timestamp = (date('w', $start_timestamp) == 0) ? $start_timestamp : strtotime('last Sunday ' . date('H:i:s', $start_timestamp), $start_timestamp);
+
                         // Step through weeks
                         while ($week_recurring_timestamp <= $until) {
                             // Add events for bydays
                             $day_recurring_timestamp = $week_recurring_timestamp;
+
                             foreach ($weekdays as $day) {
                                 // Check if day should be added
+
                                 if (in_array($day, $bydays) && $day_recurring_timestamp > $start_timestamp && $day_recurring_timestamp <= $until) {
                                     // Add event to day
                                     $anEvent['DTSTART'] = date('Ymd\THis', $day_recurring_timestamp);
                                     $anEvent['DTEND'] = date('Ymd\THis', $day_recurring_timestamp + $event_timestmap_offset);
+
                                     if ((!isset($anEvent['EXDATE_array'])) || (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array']))) {
                                         $events[] = $anEvent;
                                     }
                                 }
-                                // Move forward a day
+
+                                // Move forwards a day
                                 $day_recurring_timestamp = strtotime('+1 day', $day_recurring_timestamp);
                             }
-                            // Move forward $interval weeks
+
+                            // Move forwards $interval weeks
                             $week_recurring_timestamp = strtotime($offset, $week_recurring_timestamp);
                         }
                         break;
@@ -434,34 +445,42 @@ class ICal
                         // Create offset
                         $offset = "+$interval month";
                         $recurring_timestamp = strtotime($offset, $start_timestamp);
+
                         if (isset($rrules['BYMONTHDAY']) && $rrules['BYMONTHDAY'] != '') {
                             // Deal with BYMONTHDAY
                             $monthdays = explode(',', $rrules['BYMONTHDAY']);
+
                             while ($recurring_timestamp <= $until) {
                                 foreach ($monthdays as $monthday) {
                                     // Add event
                                     $anEvent['DTSTART'] = date('Ym' . sprintf('%02d', $monthday) . '\THis', $recurring_timestamp);
                                     $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset);
+
                                     if ((!isset($anEvent['EXDATE_array'])) || (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array']))) {
                                         $events[] = $anEvent;
                                     }
                                 }
-                                // Move forward
+
+                                // Move forwards
                                 $recurring_timestamp = strtotime($offset, $recurring_timestamp);
                             }
                         } else if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
                             $start_time = date('His', $start_timestamp);
+
                             while ($recurring_timestamp <= $until) {
                                 $event_start_desc = "{$day_ordinals[$day_number]} {$weekdays[$week_day]} of " . date('F Y H:i:s', $recurring_timestamp);
                                 $event_start_timestamp = strtotime($event_start_desc);
+
                                 if ($event_start_timestamp > $start_timestamp && $event_start_timestamp < $until) {
                                     $anEvent['DTSTART'] = date('Ymd\T', $event_start_timestamp) . $start_time;
                                     $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset);
+
                                     if ((!isset($anEvent['EXDATE_array'])) || (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array']))) {
                                         $events[] = $anEvent;
                                     }
                                 }
-                                // Move forward
+
+                                // Move forwards
                                 $recurring_timestamp = strtotime($offset, $recurring_timestamp);
                             }
                         }
@@ -471,36 +490,45 @@ class ICal
                         $offset = "+$interval year";
                         $recurring_timestamp = strtotime($offset, $start_timestamp);
                         $month_names = array(1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December');
+
                         // Check if BYDAY rule exists
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
                             $start_time = date('His', $start_timestamp);
+
                             while ($recurring_timestamp <= $until) {
                                 $event_start_desc = "{$day_ordinals[$day_number]} {$weekdays[$week_day]} of {$month_names[$rrules['BYMONTH']]} " . date('Y H:i:s', $recurring_timestamp);
                                 $event_start_timestamp = strtotime($event_start_desc);
+
                                 if ($event_start_timestamp > $start_timestamp && $event_start_timestamp < $until) {
                                     $anEvent['DTSTART'] = date('Ymd\T', $event_start_timestamp) . $start_time;
                                     $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset);
+
                                     if ((!isset($anEvent['EXDATE_array'])) || (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array']))) {
                                         $events[] = $anEvent;
                                     }
                                 }
-                                // Move forward
+
+                                // Move forwards
                                 $recurring_timestamp = strtotime($offset, $recurring_timestamp);
                             }
                         } else {
                             $day = date('d', $start_timestamp);
+
                             // Step through years adding specific month dates
                             while ($recurring_timestamp <= $until) {
                                 $event_start_desc = "$day {$month_names[$rrules['BYMONTH']]} " . date('Y H:i:s', $recurring_timestamp);
                                 $event_start_timestamp = strtotime($event_start_desc);
+
                                 if ($event_start_timestamp > $start_timestamp && $event_start_timestamp < $until) {
                                     $anEvent['DTSTART'] = date('Ymd\T', $event_start_timestamp) . $start_time;
                                     $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset);
+
                                     if ((!isset($anEvent['EXDATE_array'])) || (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array']))) {
                                         $events[] = $anEvent;
                                     }
                                 }
-                                // Move forward
+
+                                // Move forwards
                                 $recurring_timestamp = strtotime($offset, $recurring_timestamp);
                             }
                         }

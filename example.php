@@ -42,8 +42,8 @@ foreach ($events as $event) {
     echo 'DTEND: ' . $event['DTEND'] . "<br />\n";
     echo 'DTSTAMP: ' . $event['DTSTAMP'] . "<br />\n";
     echo 'UID: ' . $event['UID'] . "<br />\n";
-    echo 'CREATED: ' . $event['CREATED'] . "<br />\n";
-    echo 'LAST-MODIFIED: ' . $event['LAST-MODIFIED'] . "<br />\n";
+    echo 'CREATED: ' . @$event['CREATED'] . "<br />\n";
+    echo 'LAST-MODIFIED: ' . @$event['LAST-MODIFIED'] . "<br />\n";
     echo 'DESCRIPTION: ' . @$event['DESCRIPTION'] . "<br />\n";
     echo 'LOCATION: ' . @$event['LOCATION'] . "<br />\n";
     echo 'SEQUENCE: ' . @$event['SEQUENCE'] . "<br />\n";
