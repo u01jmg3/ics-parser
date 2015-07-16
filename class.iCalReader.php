@@ -47,7 +47,7 @@ class ICal
      *
      * @return Object The iCal Object
      */
-    public function __construct($filename)
+    public function __construct($filename=false)
     {
         if (!$filename) {
             return false;
@@ -63,6 +63,23 @@ class ICal
     }
 
 
+	/**
+     * Initializes lines from a URL
+     *
+     * @url {string} $url The url of the ical file to download and initialize.  Unless you know what you're doing, it should begin with "http://"
+     *
+     * @return Object The iCal Object
+     */
+    public function initURL($url)
+	{
+		$contents = file_get_contents($url);
+		
+		$lines = explode("\n", $contents);
+		
+		return $this->initLines($lines);
+	}
+	
+	
     /**
      * Initializes lines from file
      *
