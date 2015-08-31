@@ -73,13 +73,13 @@ class ICal
     public function initURL($url)
     {
         $contents = file_get_contents($url);
-        
+
         $lines = explode("\n", $contents);
-        
+
         return $this->initLines($lines);
     }
-    
-    
+
+
     /**
      * Initializes lines from file
      *
@@ -692,4 +692,3 @@ class ICal
         return $extendedEvents;
     }
 }
-?>
