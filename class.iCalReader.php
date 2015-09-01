@@ -610,6 +610,16 @@ class ICal
     }
 
     /**
+     * Returns the calendar description
+     *
+     * @return {calendar description}
+     */
+    public function calendarDescription()
+    {
+        return $this->cal['VCALENDAR']['X-WR-CALDESC'];
+    }
+
+    /**
      * Returns an array of arrays with all free/busy events. Every event is
      * an associative array and each property is an element it.
      *
