@@ -18,7 +18,7 @@ require 'class.iCalReader.php';
 $ical   = new ICal('MyCal.ics');
 $events = $ical->events();
 
-$date = reset($events)['DTSTART'];
+$date = reset($events['DTSTART']);
 echo 'The ical date: ';
 echo $date;
 echo "<br />\n";
