@@ -18,4 +18,4 @@ It was modified by John Grogg to properly handle recurring events (specifically 
   - Martin Thoma (programming, bug fixing, project management)
   - Frank Gregor (programming, feedback, testing)
   - John Grogg (programming, addition of event recurrence handling)
-  - Jonathan Goode (programming, bug fixing, enhancement, coding standard)
+  - [Jonathan Goode](https://github.com/u01jmg3) (programming, bug fixing, enhancement, coding standard)
