@@ -8,7 +8,7 @@ It is hosted at [https://github.com/MartinThoma/ics-parser/](https://github.com/
 It was modified by John Grogg to properly handle recurring events (specifically with regards to Microsoft Exchange).
 
 ## Requirements
-  - PHP 5 >= 5.2.0
+  - PHP 5 >= 5.3.0
 
 ## Installation
   - Copy all files to a folder where PHP can be executed
