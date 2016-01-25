@@ -632,7 +632,7 @@ class ICal
     }
 
     /**
-     * Returns a boolean value whether thr current calendar has events or not
+     * Returns a boolean value whether the current calendar has events or not
      *
      * @return {boolean}
      */
