@@ -726,37 +726,4 @@ class ICal
 
         return $extendedEvents;
     }
-
-    /**
-     * Filtert ein ical-Array nach dem Datum der einzelnen Objekte innerhalb einer Range und gibt ein neues Array zurück.
-     *
-     * @param  array $events   - eine Instanz von $ical->events()
-     * @param  int $begin      - Unix-Timestamp
-     * @param  int $end        - Unix-Timestamp
-     *
-     * @return array $relevant - Array mit den relevanten Indecies innerhalb der vorgegebenen Range aus $events
-     */
-    public function iCalEventsInRange($events, $begin, $end)
-    {
-        $unixTsEvents = array();
-        $relevant = array();
-        $relevantIcs = array();
-
-        for ($i = 0; $i < count($events); ++$i) {
-            $unixTsEvents[$i] = $this->iCalDateToUnixTimestamp($events[$i]['DTSTART']);
-        }
-        for ($i = 0; $i < count($events); ++$i) {
-            if ($unixTsEvents[$i] >= $begin && $unixTsEvents[$i] <= $end) {
-                $relevant[] = $i;
-
-            }
-
-        }
-
-
-        foreach ($relevant as $i) {
-            $relevantIcs[] = $events[$i];
-        }
-        return $relevantIcs;
-    }
 }
