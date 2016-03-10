@@ -412,8 +412,12 @@ class ICal
                             $dtstart->modify($offset);
                         }
 
-                        // Jumping X months forwards doesn't mean the end date will fall on the same day defined in BYDAY
-                        // Use the largest of these to ensure we are going far enough in the future to capture our final end day
+                        /**
+                         * Jumping X months forwards doesn't mean
+                         * the end date will fall on the same day defined in BYDAY
+                         * Use the largest of these to ensure we are going far enough
+                         * in the future to capture our final end day
+                         */
                         $until = max($until, $dtstart->format('U'));
                     }
 
@@ -578,7 +582,8 @@ class ICal
                             $start_time = date('His', $start_timestamp);
 
                             while ($recurring_timestamp <= $until) {
-                                $event_start_desc = "{$day_ordinals[$day_number]} {$weekdays[$week_day]} of {$month_names[$rrules['BYMONTH']]} "
+                                $event_start_desc = "{$day_ordinals[$day_number]} {$weekdays[$week_day]}"
+                                    . " of {$month_names[$rrules['BYMONTH']]} "
                                     . date('Y H:i:s', $recurring_timestamp);
                                 $event_start_timestamp = strtotime($event_start_desc);
 
