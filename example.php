@@ -8,10 +8,7 @@
  * @package  Ics-parser
  * @author   Martin Thoma <info@martin-thoma.de>
  * @license  http://www.opensource.org/licenses/mit-license.php  MIT License
- * @version  SVN: <svn_id>
  * @link     http://code.google.com/p/ics-parser/
- * @example  $ical = new ical('MyCal.ics');
- *           print_r( $ical->get_event_array() );
  */
 require 'class.iCalReader.php';
 
