@@ -3,7 +3,7 @@
  * This PHP class should only read an iCal file (*.ics), parse it and return an
  * array with its content.
  *
- * PHP Version >= 5.3
+ * PHP Version >= 5.6
  *
  * @category Parser
  * @package  ics-parser
@@ -22,7 +22,7 @@ namespace ICal;
  * @param {string} filename The name of the file which should be parsed
  * @constructor
  */
-class Parser
+class ICal
 {
     /* How many ToDos are in this iCal? */
     public /** @type {int} */ $todo_count = 0;
@@ -150,7 +150,7 @@ class Parser
                     }
                 }
             }
-            $this->process_recurrences();
+            $this->processRecurrences();
             return $this->cal;
         }
     }
@@ -319,7 +319,7 @@ class Parser
      * @author John Grogg <john.grogg@gmail.com>
      * @return array
      */
-    public function process_recurrences()
+    public function processRecurrences()
     {
         $array = $this->cal;
         $events = $array['VEVENT'];
@@ -407,7 +407,8 @@ class Parser
                         for ($i = 1; $i <= $count; $i++) {
                             $dtstart_clone = clone $dtstart;
                             $dtstart_clone->modify('next ' . $frequency_conversion[$frequency]);
-                            $offset = "{$day_ordinals[$day_number]} {$weekdays[$week_day]} of " . $dtstart_clone->format('F Y H:i:01');
+                            $offset = "{$day_ordinals[$day_number]} {$weekdays[$week_day]} of "
+                                . $dtstart_clone->format('F Y H:i:01');
                             $dtstart->modify($offset);
                         }
 
@@ -475,7 +476,10 @@ class Parser
                                 ) {
                                     // Add event to day
                                     $anEvent['DTSTART'] = date('Ymd\THis', $day_recurring_timestamp);
-                                    $anEvent['DTEND'] = date('Ymd\THis', $day_recurring_timestamp + $event_timestmap_offset);
+                                    $anEvent['DTEND'] = date(
+                                        'Ymd\THis',
+                                        $day_recurring_timestamp + $event_timestmap_offset
+                                    );
 
                                     if ((!isset($anEvent['EXDATE_array']))
                                         || (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array']))
@@ -504,8 +508,14 @@ class Parser
                             while ($recurring_timestamp <= $until) {
                                 foreach ($monthdays as $monthday) {
                                     // Add event
-                                    $anEvent['DTSTART'] = date('Ym' . sprintf('%02d', $monthday) . '\THis', $recurring_timestamp);
-                                    $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset);
+                                    $anEvent['DTSTART'] = date(
+                                        'Ym' . sprintf('%02d', $monthday) . '\THis',
+                                        $recurring_timestamp
+                                    );
+                                    $anEvent['DTEND'] = date(
+                                        'Ymd\THis',
+                                        $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset
+                                    );
 
                                     if ((!isset($anEvent['EXDATE_array']))
                                         || (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array']))
@@ -521,12 +531,16 @@ class Parser
                             $start_time = date('His', $start_timestamp);
 
                             while ($recurring_timestamp <= $until) {
-                                $event_start_desc = "{$day_ordinals[$day_number]} {$weekdays[$week_day]} of " . date('F Y H:i:s', $recurring_timestamp);
+                                $event_start_desc = "{$day_ordinals[$day_number]} {$weekdays[$week_day]} of "
+                                    . date('F Y H:i:s', $recurring_timestamp);
                                 $event_start_timestamp = strtotime($event_start_desc);
 
                                 if ($event_start_timestamp > $start_timestamp && $event_start_timestamp < $until) {
                                     $anEvent['DTSTART'] = date('Ymd\T', $event_start_timestamp) . $start_time;
-                                    $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset);
+                                    $anEvent['DTEND'] = date(
+                                        'Ymd\THis',
+                                        $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset
+                                    );
 
                                     if ((!isset($anEvent['EXDATE_array']))
                                         || (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array']))
@@ -564,12 +578,16 @@ class Parser
                             $start_time = date('His', $start_timestamp);
 
                             while ($recurring_timestamp <= $until) {
-                                $event_start_desc = "{$day_ordinals[$day_number]} {$weekdays[$week_day]} of {$month_names[$rrules['BYMONTH']]} " . date('Y H:i:s', $recurring_timestamp);
+                                $event_start_desc = "{$day_ordinals[$day_number]} {$weekdays[$week_day]} of {$month_names[$rrules['BYMONTH']]} "
+                                    . date('Y H:i:s', $recurring_timestamp);
                                 $event_start_timestamp = strtotime($event_start_desc);
 
                                 if ($event_start_timestamp > $start_timestamp && $event_start_timestamp < $until) {
                                     $anEvent['DTSTART'] = date('Ymd\T', $event_start_timestamp) . $start_time;
-                                    $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset);
+                                    $anEvent['DTEND'] = date(
+                                        'Ymd\THis',
+                                        $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset
+                                    );
 
                                     if ((!isset($anEvent['EXDATE_array']))
                                         || (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array']))
@@ -589,7 +607,8 @@ class Parser
                             while ($recurring_timestamp <= $until) {
                                 // Add specific month dates
                                 if (isset($rrules['BYMONTH']) && $rrules['BYMONTH'] != '') {
-                                    $event_start_desc = "$day {$month_names[$rrules['BYMONTH']]} " . date('Y H:i:s', $recurring_timestamp);
+                                    $event_start_desc = "$day {$month_names[$rrules['BYMONTH']]} "
+                                        . date('Y H:i:s', $recurring_timestamp);
                                 } else {
                                     $event_start_desc = $day . date('F Y H:i:s', $recurring_timestamp);
                                 }
@@ -598,7 +617,10 @@ class Parser
 
                                 if ($event_start_timestamp > $start_timestamp && $event_start_timestamp < $until) {
                                     $anEvent['DTSTART'] = date('Ymd\T', $event_start_timestamp) . $start_time;
-                                    $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset);
+                                    $anEvent['DTEND'] = date(
+                                        'Ymd\THis',
+                                        $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestmap_offset
+                                    );
 
                                     if ((!isset($anEvent['EXDATE_array']))
                                         || (!in_array($anEvent['DTSTART'], $anEvent['EXDATE_array']))
@@ -612,11 +634,6 @@ class Parser
                             }
                         }
                         break;
-
-                        // Ensure we abide by COUNT if defined
-                        $events = (isset($count_orig) && sizeof($events) > $count_orig)
-                            ? array_slice($events, 0, $count_orig)
-                            : $events;
                 }
             }
         }

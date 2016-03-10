@@ -1,0 +1,28 @@
+language: php
+php:
+  - 5.6
+  - 7
+  - hhvm
+matrix:
+  allow_failures:
+    - php: hhvm
+before_script:
+  # Composer
+  - COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install
+  - composer self-update
+  - composer update --prefer-source
+script:
+  - mkdir .reports
+  # Code style
+  - php vendor/bin/phpcs ./src/Ics --standard=PSR7 --encoding=utf-8 --report=summary
+  # PHPUnit tests
+  #- php vendor/bin/phpunit --configuration tests/phpunit.xml.dist --coverage-clover=.reports/clover.xml
+after_success:
+  # Send cover
+  - php vendor/bin/coveralls -v
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover .reports/clover.xml
+  # Share build
+  - composer update --no-dev
+notifications:
+  email: tanchik194@bk.ru

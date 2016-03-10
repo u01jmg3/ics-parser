@@ -1,4 +1,6 @@
 <?php
+require_once '../src/ICal/ICal.php';
+
 use ICal\ICal;
 /**
  * This example demonstrates how the Ics-Parser should be used.
@@ -14,7 +16,7 @@ use ICal\ICal;
  * @example  $ical = new ical('MyCal.ics');
  *           print_r( $ical->get_event_array() );
  */
-$ical   = new ICal('MyCal.ics');
+$ical   = new ICal('basic2.ics');
 $events = $ical->events();
 
 $date = reset($events)['DTSTART'];
