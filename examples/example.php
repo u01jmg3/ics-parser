@@ -1,4 +1,5 @@
 <?php
+use ICal\ICal;
 /**
  * This example demonstrates how the Ics-Parser should be used.
  *
@@ -13,8 +14,6 @@
  * @example  $ical = new ical('MyCal.ics');
  *           print_r( $ical->get_event_array() );
  */
-require 'class.iCalReader.php';
-
 $ical   = new ICal('MyCal.ics');
 $events = $ical->events();
 

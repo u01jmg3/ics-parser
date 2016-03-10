@@ -3,7 +3,7 @@
  * This PHP class should only read an iCal file (*.ics), parse it and return an
  * array with its content.
  *
- * PHP Version 5
+ * PHP Version >= 5.3
  *
  * @category Parser
  * @package  ics-parser
@@ -14,13 +14,15 @@
  * @version  1.0.2
  */
 
+namespace ICal;
+
 /**
  * This is the ICal class
  *
  * @param {string} filename The name of the file which should be parsed
  * @constructor
  */
-class ICal
+class Parser
 {
     /* How many ToDos are in this iCal? */
     public /** @type {int} */ $todo_count = 0;
@@ -160,7 +162,7 @@ class ICal
      * @param {string} $keyword   The keyword, for example DTSTART
      * @param {string} $value     The value, for example 20110105T090000Z
      *
-     * @return {None}
+     * @return void
      */
     public function addCalendarComponentWithKeyAndValue($component, $keyword, $value)
     {
@@ -174,11 +176,13 @@ class ICal
                 break;
             case 'VEVENT':
                 if (!isset($this->cal[$component][$this->event_count - 1][$keyword . '_array'])) {
-                    $this->cal[$component][$this->event_count - 1][$keyword . '_array'] = array(); // Create array()
+                    // Create array()
+                    $this->cal[$component][$this->event_count - 1][$keyword . '_array'] = array();
                 }
 
                 if (is_array($value)) {
-                    array_push($this->cal[$component][$this->event_count - 1][$keyword . '_array'], $value); // Add array of properties to the end
+                    // Add array of properties to the end
+                    array_push($this->cal[$component][$this->event_count - 1][$keyword . '_array'], $value);
                 } else {
                     if (!isset($this->cal[$component][$this->event_count - 1][$keyword])) {
                         $this->cal[$component][$this->event_count - 1][$keyword] = $value;
@@ -188,16 +192,19 @@ class ICal
 
                     // Glue back together for multi-line content
                     if ($this->cal[$component][$this->event_count - 1][$keyword] != $value) {
-                        $ord = (isset($value[0])) ? ord($value[0]) : NULL; // First char
+                        $ord = (isset($value[0])) ? ord($value[0]) : null; // First char
 
-                        if(in_array($ord, array(9, 32))){ // Is space or tab?
+                        if (in_array($ord, array(9, 32))) { // Is space or tab?
                             $value = substr($value, 1); // Only trim the first character
                         }
 
-                        if(is_array($this->cal[$component][$this->event_count - 1][$keyword . '_array'][1])){ // Account for multiple definitions of current keyword (e.g. ATTENDEE)
-                            $this->cal[$component][$this->event_count - 1][$keyword] .= ';' . $value; // Concat value *with separator* as content spans multiple lines
+                        // Account for multiple definitions of current keyword (e.g. ATTENDEE)
+                        if (is_array($this->cal[$component][$this->event_count - 1][$keyword . '_array'][1])) {
+                            // Concat value *with separator* as content spans multiple lines
+                            $this->cal[$component][$this->event_count - 1][$keyword] .= ';' . $value;
                         } else {
-                            $this->cal[$component][$this->event_count - 1][$keyword] .= $value; // Concat value as content spans multiple lines
+                            // Concat value as content spans multiple lines
+                            $this->cal[$component][$this->event_count - 1][$keyword] .= $value;
                         }
                     }
                 }
@@ -684,15 +691,15 @@ class ICal
         $extendedEvents = array();
 
         if ($rangeStart === false) {
-            $rangeStart = new DateTime();
+            $rangeStart = new \DateTime();
         } else {
-            $rangeStart = new DateTime($rangeStart);
+            $rangeStart = new \DateTime($rangeStart);
         }
 
         if ($rangeEnd === false or $rangeEnd <= 0) {
-            $rangeEnd = new DateTime('2038/01/18');
+            $rangeEnd = new \DateTime('2038/01/18');
         } else {
-            $rangeEnd = new DateTime($rangeEnd);
+            $rangeEnd = new \DateTime($rangeEnd);
         }
 
         $rangeStart = $rangeStart->format('U');
