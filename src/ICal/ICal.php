@@ -45,7 +45,7 @@ class ICal
     /**
      * Creates the iCal Object
      *
-     * @param {mixed} $filename The path to the iCal-file or an array of lines from an iCal file
+     * @param mixed $filename The path to the iCal-file or an array of lines from an iCal file
      *
      * @return ICal
      */
@@ -68,7 +68,7 @@ class ICal
     /**
      * Initializes lines from file
      *
-     * @param {array} $lines The lines to initialize
+     * @param array $lines The lines to initialize
      *
      * @return ICal
      */
