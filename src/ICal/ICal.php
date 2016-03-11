@@ -111,8 +111,6 @@ class ICal
      * Creates the iCal Object
      *
      * @param mixed $filename The path to the iCal-file or an array of lines from an iCal file
-     *
-     * @return ICal
      */
     public function __construct($filename)
     {
@@ -221,7 +219,7 @@ class ICal
      * Add to $this->ical array one value and key.
      *
      * @param string $component This could be VTODO, VEVENT, VCALENDAR, ...
-     * @param string|false $keyword   The keyword, for example DTSTART
+     * @param string|boolean $keyword   The keyword, for example DTSTART
      * @param string $value     The value, for example 20110105T090000Z
      *
      * @return void
