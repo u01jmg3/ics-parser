@@ -28,8 +28,9 @@
         "phpunit/php-code-coverage": "^3.3"
     },
     "autoload": {
-        "psr-4": {
-            "ICal\\": "src/ICal/"
+        "psr-0": {
+            "ICal": "src/",
+            "ICal\\Tests": "tests/"
         }
     }
 }

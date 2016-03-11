@@ -1,5 +1,5 @@
 <?php
-require_once '../src/ICal/ICal.php';
+require_once '../vendor/autoload.php';
 
 use ICal\ICal;
 /**
@@ -14,44 +14,35 @@ use ICal\ICal;
  * @version  SVN: <svn_id>
  * @link     http://code.google.com/p/ics-parser/
  * @example  $ical = new ical('MyCal.ics');
- *           print_r( $ical->get_event_array() );
+ *           print_r( $ical->events() );
  */
-$ical   = new ICal('basic2.ics');
+$ical   = new ICal('basic.ics');
 $events = $ical->events();
 
-$date = reset($events)['DTSTART'];
-echo 'The ical date: ';
-echo $date;
-echo "<br />\n";
-
-echo 'The Unix timestamp: ';
-echo $ical->iCalDateToUnixTimestamp($date);
-echo "<br />\n";
-
 echo 'The number of events: ';
-echo $ical->event_count;
+echo $ical->eventCount;
 echo "<br />\n";
 
 echo 'The number of todos: ';
-echo $ical->todo_count;
+echo $ical->todoCount;
 echo "<br />\n";
 echo '<hr/><hr/>';
 
 foreach ($events as $event) {
-    echo 'SUMMARY: ' . @$event['SUMMARY'] . "<br />\n";
-    echo 'DTSTART: ' . $event['DTSTART'] . ' - UNIX-Time: ' . $ical->iCalDateToUnixTimestamp($event['DTSTART']) . "<br />\n";
-    echo 'DTEND: ' . $event['DTEND'] . "<br />\n";
-    echo 'DTSTAMP: ' . $event['DTSTAMP'] . "<br />\n";
-    echo 'UID: ' . $event['UID'] . "<br />\n";
-    echo 'CREATED: ' . @$event['CREATED'] . "<br />\n";
-    echo 'LAST-MODIFIED: ' . @$event['LAST-MODIFIED'] . "<br />\n";
-    echo 'DESCRIPTION: ' . @$event['DESCRIPTION'] . "<br />\n";
-    echo 'LOCATION: ' . @$event['LOCATION'] . "<br />\n";
-    echo 'SEQUENCE: ' . @$event['SEQUENCE'] . "<br />\n";
-    echo 'STATUS: ' . @$event['STATUS'] . "<br />\n";
-    echo 'TRANSP: ' . @$event['TRANSP'] . "<br />\n";
-    echo 'ORGANIZER: ' . @$event['ORGANIZER'] . "<br />\n";
-    echo 'ATTENDEE(S): ' . @$event['ATTENDEE'] . "<br />\n";
+    echo 'SUMMARY: ' . $event->summary . "<br />\n";
+    echo 'DTSTART: ' . $event->dtstart . "<br />\n";
+    echo 'DTEND: ' . $event->dtend . "<br />\n";
+    echo 'DTSTAMP: ' . $event->dtstamp . "<br />\n";
+    echo 'UID: ' . $event->uid. "<br />\n";
+    echo 'CREATED: ' . $event->created . "<br />\n";
+    echo 'LAST-MODIFIED: ' . $event->lastModified . "<br />\n";
+    echo 'DESCRIPTION: ' . $event->description . "<br />\n";
+    echo 'LOCATION: ' . $event->location . "<br />\n";
+    echo 'SEQUENCE: ' . $event->sequence . "<br />\n";
+    echo 'STATUS: ' . $event->status . "<br />\n";
+    echo 'TRANSP: ' . $event->transp . "<br />\n";
+    echo 'ORGANIZER: ' . $event->organizer . "<br />\n";
+    echo 'ATTENDEE(S): ' . $event->attendee . "<br />\n";
     echo '<hr/>';
 }
 ?>

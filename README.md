@@ -2,8 +2,9 @@
 ============================
 
 [![Build Status](https://secure.travis-ci.org/tanchik194/ics-parser.png?branch=master)](https://travis-ci.org/tanchik194/ics-parser)
-[![Coverage Status](https://coveralls.io/repos/github/tanchik194/ics-parser/badge.svg?branch=master)](https://coveralls.io/github/tanchik194/ics-parser?branch=master)
 [![Dependency Status](https://www.versioneye.com/user/projects/56e27f6ddf573d00495ab917/badge.svg?style=flat)](https://www.versioneye.com/user/projects/56e27f6ddf573d00495ab917)
+
+[![Coverage Status](https://coveralls.io/repos/github/tanchik194/ics-parser/badge.svg?branch=master)](https://coveralls.io/github/tanchik194/ics-parser?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tanchik194/ics-parser/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/tanchik194/ics-parser/?branch=master)
 
 [![Latest Stable Version](https://poser.pugx.org/johngrogg/ics-parser/v/stable.png)](https://packagist.org/packages/johngrogg/ics-parser)
