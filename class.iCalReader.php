@@ -58,7 +58,6 @@ class ICal
         } else {
             $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         }
-
         return $this->initLines($lines);
     }
 
@@ -357,7 +356,7 @@ class ICal
                     $day_number = ($day_number == -1) ? 6 : $day_number; // Override for our custom key (6 => 'last')
                     $week_day = substr($rrules['BYDAY'], -2);
                     $day_ordinals = array(1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'fifth', 6 => 'last');
-                    $weekdays = array('SU' => 'sunday', 'MO' => 'monday', 'TU' => 'tuesday', 'WE' => 'wednesday', 'TH' => 'thursday', 'FR' => 'friday', 'SA' => 'saturday');
+                    $weekdays = array('MO' => 'monday', 'TU' => 'tuesday', 'WE' => 'wednesday', 'TH' => 'thursday', 'FR' => 'friday', 'SA' => 'saturday', 'SU' => 'sunday');
                 }
 
                 $until_default = date_create('now');
@@ -365,9 +364,12 @@ class ICal
                 $until_default->setTime(23, 59, 59); // End of the day
                 $until_default = date_format($until_default, 'Ymd\THis');
 
+                $gmt_offset = timezone_offset_get(timezone_open(date_default_timezone_get()), new DateTime());
+
                 if (isset($rrules['UNTIL'])) {
                     // Get Until
-                    $until = $this->iCalDateToUnixTimestamp($rrules['UNTIL']);
+                    $until = $this->iCalDateToUnixTimestamp($rrules['UNTIL']) + $gmt_offset;
+                    
                 } else if (isset($rrules['COUNT'])) {
                     $frequency_conversion = array('DAILY' => 'day', 'WEEKLY' => 'week', 'MONTHLY' => 'month', 'YEARLY' => 'year');
                     $count_orig = (is_numeric($rrules['COUNT']) && $rrules['COUNT'] > 1) ? $rrules['COUNT'] : 0;
@@ -428,18 +430,18 @@ class ICal
                         // Create offset
                         $offset = "+$interval week";
                         // Build list of days of week to add events
-                        $weekdays = array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA');
+                        $weekdays = array('MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU');
 
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
                             $bydays = explode(',', $rrules['BYDAY']);
                         } else {
-                            $weekTemp = array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA');
+                            $weekTemp = array('MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU');
                             $findDay = $weekTemp[date('w', $start_timestamp)];
                             $bydays = array($findDay);
                         }
 
                         // Get timestamp of first day of start week
-                        $week_recurring_timestamp = (date('w', $start_timestamp) == 0) ? $start_timestamp : strtotime('last Sunday ' . date('H:i:s', $start_timestamp), $start_timestamp);
+                        $week_recurring_timestamp = (date('w', $start_timestamp) == 0) ? $start_timestamp : strtotime('last monday' . date('H:i:s', $start_timestamp), $start_timestamp);
 
                         // Step through weeks
                         while ($week_recurring_timestamp <= $until) {
@@ -455,7 +457,8 @@ class ICal
                                     $anEvent['DTEND'] = date('Ymd\THis', $day_recurring_timestamp + $event_timestamp_offset);
 
                                     $search_date = $anEvent['DTSTART'];
-                                    $is_excluded = array_filter($anEvent['EXDATE_array'], function($val) use ($search_date) { return is_string($val) && strpos($search_date, $val) === 0; });
+                                    $is_excluded = array_filter($anEvent['EXDATE_array'], function($val) use ($search_date) {
+                                        return is_string($val) && strpos($search_date, $val) === 0; });
 
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
@@ -634,7 +637,7 @@ class ICal
     }
 
     /**
-     * Returns a boolean value whether the current calendar has events or not
+     * Returns a boolean value whether thr current calendar has events or not
      *
      * @return {boolean}
      */
