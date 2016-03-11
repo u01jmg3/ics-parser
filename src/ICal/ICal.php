@@ -66,6 +66,47 @@ class ICal
 
     const DATE_TIME_FORMAT = 'Ymd\THis';
 
+    protected $dayOrdinals = array(
+        1 => 'first',
+        2 => 'second',
+        3 => 'third',
+        4 => 'fourth',
+        5 => 'fifth',
+        6 => 'last'
+    );
+
+    protected $weekdays = array(
+        'SU' => 'sunday',
+        'MO' => 'monday',
+        'TU' => 'tuesday',
+        'WE' => 'wednesday',
+        'TH' => 'thursday',
+        'FR' => 'friday',
+        'SA' => 'saturday'
+    );
+
+    protected $monthNames = array(
+        1 => 'January',
+        2 => 'February',
+        3 => 'March',
+        4 => 'April',
+        5 => 'May',
+        6 => 'June',
+        7 => 'July',
+        8 => 'August',
+        9 => 'September',
+        10 => 'October',
+        11 => 'November',
+        12 => 'December'
+    );
+
+    protected $frequencyConversion = array(
+        'DAILY' => 'day',
+        'WEEKLY' => 'week',
+        'MONTHLY' => 'month',
+        'YEARLY' => 'year'
+    );
+
     /**
      * Creates the iCal Object
      *
@@ -180,7 +221,7 @@ class ICal
      * Add to $this->ical array one value and key.
      *
      * @param string $component This could be VTODO, VEVENT, VCALENDAR, ...
-     * @param string $keyword   The keyword, for example DTSTART
+     * @param string|false $keyword   The keyword, for example DTSTART
      * @param string $value     The value, for example 20110105T090000Z
      *
      * @return void
@@ -321,11 +362,11 @@ class ICal
         $icalDate = str_replace('T', '', $icalDate);
         $icalDate = str_replace('Z', '', $icalDate);
 
-        $pattern  = '/([0-9]{4})';   // 1: YYYY
-        $pattern .= '([0-9]{2})';    // 2: MM
-        $pattern .= '([0-9]{2})';    // 3: DD
-        $pattern .= '([0-9]{0,2})';  // 4: HH
-        $pattern .= '([0-9]{0,2})';  // 5: MM
+        $pattern = '/([0-9]{4})'; // 1: YYYY
+        $pattern .= '([0-9]{2})'; // 2: MM
+        $pattern .= '([0-9]{2})'; // 3: DD
+        $pattern .= '([0-9]{0,2})'; // 4: HH
+        $pattern .= '([0-9]{0,2})'; // 5: MM
         $pattern .= '([0-9]{0,2})/'; // 6: SS
         preg_match($pattern, $icalDate, $date);
 
@@ -335,7 +376,14 @@ class ICal
         }
         // Unix timestamps after 03:14:07 UTC 2038-01-19 might cause an overflow
         // if 32 bit integers are used.
-        $timestamp = mktime((int)$date[4], (int)$date[5], (int)$date[6], (int)$date[2], (int)$date[3], (int)$date[1]);
+        $timestamp = mktime(
+            (int) $date[4],
+            (int) $date[5],
+            (int) $date[6],
+            (int) $date[2],
+            (int) $date[3],
+            (int) $date[1]
+        );
         return $timestamp;
     }
 
@@ -372,6 +420,9 @@ class ICal
                     ? $rrules['INTERVAL']
                     : 1;
 
+                $dayNumber = null;
+                $weekDay = null;
+
                 if (in_array($frequency, array('MONTHLY', 'YEARLY'))
                     && isset($rrules['BYDAY']) && $rrules['BYDAY'] != ''
                 ) {
@@ -386,23 +437,6 @@ class ICal
                     }
                     $dayNumber = ($dayNumber == -1) ? 6 : $dayNumber; // Override for our custom key (6 => 'last')
                     $weekDay = substr($rrules['BYDAY'], -2);
-                    $dayOrdinals = array(
-                        1 => 'first',
-                        2 => 'second',
-                        3 => 'third',
-                        4 => 'fourth',
-                        5 => 'fifth',
-                        6 => 'last'
-                    );
-                    $weekdays = array(
-                        'SU' => 'sunday',
-                        'MO' => 'monday',
-                        'TU' => 'tuesday',
-                        'WE' => 'wednesday',
-                        'TH' => 'thursday',
-                        'FR' => 'friday',
-                        'SA' => 'saturday'
-                    );
                 }
 
                 $untilDefault = date_create('now');
@@ -414,16 +448,10 @@ class ICal
                     // Get Until
                     $until = $this->iCalDateToUnixTimestamp($rrules['UNTIL']);
                 } elseif (isset($rrules['COUNT'])) {
-                    $frequencyConversion = array(
-                        'DAILY' => 'day',
-                        'WEEKLY' => 'week',
-                        'MONTHLY' => 'month',
-                        'YEARLY' => 'year'
-                    );
                     $count_orig = (is_numeric($rrules['COUNT']) && $rrules['COUNT'] > 1) ? $rrules['COUNT'] : 0;
                     $count = ($count_orig - 1); // Remove one to exclude the occurrence that initialises the rule
                     $count += ($count > 0) ? $count * ($interval - 1) : 0;
-                    $offset = "+$count " . $frequencyConversion[$frequency];
+                    $offset = "+$count " . $this->frequencyConversion[$frequency];
                     $until = strtotime($offset, $startTimestamp);
 
                     if (in_array($frequency, array('MONTHLY', 'YEARLY'))
@@ -432,8 +460,8 @@ class ICal
                         $dtstart = date_create($anEvent['DTSTART']);
                         for ($i = 1; $i <= $count; $i++) {
                             $dtstartClone = clone $dtstart;
-                            $dtstartClone->modify('next ' . $frequencyConversion[$frequency]);
-                            $offset = "{$dayOrdinals[$dayNumber]} {$weekdays[$weekDay]} of "
+                            $dtstartClone->modify('next ' . $this->frequencyConversion[$frequency]);
+                            $offset = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]} of "
                                 . $dtstartClone->format('F Y H:i:01');
                             $dtstart->modify($offset);
                         }
@@ -563,7 +591,7 @@ class ICal
                             $startTime = date('His', $startTimestamp);
 
                             while ($recurringTimestamp <= $until) {
-                                $eventStartDesc = "{$dayOrdinals[$dayNumber]} {$weekdays[$weekDay]} of "
+                                $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]} of "
                                     . date('F Y H:i:s', $recurringTimestamp);
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
@@ -590,28 +618,14 @@ class ICal
                         // Create offset
                         $offset = "+$interval year";
                         $recurringTimestamp = strtotime($offset, $startTimestamp);
-                        $monthNames = array(
-                            1 => 'January',
-                            2 => 'February',
-                            3 => 'March',
-                            4 => 'April',
-                            5 => 'May',
-                            6 => 'June',
-                            7 => 'July',
-                            8 => 'August',
-                            9 => 'September',
-                            10 => 'October',
-                            11 => 'November',
-                            12 => 'December'
-                        );
 
                         // Check if BYDAY rule exists
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
                             $startTime = date('His', $startTimestamp);
 
                             while ($recurringTimestamp <= $until) {
-                                $eventStartDesc = "{$dayOrdinals[$dayNumber]} {$weekdays[$weekDay]}"
-                                    . " of {$monthNames[$rrules['BYMONTH']]} "
+                                $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]}"
+                                    . " of {$this->monthNames[$rrules['BYMONTH']]} "
                                     . date('Y H:i:s', $recurringTimestamp);
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
@@ -640,7 +654,7 @@ class ICal
                             while ($recurringTimestamp <= $until) {
                                 // Add specific month dates
                                 if (isset($rrules['BYMONTH']) && $rrules['BYMONTH'] != '') {
-                                    $eventStartDesc = "$day {$monthNames[$rrules['BYMONTH']]} "
+                                    $eventStartDesc = "$day {$this->monthNames[$rrules['BYMONTH']]} "
                                         . date('Y H:i:s', $recurringTimestamp);
                                 } else {
                                     $eventStartDesc = $day . date('F Y H:i:s', $recurringTimestamp);

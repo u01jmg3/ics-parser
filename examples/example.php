@@ -16,7 +16,7 @@ use ICal\ICal;
  * @example  $ical = new ical('MyCal.ics');
  *           print_r( $ical->events() );
  */
-$ical   = new ICal('basic.ics');
+$ical   = new ICal('MyCal.ics');
 $events = $ical->events();
 
 echo 'The number of events: ';
@@ -33,7 +33,7 @@ foreach ($events as $event) {
     echo 'DTSTART: ' . $event->dtstart . "<br />\n";
     echo 'DTEND: ' . $event->dtend . "<br />\n";
     echo 'DTSTAMP: ' . $event->dtstamp . "<br />\n";
-    echo 'UID: ' . $event->uid. "<br />\n";
+    echo 'UID: ' . $event->uid . "<br />\n";
     echo 'CREATED: ' . $event->created . "<br />\n";
     echo 'LAST-MODIFIED: ' . $event->lastModified . "<br />\n";
     echo 'DESCRIPTION: ' . $event->description . "<br />\n";

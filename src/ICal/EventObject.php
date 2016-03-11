@@ -33,9 +33,4 @@ class EventObject
             }
         }
     }
-
-    public function dateToUnixTimestamp($date)
-    {
-
-    }
 }
