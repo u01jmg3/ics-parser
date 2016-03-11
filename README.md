@@ -21,8 +21,24 @@ It was modified by John Grogg to properly handle recurring events (specifically 
   - PHP 5 >= 5.6.0
 
 ## Installation
-  - Copy all files to a folder where PHP can be executed
-  - Include `class.iCalReader.php` to your project
+
+### composer
+
+Установка с использованием менеджера пакетов [Composer](http://getcomposer.org):
+
+```bash
+$ curl -s https://getcomposer.org/installer | php
+```
+
+Теперь вносим изменения в ваш `composer.json`:
+
+```yaml
+{
+    "require": {
+        "johngrogg/ics-parser": "dev-master"
+    }
+}
+```
 
 ## Credits
   - Martin Thoma (programming, bug fixing, project management)

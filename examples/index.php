@@ -3,7 +3,7 @@ require_once '../vendor/autoload.php';
 
 use ICal\ICal;
 
-$ical   = new ICal('MyCal.ics');
+$ical = new ICal('MyCal.ics');
 $events = $ical->events();
 ?>
 <!DOCTYPE html>
@@ -33,7 +33,7 @@ $events = $ical->events();
         <div class="col-sm-6 col-md-4">
             <div class="thumbnail">
                 <div class="caption">
-                    <h3><?= $event->summary ?></h3>
+                    <h3><?= $event->summary . ' (' . date('d-m-Y H:i', $ical->iCalDateToUnixTimestamp($event->dtstart)) . ')' ?></h3>
 
                     <p>SUMMARY <?= $event->summary ?></p>
 
