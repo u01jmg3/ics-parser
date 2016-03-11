@@ -133,13 +133,11 @@ class ICal
      */
     public function initLines($lines)
     {
-        if (stristr($lines[0], 'BEGIN:VCALENDAR') === false) {
-            return false;
-        } else {
+        if (stristr($lines[0], 'BEGIN:VCALENDAR') !== false) {
             $component = '';
             foreach ($lines as $line) {
                 $line = rtrim($line); // Trim trailing whitespace
-                $add  = $this->keyValueFromString($line);
+                $add = $this->keyValueFromString($line);
 
                 if ($add === false) {
                     $this->addCalendarComponentWithKeyAndValue($component, false, $line);
@@ -211,7 +209,6 @@ class ICal
                 }
             }
             $this->processRecurrences();
-            return $this->cal;
         }
     }
 
@@ -290,7 +287,7 @@ class ICal
         // Match colon separator outside of quoted substrings
         // Fallback to nearest semicolon outside of quoted substrings, if colon cannot be found
         // Do not try and match within the value paired with the keyword
-        preg_match('/(.*?)(?::(?=(?:[^"]*"[^"]*")*[^"]*$)|;(?=[^:]*$))([\w\W]*)/', $text, $matches);
+        preg_match('/(.*?)(?::(?=(?:[^"]*"[^"]*")*[^"]*$)|;(?=[^:]*$))([\w\W]*)/', htmlentities($text), $matches);
 
         if (count($matches) == 0) {
             return false;
@@ -398,7 +395,7 @@ class ICal
         if (empty($events)) {
             return false;
         }
-        foreach ($array['VEVENT'] as $anEvent) {
+        foreach ($events as $anEvent) {
             if (isset($anEvent['RRULE']) && $anEvent['RRULE'] != '') {
                 // Recurring event, parse RRULE and add appropriate duplicate events
                 $rrules = array();
