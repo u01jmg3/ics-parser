@@ -241,7 +241,7 @@ class ICal
         // Match colon separator outside of quoted substrings
         // Fallback to nearest semicolon outside of quoted substrings, if colon cannot be found
         // Do not try and match within the value paired with the keyword
-        preg_match('/(.*?)(?::(?=(?:[^"]*"[^"]*")*[^"]*$)|;(?=[^:]*$))([\w\W]*)/', $text, $matches);
+        preg_match('/(.*?)(?::(?=(?:[^"]*"[^"]*")*[^"]*$)|;(?=[^:]*$))([\w\W]*)/', htmlspecialchars($text, ENT_QUOTES, 'UTF-8'), $matches);
 
         if (count($matches) == 0) {
             return false;
