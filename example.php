@@ -5,10 +5,10 @@
  * PHP Version 5
  *
  * @category Example
- * @package  Ics-parser
+ * @package  ics-parser
  * @author   Martin Thoma <info@martin-thoma.de>
- * @license  http://www.opensource.org/licenses/mit-license.php  MIT License
- * @link     http://code.google.com/p/ics-parser/
+ * @license  http://www.opensource.org/licenses/mit-license.php MIT License
+ * @link     https://github.com/MartinThoma/ics-parser/
  */
 require 'class.iCalReader.php';
 
