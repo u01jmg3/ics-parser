@@ -213,7 +213,14 @@ class ICal
                         if(is_array($this->cal[$component][$this->event_count - 1][$keyword . '_array'][1])){ // Account for multiple definitions of current keyword (e.g. ATTENDEE)
                             $this->cal[$component][$this->event_count - 1][$keyword] .= ';' . $value; // Concat value *with separator* as content spans multiple lines
                         } else {
-                            $this->cal[$component][$this->event_count - 1][$keyword] .= $value; // Concat value as content spans multiple lines
+                             if($keyword=='EXDATE'){
+                                 // This will give out a comma separated EXDATE string as per rfc2445 
+                                 // Example : EXDATE:19960402T010000Z,19960403T010000Z,19960404T010000Z
+                                 // Usage: @$event['EXDATE'] will print out 19960402T010000Z,19960403T010000Z,19960404T010000Z
+                                $this->cal[$component][$this->event_count - 1][$keyword] .= ',' . $value; 
+                            } else {
+                                $this->cal[$component][$this->event_count - 1][$keyword] .= $value; // Concat value as content spans multiple lines
+                            }
                         }
                     }
                 }
