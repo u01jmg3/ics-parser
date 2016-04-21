@@ -50,4 +50,3 @@ foreach ($events as $event) {
     echo 'ATTENDEE(S): ' . @$event['ATTENDEE'] . "<br />\n";
     echo '<hr/>';
 }
-?>
