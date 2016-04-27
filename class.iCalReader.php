@@ -92,8 +92,8 @@ class ICal
 
         return $this->initLines($lines);
     }
-    
-    
+
+
     /**
      * Initializes lines from file
      *
