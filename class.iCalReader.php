@@ -80,6 +80,21 @@ class ICal
 
 
     /**
+     * Initializes lines from a string
+     *
+     * @param {string} $contents The contents of the ical file to initialize
+     *
+     * @return Object The iCal Object
+     */
+    public function initString($contents)
+    {
+        $lines = explode("\n", $contents);
+
+        return $this->initLines($lines);
+    }
+    
+    
+    /**
      * Initializes lines from file
      *
      * @param {array} $lines The lines to initialize
