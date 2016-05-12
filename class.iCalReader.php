@@ -307,6 +307,10 @@ class ICal
      */
     public function iCalDateToUnixTimestamp($icalDate)
     {
+        // Trailing 'Z' indicates the date is UTC
+        // ref http://www.kanzaki.com/docs/ical/dateTime.html
+        $is_utc = strcmp('Z', substr($icalDate, -1));
+
         $icalDate = str_replace('T', '', $icalDate);
         $icalDate = str_replace('Z', '', $icalDate);
 
@@ -322,9 +326,17 @@ class ICal
         if ($date[1] <= 1970) {
             return false;
         }
+    
         // Unix timestamps after 03:14:07 UTC 2038-01-19 might cause an overflow
         // if 32 bit integers are used.
-        $timestamp = mktime((int)$date[4], (int)$date[5], (int)$date[6], (int)$date[2], (int)$date[3], (int)$date[1]);
+        
+        // If the time is in UTC we should use gmmktime()
+        // Otherwise, use regualr mktime()
+        if ($is_utc !== false){
+                $timestamp = gmmktime((int)$date[4], (int)$date[5], (int)$date[6], (int)$date[2], (int)$date[3], (int)$date[1]);
+        } else {
+                $timestamp = mktime((int)$date[4], (int)$date[5], (int)$date[6], (int)$date[2], (int)$date[3], (int)$date[1]);
+        }
         return $timestamp;
     }
 
