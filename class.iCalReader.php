@@ -331,7 +331,7 @@ class ICal
         // if 32 bit integers are used.
         
         // If the time is in UTC we should use gmmktime()
-        // Otherwise, use regualr mktime()
+        // Otherwise, use regular mktime()
         if ($is_utc !== false){
                 $timestamp = gmmktime((int)$date[4], (int)$date[5], (int)$date[6], (int)$date[2], (int)$date[3], (int)$date[1]);
         } else {
