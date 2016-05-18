@@ -126,7 +126,7 @@ class ICal
                     } else {
                         $values = array(); // Use blank array to ignore this line
                     }
-                } else if(empty($values[0])) {
+                } else if (empty($values[0])) {
                     $values = array(); // Use blank array to ignore this line
                 }
 
@@ -221,20 +221,21 @@ class ICal
                     if ($this->cal[$component][$this->event_count - 1][$keyword] != $value) {
                         $ord = (isset($value[0])) ? ord($value[0]) : NULL; // First char
 
-                        if(in_array($ord, array(9, 32))){ // Is space or tab?
+                        if (in_array($ord, array(9, 32))) { // Is space or tab?
                             $value = substr($value, 1); // Only trim the first character
                         }
 
-                        if(is_array($this->cal[$component][$this->event_count - 1][$keyword . '_array'][1])){ // Account for multiple definitions of current keyword (e.g. ATTENDEE)
+                        if (is_array($this->cal[$component][$this->event_count - 1][$keyword . '_array'][1])) { // Account for multiple definitions of current keyword (e.g. ATTENDEE)
                             $this->cal[$component][$this->event_count - 1][$keyword] .= ';' . $value; // Concat value *with separator* as content spans multiple lines
                         } else {
-                             if($keyword=='EXDATE'){
-                                 // This will give out a comma separated EXDATE string as per rfc2445 
-                                 // Example : EXDATE:19960402T010000Z,19960403T010000Z,19960404T010000Z
-                                 // Usage: @$event['EXDATE'] will print out 19960402T010000Z,19960403T010000Z,19960404T010000Z
-                                $this->cal[$component][$this->event_count - 1][$keyword] .= ',' . $value; 
+                            if ($keyword === 'EXDATE') {
+                                // This will give out a comma separated EXDATE string as per RFC2445
+                                // Example: EXDATE:19960402T010000Z,19960403T010000Z,19960404T010000Z
+                                // Usage: $event['EXDATE'] will print out 19960402T010000Z,19960403T010000Z,19960404T010000Z
+                                $this->cal[$component][$this->event_count - 1][$keyword] .= ',' . $value;
                             } else {
-                                $this->cal[$component][$this->event_count - 1][$keyword] .= $value; // Concat value as content spans multiple lines
+                                // Concat value as content spans multiple lines
+                                $this->cal[$component][$this->event_count - 1][$keyword] .= $value;
                             }
                         }
                     }
@@ -416,7 +417,7 @@ class ICal
                     $until = $this->iCalDateToUnixTimestamp($until_default);
                 }
 
-                if(!isset($anEvent['EXDATE_array'])){
+                if (!isset($anEvent['EXDATE_array'])) {
                     $anEvent['EXDATE_array'] = array();
                 }
 
