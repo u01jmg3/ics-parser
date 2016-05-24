@@ -313,7 +313,7 @@ class ICal
      *
      * @return {int}
      */
-    public function iCalDateToUnixTimestamp($icalDate)
+    public static function iCalDateToUnixTimestamp($icalDate)
     {
         $icalDate = str_replace('T', '', $icalDate);
         $icalDate = str_replace('Z', '', $icalDate);
