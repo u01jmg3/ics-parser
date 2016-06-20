@@ -401,6 +401,7 @@ class ICal
                     $count_orig = (is_numeric($rrules['COUNT']) && $rrules['COUNT'] > 1) ? $rrules['COUNT'] : 0;
                     $count = ($count_orig - 1); // Remove one to exclude the occurrence that initialises the rule
                     $count += ($count > 0) ? $count * ($interval - 1) : 0;
+                    $count_nb = 1;
 
                     $offset = "+$count " . $frequency_conversion[$frequency];
                     $until = strtotime($offset, $start_timestamp);
@@ -447,6 +448,12 @@ class ICal
 
                             if (!$is_excluded) {
                                 $events[] = $anEvent;
+                                if ($count_orig > 0) {
+				    $count_nb ++;
+				    if ($count_nb >= $count_orig){
+					break 2;
+				    }
+				}
                             }
 
                             // Move forwards
@@ -499,6 +506,12 @@ class ICal
 
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
+					if ($count_orig > 0) {
+					    $count_nb ++;
+					    if ($count_nb >= $count_orig){
+						break 2;
+					    }
+					}
                                     }
                                 }
 
@@ -531,6 +544,12 @@ class ICal
 
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
+					if ($count_orig > 0) {
+					    $count_nb ++;
+					    if ($count_nb >= $count_orig){
+						break 2;
+					    }
+					}
                                     }
                                 }
 
@@ -553,6 +572,12 @@ class ICal
 
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
+					if ($count_orig > 0) {
+					    $count_nb ++;
+					    if ($count_nb >= $count_orig){
+						break 2;
+					    }
+					}
                                     }
                                 }
 
@@ -584,6 +609,12 @@ class ICal
 
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
+					if ($count_orig > 0) {
+					    $count_nb ++;
+					    if ($count_nb >= $count_orig){
+						break 2;
+					    }
+					}
                                     }
                                 }
 
@@ -614,6 +645,12 @@ class ICal
 
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
+					if ($count_orig > 0) {
+					    $count_nb ++;
+					    if ($count_nb >= $count_orig){
+						break 2;
+					    }
+					}
                                     }
                                 }
 
