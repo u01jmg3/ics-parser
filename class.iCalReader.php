@@ -186,6 +186,7 @@ class ICal
                 }
             }
             $this->process_recurrences();
+            $this->process_dates_conversion();
             return $this->cal;
         }
     }
@@ -343,6 +344,52 @@ class ICal
     }
 
     /**
+     * Return a date adapted to the calendar timezone depending to the event TZID
+     * @author Jerome Combes <jerome@planningbiblio.fr>
+     *
+     * @param {array} $event an event
+     * @param {string} $key an event parameter (DTSTART or DTEND)
+     *
+     * @return {string} Ymd\THis date
+     */
+    public function iCalDateWithTimezone ($event, $key)
+    {
+	$defaultTimeZone = $this->calendarTimeZone();
+	$date_array=$event[$key."_array"];
+	$date=$event[$key];
+	
+	if (isset($date_array[0]['TZID']) and preg_match("/[a-z]*\/[a-z_]*/i",$date_array[0]['TZID'])) {
+	    $timeZone = $date_array[0]['TZID'];
+	} else {
+	    $timeZone = $defaultTimeZone;
+	}
+
+	$dateTime = new dateTime($event[$key]);
+	
+	if (substr($date,-1) == "Z") {
+	  $date=substr($date,0,-1);
+	  $tz = new dateTimeZone($defaultTimeZone);
+	  $offset = timezone_offset_get($tz, $dateTime);
+	} else {
+	  $tz = new dateTimeZone($defaultTimeZone);
+	  $offset1 = timezone_offset_get($tz, $dateTime);
+	  $tz = new dateTimeZone($timeZone);
+	  $offset2 = timezone_offset_get($tz, $dateTime);
+	  $offset=$offset1-$offset2;
+	}
+
+	if ($offset >= 0) {
+	  $offset = "+".$offset;
+	}
+	
+	$time = strtotime($date." $offset seconds");
+	
+	return date("Ymd\THis",$time);
+    }
+
+
+    
+    /**
      * Processes recurrences
      *
      * @author John Grogg <john.grogg@gmail.com>
@@ -395,7 +442,7 @@ class ICal
 
                 if (isset($rrules['UNTIL'])) {
                     // Get Until
-                    $until = $this->iCalDateToUnixTimestamp($rrules['UNTIL']);
+                    $until = strtotime($rrules['UNTIL']);
                 } else if (isset($rrules['COUNT'])) {
                     $frequency_conversion = array('DAILY' => 'day', 'WEEKLY' => 'week', 'MONTHLY' => 'month', 'YEARLY' => 'year');
                     $count_orig = (is_numeric($rrules['COUNT']) && $rrules['COUNT'] > 1) ? $rrules['COUNT'] : 0;
@@ -668,6 +715,33 @@ class ICal
     }
 
     /**
+     * Processes dates conversion with timezone 
+     * @author Jerome Combes <jerome@planningbiblio.fr>
+     *
+     * Add fields DTSTART_tz and DTEND_tz to each event
+     * These fields contain dates adapted to the calendar timezone depending to the event TZID (Ymd\THis) 
+     * @return {array}
+     */
+    public function process_dates_conversion()
+    {
+	$array = $this->cal;
+        $events = $array['VEVENT'];
+        
+        if (empty($events))
+        {
+            return false;
+	}
+	
+        foreach ($events as $key => $anEvent)
+        {
+	    $events[$key]['DTSTART_tz'] = $this->iCalDateWithTimezone($anEvent, "DTSTART");
+	    $events[$key]['DTEND_tz'] = $this->iCalDateWithTimezone($anEvent, "DTEND");
+        }
+        
+        $this->cal['VEVENT'] = $events;
+    }
+
+    /**
      * Returns an array of arrays with all events. Every event is an associative
      * array and each property is an element it.
      *
@@ -697,6 +771,16 @@ class ICal
     public function calendarDescription()
     {
         return $this->cal['VCALENDAR']['X-WR-CALDESC'];
+    }
+
+    /**
+     * Returns the calendar timezone
+     *
+     * @return {calendar timezone}
+     */
+    public function calendarTimeZone()
+    {
+        return $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
     }
 
     /**
