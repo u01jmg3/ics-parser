@@ -355,6 +355,10 @@ class ICal
     public function iCalDateWithTimezone ($event, $key)
     {
 	$defaultTimeZone = $this->calendarTimeZone();
+	if (!$defaultTimeZone) 
+	    {
+	    return false;
+	    }
 	$date_array=$event[$key."_array"];
 	$date=$event[$key];
 	
@@ -780,7 +784,11 @@ class ICal
      */
     public function calendarTimeZone()
     {
-        return $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
+	if (isset($this->cal['VCALENDAR']['X-WR-TIMEZONE']))
+	{
+	    return $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
+	}
+	return $this->cal['VTIMEZONE']['TZID'];
     }
 
     /**
