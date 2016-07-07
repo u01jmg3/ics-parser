@@ -9,3 +9,5 @@ We appreciate pull requests, here are our guidelines:
 1. We ask that you compile all the commits together before pushing.
 1. Please follow the coding standards already adhered to in the file you're editing before committing
   - This includes the use of *4 spaces* over tabs for indentation
+  - Using single quotes (`'`) where possible
+  - Using the [1TBS](https://en.wikipedia.org/wiki/Indent_style#Variant:_1TBS) indent style
