@@ -361,10 +361,9 @@ class ICal
                 $frequency = $rrules['FREQ'];
                 // Get Start timestamp
                 $start_timestamp = $this->iCalDateToUnixTimestamp($anEvent['DTSTART']);
-                if(isset($anEvent['DTEND'])) {
+                if (isset($anEvent['DTEND'])) {
                     $end_timestamp = $this->iCalDateToUnixTimestamp($anEvent['DTEND']);
-                }
-                else {
+                } else {
                     $end_timestamp = $this->iCalDateToUnixTimestamp($anEvent['DTSTART']);
                 }
                 $event_timestamp_offset = $end_timestamp - $start_timestamp;
