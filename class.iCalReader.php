@@ -39,6 +39,9 @@ class ICal
     /* The value in years to use for indefinite, recurring events */
     public /** @type {int} */ $default_span = 2;
 
+    /* The default first day of weeks */
+    public /** @type {string} */ $default_weekStart = 'SU';
+
     /**
      * Creates the iCal Object
      *
@@ -46,7 +49,7 @@ class ICal
      *
      * @return Object The iCal Object
      */
-    public function __construct($filename=false)
+    public function __construct($filename=false, $weekStart=false)
     {
         if (!$filename) {
             return false;
@@ -56,6 +59,10 @@ class ICal
             $lines = $filename;
         } else {
             $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        }
+        
+        if ($weekStart) {
+            $this->default_weekStart = $weekStart;
         }
 
         return $this->initLines($lines);
@@ -449,19 +456,30 @@ class ICal
                     case 'WEEKLY':
                         // Create offset
                         $offset = "+$interval week";
+                        
+                        // Use RRULE['WKST'] setting or a default week start (USA = SU, Europe = MO)
+                        $weeks = array(
+                            'SA' => array('SA', 'SU', 'MO', 'TU', 'WE', 'TH', 'FR'),
+                            'SU' => array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'),
+                            'MO' => array('MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'));
+
+                        $wkst = (isset($rrules['WKST']) and in_array($rrules['WKST'], array('SA','SU','MO'))) ? $rrules['WKST'] : $this->default_weekStart;
+                        $aWeek = $weeks[$wkst];
+                        $days = array('SA'=>'Saturday', 'SU'=>'Sunday', 'MO'=> 'Monday');
+
                         // Build list of days of week to add events
-                        $weekdays = array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA');
+                        $weekdays = $aWeek;
 
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
                             $bydays = explode(',', $rrules['BYDAY']);
                         } else {
-                            $weekTemp = array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA');
+                            $weekTemp = $aWeek;
                             $findDay = $weekTemp[date('w', $start_timestamp)];
                             $bydays = array($findDay);
                         }
 
                         // Get timestamp of first day of start week
-                        $week_recurring_timestamp = (date('w', $start_timestamp) == 0) ? $start_timestamp : strtotime('last Sunday ' . date('H:i:s', $start_timestamp), $start_timestamp);
+                        $week_recurring_timestamp = (date('w', $start_timestamp) == 0) ? $start_timestamp : strtotime("last {$days[$wkst]} " . date('H:i:s', $start_timestamp), $start_timestamp);
 
                         // Step through weeks
                         while ($week_recurring_timestamp <= $until) {
