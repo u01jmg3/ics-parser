@@ -39,6 +39,9 @@ class ICal
     /* The value in years to use for indefinite, recurring events */
     public /** @type {int} */ $default_span = 2;
 
+    /* The default first day of weeks */
+    public /** @type {string} */ $default_weekStart = 'SU';
+
     /**
      * Creates the iCal Object
      *
@@ -46,7 +49,7 @@ class ICal
      *
      * @return Object The iCal Object
      */
-    public function __construct($filename=false)
+    public function __construct($filename=false, $weekStart=false)
     {
         if (!$filename) {
             return false;
@@ -56,6 +59,10 @@ class ICal
             $lines = $filename;
         } else {
             $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        }
+        
+        if ($weekStart) {
+            $this->default_weekStart = $weekStart;
         }
 
         return $this->initLines($lines);
@@ -180,6 +187,7 @@ class ICal
                 }
             }
             $this->process_recurrences();
+            $this->process_dates_conversion();
             return $this->cal;
         }
     }
@@ -337,6 +345,54 @@ class ICal
     }
 
     /**
+     * Return a date adapted to the calendar timezone depending to the event TZID
+     * @author Jerome Combes <jerome@planningbiblio.fr>
+     *
+     * @param {array} $event an event
+     * @param {string} $key an event parameter (DTSTART or DTEND)
+     *
+     * @return {string} Ymd\THis date
+     */
+    public function iCalDateWithTimezone ($event, $key)
+    {
+        $defaultTimeZone = $this->calendarTimeZone();
+        if (!$defaultTimeZone) {
+            return false;
+        }
+        $date_array=$event[$key."_array"];
+        $date=$event[$key];
+    
+        if (isset($date_array[0]['TZID']) and preg_match("/[a-z]*\/[a-z_]*/i",$date_array[0]['TZID'])) {
+            $timeZone = $date_array[0]['TZID'];
+        } else {
+            $timeZone = $defaultTimeZone;
+        }
+
+        $dateTime = new dateTime($event[$key]);
+    
+        if (substr($date,-1) == 'Z') {
+            $date=substr($date,0,-1);
+            $tz = new dateTimeZone($defaultTimeZone);
+            $offset = timezone_offset_get($tz, $dateTime);
+        } else {
+            $tz = new dateTimeZone($defaultTimeZone);
+            $offset1 = timezone_offset_get($tz, $dateTime);
+            $tz = new dateTimeZone($timeZone);
+            $offset2 = timezone_offset_get($tz, $dateTime);
+            $offset=$offset1-$offset2;
+        }
+
+        if ($offset >= 0) {
+            $offset = '+'.$offset;
+        }
+    
+        $time = strtotime($date." $offset seconds");
+    
+        return date('Ymd\THis',$time);
+    }
+    
+    
+    /**
      * Processes recurrences
      *
      * @author John Grogg <john.grogg@gmail.com>
@@ -393,12 +449,13 @@ class ICal
 
                 if (isset($rrules['UNTIL'])) {
                     // Get Until
-                    $until = $this->iCalDateToUnixTimestamp($rrules['UNTIL']);
+                    $until = strtotime($rrules['UNTIL']);
                 } else if (isset($rrules['COUNT'])) {
                     $frequency_conversion = array('DAILY' => 'day', 'WEEKLY' => 'week', 'MONTHLY' => 'month', 'YEARLY' => 'year');
                     $count_orig = (is_numeric($rrules['COUNT']) && $rrules['COUNT'] > 1) ? $rrules['COUNT'] : 0;
                     $count = ($count_orig - 1); // Remove one to exclude the occurrence that initialises the rule
                     $count += ($count > 0) ? $count * ($interval - 1) : 0;
+                    $count_nb = 1;
                     $offset = "+$count " . $frequency_conversion[$frequency];
                     $until = strtotime($offset, $start_timestamp);
 
@@ -444,6 +501,14 @@ class ICal
 
                             if (!$is_excluded) {
                                 $events[] = $anEvent;
+                                
+                                // If RRULE[COUNT] is reached : break
+                                if (isset($rrules['COUNT'])) {
+                                    $count_nb ++;
+                                    if ($count_nb >= $count_orig){
+                                        break 2;
+                                    }
+                                }
                             }
 
                             // Move forwards
@@ -453,19 +518,30 @@ class ICal
                     case 'WEEKLY':
                         // Create offset
                         $offset = "+$interval week";
+                        
+                        // Use RRULE['WKST'] setting or a default week start (USA = SU, Europe = MO)
+                        $weeks = array(
+                            'SA' => array('SA', 'SU', 'MO', 'TU', 'WE', 'TH', 'FR'),
+                            'SU' => array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'),
+                            'MO' => array('MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'));
+
+                        $wkst = (isset($rrules['WKST']) and in_array($rrules['WKST'], array('SA','SU','MO'))) ? $rrules['WKST'] : $this->default_weekStart;
+                        $aWeek = $weeks[$wkst];
+                        $days = array('SA'=>'Saturday', 'SU'=>'Sunday', 'MO'=> 'Monday');
+
                         // Build list of days of week to add events
-                        $weekdays = array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA');
+                        $weekdays = $aWeek;
 
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
                             $bydays = explode(',', $rrules['BYDAY']);
                         } else {
-                            $weekTemp = array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA');
+                            $weekTemp = $aWeek;
                             $findDay = $weekTemp[date('w', $start_timestamp)];
                             $bydays = array($findDay);
                         }
 
                         // Get timestamp of first day of start week
-                        $week_recurring_timestamp = (date('w', $start_timestamp) == 0) ? $start_timestamp : strtotime('last Sunday ' . date('H:i:s', $start_timestamp), $start_timestamp);
+                        $week_recurring_timestamp = (date('w', $start_timestamp) == 0) ? $start_timestamp : strtotime("last {$days[$wkst]} " . date('H:i:s', $start_timestamp), $start_timestamp);
 
                         // Step through weeks
                         while ($week_recurring_timestamp <= $until) {
@@ -485,6 +561,14 @@ class ICal
 
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
+
+                                        // If RRULE[COUNT] is reached : break
+                                        if (isset($rrules['COUNT'])) {
+                                            $count_nb ++;
+                                            if ($count_nb >= $count_orig){
+                                                break 2;
+                                            }
+                                        }
                                     }
                                 }
 
@@ -516,6 +600,14 @@ class ICal
 
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
+
+                                        // If RRULE[COUNT] is reached : break
+                                        if (isset($rrules['COUNT'])) {
+                                            $count_nb ++;
+                                            if ($count_nb >= $count_orig){
+                                                break 2;
+                                            }
+                                        }
                                     }
                                 }
 
@@ -538,6 +630,14 @@ class ICal
 
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
+
+                                        // If RRULE[COUNT] is reached : break
+                                        if (isset($rrules['COUNT'])) {
+                                            $count_nb ++;
+                                            if ($count_nb >= $count_orig){
+                                                break 2;
+                                            }
+                                        }
                                     }
                                 }
 
@@ -569,6 +669,14 @@ class ICal
 
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
+
+                                        // If RRULE[COUNT] is reached : break
+                                        if (isset($rrules['COUNT'])) {
+                                            $count_nb ++;
+                                            if ($count_nb >= $count_orig){
+                                                break 2;
+                                            }
+                                        }
                                     }
                                 }
 
@@ -599,6 +707,14 @@ class ICal
 
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
+
+                                        // If RRULE[COUNT] is reached : break
+                                        if (isset($rrules['COUNT'])) {
+                                            $count_nb ++;
+                                            if ($count_nb >= $count_orig){
+                                                break 2;
+                                            }
+                                        }
                                     }
                                 }
 
@@ -612,6 +728,31 @@ class ICal
                 }
             }
         }
+        $this->cal['VEVENT'] = $events;
+    }
+
+    /**
+     * Processes dates conversion with timezone 
+     * @author Jerome Combes <jerome@planningbiblio.fr>
+     *
+     * Add fields DTSTART_tz and DTEND_tz to each event
+     * These fields contain dates adapted to the calendar timezone depending to the event TZID (Ymd\THis) 
+     * @return {array}
+     */
+    public function process_dates_conversion()
+    {
+        $array = $this->cal;
+        $events = $array['VEVENT'];
+
+        if (empty($events)) {
+            return false;
+        }
+    
+        foreach ($events as $key => $anEvent) {
+            $events[$key]['DTSTART_tz'] = $this->iCalDateWithTimezone($anEvent, "DTSTART");
+            $events[$key]['DTEND_tz'] = $this->iCalDateWithTimezone($anEvent, "DTEND");
+        }
+
         $this->cal['VEVENT'] = $events;
     }
 
@@ -645,6 +786,22 @@ class ICal
     public function calendarDescription()
     {
         return $this->cal['VCALENDAR']['X-WR-CALDESC'];
+    }
+
+    /**
+     * Returns the calendar timezone
+     *
+     * @return {calendar timezone}
+     */
+    public function calendarTimeZone()
+    {
+        if (isset($this->cal['VCALENDAR']['X-WR-TIMEZONE'])) {
+            return $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
+        } elseif(isset($this->cal['VTIMEZONE']['TZID'])) {
+            return $this->cal['VTIMEZONE']['TZID'];
+        } else {
+            return "UTC";
+        }
     }
 
     /**
