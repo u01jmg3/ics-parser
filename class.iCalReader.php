@@ -60,7 +60,7 @@ class ICal
         } else {
             $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         }
-        
+
         if ($weekStart) {
             $this->default_weekStart = $weekStart;
         }
@@ -361,7 +361,7 @@ class ICal
         }
         $date_array=$event[$key."_array"];
         $date=$event[$key];
-    
+
         if (isset($date_array[0]['TZID']) and preg_match("/[a-z]*\/[a-z_]*/i",$date_array[0]['TZID'])) {
             $timeZone = $date_array[0]['TZID'];
         } else {
@@ -369,7 +369,7 @@ class ICal
         }
 
         $dateTime = new dateTime($event[$key]);
-    
+
         if (substr($date,-1) == 'Z') {
             $date=substr($date,0,-1);
             $tz = new dateTimeZone($defaultTimeZone);
@@ -385,13 +385,13 @@ class ICal
         if ($offset >= 0) {
             $offset = '+'.$offset;
         }
-    
+
         $time = strtotime($date." $offset seconds");
-    
+
         return date('Ymd\THis',$time);
     }
-    
-    
+
+
     /**
      * Processes recurrences
      *
@@ -501,7 +501,7 @@ class ICal
 
                             if (!$is_excluded) {
                                 $events[] = $anEvent;
-                                
+
                                 // If RRULE[COUNT] is reached : break
                                 if (isset($rrules['COUNT'])) {
                                     $count_nb ++;
@@ -518,7 +518,7 @@ class ICal
                     case 'WEEKLY':
                         // Create offset
                         $offset = "+$interval week";
-                        
+
                         // Use RRULE['WKST'] setting or a default week start (USA = SU, Europe = MO)
                         $weeks = array(
                             'SA' => array('SA', 'SU', 'MO', 'TU', 'WE', 'TH', 'FR'),
@@ -732,11 +732,11 @@ class ICal
     }
 
     /**
-     * Processes dates conversion with timezone 
+     * Processes dates conversion with timezone
      * @author Jerome Combes <jerome@planningbiblio.fr>
      *
      * Add fields DTSTART_tz and DTEND_tz to each event
-     * These fields contain dates adapted to the calendar timezone depending to the event TZID (Ymd\THis) 
+     * These fields contain dates adapted to the calendar timezone depending to the event TZID (Ymd\THis)
      * @return {array}
      */
     public function process_dates_conversion()
@@ -747,7 +747,7 @@ class ICal
         if (empty($events)) {
             return false;
         }
-    
+
         foreach ($events as $key => $anEvent) {
             $events[$key]['DTSTART_tz'] = $this->iCalDateWithTimezone($anEvent, "DTSTART");
             $events[$key]['DTEND_tz'] = $this->iCalDateWithTimezone($anEvent, "DTEND");
