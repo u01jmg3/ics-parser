@@ -72,7 +72,7 @@ class ICal
     /**
      * Initializes lines from a URL
      *
-     * @url {string} $url The url of the ical file to download and initialize.  Unless you know what you're doing, it should begin with "http://"
+     * @url {string} $url The url of the ical file to download and initialize
      *
      * @return Object The iCal Object
      */
@@ -123,7 +123,7 @@ class ICal
                 }
 
                 $keyword = $add[0];
-                $values = $add[1]; // Could be an array containing multiple values
+                $values  = $add[1]; // Could be an array containing multiple values
 
                 if (!is_array($values)) {
                     if (!empty($values)) {
@@ -186,8 +186,10 @@ class ICal
                     }
                 }
             }
+
             $this->process_recurrences();
             $this->process_dates_conversion();
+
             return $this->cal;
         }
     }
@@ -227,7 +229,7 @@ class ICal
 
                     // Glue back together for multi-line content
                     if ($this->cal[$component][$this->event_count - 1][$keyword] != $value) {
-                        $ord = (isset($value[0])) ? ord($value[0]) : NULL; // First char
+                        $ord = (isset($value[0])) ? ord($value[0]) : null; // First char
 
                         if (in_array($ord, array(9, 32))) { // Is space or tab?
                             $value = substr($value, 1); // Only trim the first character
@@ -293,7 +295,7 @@ class ICal
 
                     foreach ($attributes as $attribute) {
                         preg_match_all('~[^\r\n"=]+(?:"[^"\\\]*(?:\\\.[^"\\\]*)*"[^\r\n"=]*)*~', $attribute, $values); // Match equals sign separator outside of quoted substrings
-                        $value = (sizeof($values) == 0) ? NULL : reset($values); // Remove multi-dimensional array and use the first key
+                        $value = (sizeof($values) == 0) ? null : reset($values); // Remove multi-dimensional array and use the first key
 
                         if (is_array($value) && isset($value[1])) {
                             $formatted[$value[0]] = trim($value[1], '"'); // Remove double quotes from beginning and end only
@@ -430,8 +432,9 @@ class ICal
     {
         $array = $this->cal;
         $events = $array['VEVENT'];
-        if (empty($events))
+        if (empty($events)) {
             return false;
+        }
         foreach ($array['VEVENT'] as $anEvent) {
             if (isset($anEvent['RRULE']) && $anEvent['RRULE'] != '') {
                 // Recurring event, parse RRULE and add appropriate duplicate events
@@ -533,6 +536,7 @@ class ICal
                                 // If RRULE[COUNT] is reached then break
                                 if (isset($rrules['COUNT'])) {
                                     $count_nb++;
+
                                     if ($count_nb >= $count_orig) {
                                         break 2;
                                     }
@@ -564,8 +568,7 @@ class ICal
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
                             $bydays = explode(',', $rrules['BYDAY']);
                         } else {
-                            $weekTemp = $aWeek;
-                            $findDay = $weekTemp[date('w', $start_timestamp)];
+                            $findDay = $weekdays[date('w', $start_timestamp)];
                             $bydays = array($findDay);
                         }
 
@@ -586,7 +589,9 @@ class ICal
                                     $anEvent['DTEND'] = date('Ymd\THis', $day_recurring_timestamp + $event_timestamp_offset);
 
                                     $search_date = $anEvent['DTSTART'];
-                                    $is_excluded = array_filter($anEvent['EXDATE_array'], function($val) use ($search_date) { return is_string($val) && strpos($search_date, $val) === 0; });
+                                    $is_excluded = array_filter($anEvent['EXDATE_array'], function($val) use ($search_date) {
+                                        return is_string($val) && strpos($search_date, $val) === 0;
+                                    });
 
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
@@ -594,6 +599,7 @@ class ICal
                                         // If RRULE[COUNT] is reached then break
                                         if (isset($rrules['COUNT'])) {
                                             $count_nb++;
+
                                             if ($count_nb >= $count_orig) {
                                                 break 2;
                                             }
@@ -625,7 +631,9 @@ class ICal
                                     $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestamp_offset);
 
                                     $search_date = $anEvent['DTSTART'];
-                                    $is_excluded = array_filter($anEvent['EXDATE_array'], function($val) use ($search_date) { return is_string($val) && strpos($search_date, $val) === 0; });
+                                    $is_excluded = array_filter($anEvent['EXDATE_array'], function($val) use ($search_date) {
+                                        return is_string($val) && strpos($search_date, $val) === 0;
+                                    });
 
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
@@ -633,6 +641,7 @@ class ICal
                                         // If RRULE[COUNT] is reached then break
                                         if (isset($rrules['COUNT'])) {
                                             $count_nb++;
+
                                             if ($count_nb >= $count_orig) {
                                                 break 2;
                                             }
@@ -655,7 +664,9 @@ class ICal
                                     $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestamp_offset);
 
                                     $search_date = $anEvent['DTSTART'];
-                                    $is_excluded = array_filter($anEvent['EXDATE_array'], function($val) use ($search_date) { return is_string($val) && strpos($search_date, $val) === 0; });
+                                    $is_excluded = array_filter($anEvent['EXDATE_array'], function($val) use ($search_date) {
+                                        return is_string($val) && strpos($search_date, $val) === 0;
+                                    });
 
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
@@ -663,6 +674,7 @@ class ICal
                                         // If RRULE[COUNT] is reached then break
                                         if (isset($rrules['COUNT'])) {
                                             $count_nb++;
+
                                             if ($count_nb >= $count_orig) {
                                                 break 2;
                                             }
@@ -694,7 +706,9 @@ class ICal
                                     $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestamp_offset);
 
                                     $search_date = $anEvent['DTSTART'];
-                                    $is_excluded = array_filter($anEvent['EXDATE_array'], function($val) use ($search_date) { return is_string($val) && strpos($search_date, $val) === 0; });
+                                    $is_excluded = array_filter($anEvent['EXDATE_array'], function($val) use ($search_date) {
+                                        return is_string($val) && strpos($search_date, $val) === 0;
+                                    });
 
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
@@ -702,6 +716,7 @@ class ICal
                                         // If RRULE[COUNT] is reached then break
                                         if (isset($rrules['COUNT'])) {
                                             $count_nb++;
+
                                             if ($count_nb >= $count_orig) {
                                                 break 2;
                                             }
@@ -732,7 +747,9 @@ class ICal
                                     $anEvent['DTEND'] = date('Ymd\THis', $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $event_timestamp_offset);
 
                                     $search_date = $anEvent['DTSTART'];
-                                    $is_excluded = array_filter($anEvent['EXDATE_array'], function($val) use ($search_date) { return is_string($val) && strpos($search_date, $val) === 0; });
+                                    $is_excluded = array_filter($anEvent['EXDATE_array'], function($val) use ($search_date) {
+                                        return is_string($val) && strpos($search_date, $val) === 0;
+                                    });
 
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
@@ -740,6 +757,7 @@ class ICal
                                         // If RRULE[COUNT] is reached then break
                                         if (isset($rrules['COUNT'])) {
                                             $count_nb++;
+
                                             if ($count_nb >= $count_orig) {
                                                 break 2;
                                             }
@@ -804,7 +822,7 @@ class ICal
      */
     public function calendarName()
     {
-        return $this->cal['VCALENDAR']['X-WR-CALNAME'];
+        return isset($this->cal['VCALENDAR']['X-WR-CALNAME']) ? $this->cal['VCALENDAR']['X-WR-CALNAME'] : '';
     }
 
     /**
@@ -814,7 +832,7 @@ class ICal
      */
     public function calendarDescription()
     {
-        return $this->cal['VCALENDAR']['X-WR-CALDESC'];
+        return isset($this->cal['VCALENDAR']['X-WR-CALDESC']) ? $this->cal['VCALENDAR']['X-WR-CALDESC'] : '';
     }
 
     /**
@@ -842,7 +860,7 @@ class ICal
     public function freeBusyEvents()
     {
         $array = $this->cal;
-        return $array['VFREEBUSY'];
+        return isset($array['VFREEBUSY']) ? $array['VFREEBUSY'] : '';
     }
 
     /**
@@ -933,6 +951,7 @@ class ICal
         foreach ($extendedEvents as $key => $value) {
             $timestamp[$key] = $value['UNIX_TIMESTAMP'];
         }
+
         array_multisort($timestamp, $sortOrder, $extendedEvents);
 
         return $extendedEvents;
