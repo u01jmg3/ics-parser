@@ -10,7 +10,7 @@
  * @author   Martin Thoma <info@martin-thoma.de>
  * @license  http://www.opensource.org/licenses/mit-license.php MIT License
  * @link     https://github.com/MartinThoma/ics-parser/
- * @version  1.0.3
+ * @version  1.0.4
  */
 
 /**

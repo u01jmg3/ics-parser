@@ -1,6 +1,6 @@
 {
     "name": "johngrogg/ics-parser",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Ics file parser",
     "keywords": ["ics", "ical"],
     "authors": [
