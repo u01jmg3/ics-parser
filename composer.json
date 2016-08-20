@@ -1,8 +1,10 @@
 {
     "name": "johngrogg/ics-parser",
-    "version": "1.0.4",
-    "description": "Ics file parser",
+    "version": "2.0.0",
+    "description": "ICS file parser",
     "keywords": ["ics", "ical"],
+    "type":"library",
+    "license": "MIT",
     "authors": [
         {
             "name": "Martin Thoma",
@@ -13,9 +15,23 @@
             "name": "John Grogg",
             "email": "john.grogg@gmail.com",
             "role": "Developer"
+        },
+        {
+            "name": "Jonathan Goode",
+            "role": "Maintainer/Developer"
         }
     ],
+    "require": {
+        "php": ">=5.3.0"
+
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^2.5"
+    },
     "autoload": {
-        "classmap": ["class.iCalReader.php"]
+        "psr-0": {
+            "ICal": "src/",
+            "ICal\\Tests": "tests/"
+        }
     }
 }
