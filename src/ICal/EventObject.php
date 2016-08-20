@@ -1,8 +1,7 @@
 <?php
 /**
- * @category Parser
- * @package  ics-parser
- * @author Tanya Kalashnik <tanchik194@bk.ru>
+ * @category    Parser
+ * @package     ics-parser
  */
 
 namespace ICal;

@@ -19,11 +19,11 @@ $events = $ical->events();
     <h3>PHP ICS Parser example</h3>
     <ul class="list-group">
         <li class="list-group-item">
-            <span class="badge"><?= $ical->eventCount ?></span>
+            <span class="badge"><?php echo $ical->eventCount ?></span>
             The number of events
         </li>
         <li class="list-group-item">
-            <span class="badge"><?= $ical->todoCount ?></span>
+            <span class="badge"><?php echo $ical->todoCount ?></span>
             The number of todos
         </li>
     </ul>
@@ -33,39 +33,39 @@ $events = $ical->events();
         <div class="col-sm-6 col-md-4">
             <div class="thumbnail">
                 <div class="caption">
-                    <h3><?= $event->summary . ' (' . date('d-m-Y H:i', $ical->iCalDateToUnixTimestamp($event->dtstart)) . ')' ?></h3>
+                    <h3><?php echo $event->summary . ' (' . date('d-m-Y H:i', $ical->iCalDateToUnixTimestamp($event->dtstart)) . ')' ?></h3>
 
-                    <p>SUMMARY <?= $event->summary ?></p>
+                    <p>SUMMARY <?php echo $event->summary ?></p>
 
-                    <p>DTSTART <?= $event->dtstart ?></p>
+                    <p>DTSTART <?php echo $event->dtstart ?></p>
 
-                    <p>DTEND <?= $event->dtend ?></p>
+                    <p>DTEND <?php echo $event->dtend ?></p>
 
-                    <p>DTSTAMP <?= $event->dtstamp ?></p>
+                    <p>DTSTAMP <?php echo $event->dtstamp ?></p>
 
-                    <p>UID <?= $event->uid ?></p>
+                    <p>UID <?php echo $event->uid ?></p>
 
-                    <p>CREATED <?= $event->created ?></p>
+                    <p>CREATED <?php echo $event->created ?></p>
 
-                    <p>LAST-MODIFIED <?= $event->lastModified ?></p>
+                    <p>LAST-MODIFIED <?php echo $event->lastModified ?></p>
 
-                    <p>DESCRIPTION <?= $event->description ?></p>
+                    <p>DESCRIPTION <?php echo $event->description ?></p>
 
-                    <p>LOCATION <?= $event->location ?></p>
+                    <p>LOCATION <?php echo $event->location ?></p>
 
-                    <p>SEQUENCE <?= $event->sequence ?></p>
+                    <p>SEQUENCE <?php echo $event->sequence ?></p>
 
-                    <p>STATUS <?= $event->status ?></p>
+                    <p>STATUS <?php echo $event->status ?></p>
 
-                    <p>TRANSP <?= $event->transp ?></p>
+                    <p>TRANSP <?php echo $event->transp ?></p>
 
-                    <p>ORGANIZER <?= $event->organizer ?></p>
+                    <p>ORGANIZER <?php echo $event->organizer ?></p>
 
-                    <p>ATTENDEE(S) <?= $event->attendee ?></p>
+                    <p>ATTENDEE(S) <?php echo $event->attendee ?></p>
                 </div>
             </div>
         </div>
-    <?php endforeach; ?>
+    <?php endforeach ?>
     </div>
 </div>
 </body>
