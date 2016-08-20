@@ -1,9 +1,9 @@
 # PHP ICS Parser
 
---
-
 [![Latest Stable Version](https://poser.pugx.org/johngrogg/ics-parser/v/stable.png)](https://packagist.org/packages/johngrogg/ics-parser)
 [![Total Downloads](https://poser.pugx.org/johngrogg/ics-parser/downloads.png)](https://packagist.org/packages/johngrogg/ics-parser)
+
+--
 
 ## License
 
@@ -18,15 +18,13 @@ It was modified by John Grogg to properly handle recurring events (specifically 
 
 ## Installation
 
-### Composer
-
-[Composer](http://getcomposer.org)
+### [Composer](http://getcomposer.org)
 
 ```bash
 $ curl -s https://getcomposer.org/installer | php
 ```
 
-`composer.json`
+- `composer.json`
 
 ```yaml
 {
