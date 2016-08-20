@@ -360,7 +360,7 @@ class ICal
             if (!$defaultTimeZone) {
                 $conv_date = new DateTime('now');
             } else {
-                $conv_date = new DateTime('now', new dateTimeZone($defaultTimeZone));
+                $conv_date = new DateTime('now', new DateTimeZone($defaultTimeZone));
             }
         } else {
             $conv_date = new DateTime('now', new DateTimeZone($tzone));
@@ -382,7 +382,7 @@ class ICal
      *
      * @return {string} Ymd\THis date
      */
-    public function iCalDateWithTimezone($event, $key)
+    public function iCalDateWithTimeZone($event, $key)
     {
         $defaultTimeZone = $this->calendarTimeZone();
         if (!$defaultTimeZone) {
@@ -397,16 +397,16 @@ class ICal
             $timeZone = $defaultTimeZone;
         }
 
-        $dateTime = new dateTime($event[$key]);
+        $dateTime = new DateTime($event[$key]);
 
         if (substr($date, -1) == 'Z') {
             $date = substr($date, 0, -1);
-            $tz = new dateTimeZone($defaultTimeZone);
+            $tz = new DateTimeZone($defaultTimeZone);
             $offset = timezone_offset_get($tz, $dateTime);
         } else {
-            $tz = new dateTimeZone($defaultTimeZone);
+            $tz = new DateTimeZone($defaultTimeZone);
             $offset1 = timezone_offset_get($tz, $dateTime);
-            $tz = new dateTimeZone($timeZone);
+            $tz = new DateTimeZone($timeZone);
             $offset2 = timezone_offset_get($tz, $dateTime);
             $offset = $offset1 - $offset2;
         }
@@ -554,9 +554,9 @@ class ICal
                             'MO' => array('MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'),
                         );
 
-                        $wkst = (isset($rrules['WKST']) and in_array($rrules['WKST'], array('SA','SU','MO'))) ? $rrules['WKST'] : $this->default_weekStart;
+                        $wkst = (isset($rrules['WKST']) && in_array($rrules['WKST'], array('SA', 'SU', 'MO'))) ? $rrules['WKST'] : $this->default_weekStart;
                         $aWeek = $weeks[$wkst];
-                        $days = array('SA'=>'Saturday', 'SU'=>'Sunday', 'MO'=> 'Monday');
+                        $days = array('SA' => 'Saturday', 'SU' => 'Sunday', 'MO' => 'Monday');
 
                         // Build list of days of week to add events
                         $weekdays = $aWeek;
@@ -778,8 +778,8 @@ class ICal
         }
 
         foreach ($events as $key => $anEvent) {
-            $events[$key]['DTSTART_tz'] = $this->iCalDateWithTimezone($anEvent, 'DTSTART');
-            $events[$key]['DTEND_tz'] = $this->iCalDateWithTimezone($anEvent, 'DTEND');
+            $events[$key]['DTSTART_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTSTART');
+            $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTEND');
         }
 
         $this->cal['VEVENT'] = $events;
