@@ -353,16 +353,16 @@ class ICal
      *
      * @return {string} Ymd\THis date
      */
-    public function iCalDateWithTimezone ($event, $key)
+    public function iCalDateWithTimezone($event, $key)
     {
         $defaultTimeZone = $this->calendarTimeZone();
         if (!$defaultTimeZone) {
             return false;
         }
-        $date_array=$event[$key."_array"];
-        $date=$event[$key];
+        $date_array = $event[$key . '_array'];
+        $date = $event[$key];
 
-        if (isset($date_array[0]['TZID']) and preg_match("/[a-z]*\/[a-z_]*/i",$date_array[0]['TZID'])) {
+        if (isset($date_array[0]['TZID']) && preg_match('/[a-z]*\/[a-z_]*/i', $date_array[0]['TZID'])) {
             $timeZone = $date_array[0]['TZID'];
         } else {
             $timeZone = $defaultTimeZone;
@@ -370,8 +370,8 @@ class ICal
 
         $dateTime = new dateTime($event[$key]);
 
-        if (substr($date,-1) == 'Z') {
-            $date=substr($date,0,-1);
+        if (substr($date, -1) == 'Z') {
+            $date = substr($date, 0, -1);
             $tz = new dateTimeZone($defaultTimeZone);
             $offset = timezone_offset_get($tz, $dateTime);
         } else {
@@ -379,16 +379,16 @@ class ICal
             $offset1 = timezone_offset_get($tz, $dateTime);
             $tz = new dateTimeZone($timeZone);
             $offset2 = timezone_offset_get($tz, $dateTime);
-            $offset=$offset1-$offset2;
+            $offset = $offset1 - $offset2;
         }
 
         if ($offset >= 0) {
-            $offset = '+'.$offset;
+            $offset = '+' . $offset;
         }
 
-        $time = strtotime($date." $offset seconds");
+        $time = strtotime($date . " $offset seconds");
 
-        return date('Ymd\THis',$time);
+        return date('Ymd\THis', $time);
     }
 
 
@@ -502,10 +502,10 @@ class ICal
                             if (!$is_excluded) {
                                 $events[] = $anEvent;
 
-                                // If RRULE[COUNT] is reached : break
+                                // If RRULE[COUNT] is reached then break
                                 if (isset($rrules['COUNT'])) {
-                                    $count_nb ++;
-                                    if ($count_nb >= $count_orig){
+                                    $count_nb++;
+                                    if ($count_nb >= $count_orig) {
                                         break 2;
                                     }
                                 }
@@ -523,7 +523,8 @@ class ICal
                         $weeks = array(
                             'SA' => array('SA', 'SU', 'MO', 'TU', 'WE', 'TH', 'FR'),
                             'SU' => array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'),
-                            'MO' => array('MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'));
+                            'MO' => array('MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'),
+                        );
 
                         $wkst = (isset($rrules['WKST']) and in_array($rrules['WKST'], array('SA','SU','MO'))) ? $rrules['WKST'] : $this->default_weekStart;
                         $aWeek = $weeks[$wkst];
@@ -562,10 +563,10 @@ class ICal
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
 
-                                        // If RRULE[COUNT] is reached : break
+                                        // If RRULE[COUNT] is reached then break
                                         if (isset($rrules['COUNT'])) {
-                                            $count_nb ++;
-                                            if ($count_nb >= $count_orig){
+                                            $count_nb++;
+                                            if ($count_nb >= $count_orig) {
                                                 break 2;
                                             }
                                         }
@@ -601,10 +602,10 @@ class ICal
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
 
-                                        // If RRULE[COUNT] is reached : break
+                                        // If RRULE[COUNT] is reached then break
                                         if (isset($rrules['COUNT'])) {
-                                            $count_nb ++;
-                                            if ($count_nb >= $count_orig){
+                                            $count_nb++;
+                                            if ($count_nb >= $count_orig) {
                                                 break 2;
                                             }
                                         }
@@ -631,10 +632,10 @@ class ICal
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
 
-                                        // If RRULE[COUNT] is reached : break
+                                        // If RRULE[COUNT] is reached then break
                                         if (isset($rrules['COUNT'])) {
-                                            $count_nb ++;
-                                            if ($count_nb >= $count_orig){
+                                            $count_nb++;
+                                            if ($count_nb >= $count_orig) {
                                                 break 2;
                                             }
                                         }
@@ -670,10 +671,10 @@ class ICal
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
 
-                                        // If RRULE[COUNT] is reached : break
+                                        // If RRULE[COUNT] is reached then break
                                         if (isset($rrules['COUNT'])) {
-                                            $count_nb ++;
-                                            if ($count_nb >= $count_orig){
+                                            $count_nb++;
+                                            if ($count_nb >= $count_orig) {
                                                 break 2;
                                             }
                                         }
@@ -708,10 +709,10 @@ class ICal
                                     if (!$is_excluded) {
                                         $events[] = $anEvent;
 
-                                        // If RRULE[COUNT] is reached : break
+                                        // If RRULE[COUNT] is reached then break
                                         if (isset($rrules['COUNT'])) {
-                                            $count_nb ++;
-                                            if ($count_nb >= $count_orig){
+                                            $count_nb++;
+                                            if ($count_nb >= $count_orig) {
                                                 break 2;
                                             }
                                         }
@@ -749,8 +750,8 @@ class ICal
         }
 
         foreach ($events as $key => $anEvent) {
-            $events[$key]['DTSTART_tz'] = $this->iCalDateWithTimezone($anEvent, "DTSTART");
-            $events[$key]['DTEND_tz'] = $this->iCalDateWithTimezone($anEvent, "DTEND");
+            $events[$key]['DTSTART_tz'] = $this->iCalDateWithTimezone($anEvent, 'DTSTART');
+            $events[$key]['DTEND_tz'] = $this->iCalDateWithTimezone($anEvent, 'DTEND');
         }
 
         $this->cal['VEVENT'] = $events;
@@ -797,10 +798,10 @@ class ICal
     {
         if (isset($this->cal['VCALENDAR']['X-WR-TIMEZONE'])) {
             return $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
-        } elseif(isset($this->cal['VTIMEZONE']['TZID'])) {
+        } else if (isset($this->cal['VTIMEZONE']['TZID'])) {
             return $this->cal['VTIMEZONE']['TZID'];
         } else {
-            return "UTC";
+            return 'UTC';
         }
     }
 
