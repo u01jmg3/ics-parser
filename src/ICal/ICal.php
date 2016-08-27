@@ -7,7 +7,7 @@
  *
  * @category Parser
  * @package  ics-parser
- * @author   Martin Thoma <info@martin-thoma.de>
+ * @author   Martin Thoma <info@martin-thoma.de>, John Grogg <john.grogg@gmail.com>, Jonathan Goode <https://github.com/u01jmg3>
  * @license  http://www.opensource.org/licenses/mit-license.php MIT License
  * @link     https://github.com/MartinThoma/ics-parser/
  * @example  $ical = new ical('MyCal.ics'); print_r($ical->events());
@@ -87,15 +87,15 @@ class ICal
     );
 
     protected $monthNames = array(
-        1  => 'January',
-        2  => 'February',
-        3  => 'March',
-        4  => 'April',
-        5  => 'May',
-        6  => 'June',
-        7  => 'July',
-        8  => 'August',
-        9  => 'September',
+         1 => 'January',
+         2 => 'February',
+         3 => 'March',
+         4 => 'April',
+         5 => 'May',
+         6 => 'June',
+         7 => 'July',
+         8 => 'August',
+         9 => 'September',
         10 => 'October',
         11 => 'November',
         12 => 'December',
@@ -248,7 +248,7 @@ class ICal
             }
 
             $this->processRecurrences();
-            $this->processDatesConversion();
+            $this->processDateConversions();
         }
     }
 
@@ -476,7 +476,7 @@ class ICal
 
         $dateTime = new \DateTime($event[$key]);
 
-        if (substr($date, -1) == 'Z') {
+        if (substr($date, -1) === 'Z') {
             $date = substr($date, 0, -1);
             $tz = new \DateTimeZone($defaultTimeZone);
             $offset = timezone_offset_get($tz, $dateTime);
@@ -500,7 +500,6 @@ class ICal
     /**
      * Processes recurrences
      *
-     * @author John Grogg <john.grogg@gmail.com>
      * @return array
      */
     public function processRecurrences()
@@ -897,7 +896,7 @@ class ICal
      * These fields contain dates adapted to the calendar timezone depending to the event TZID (Ymd\THis)
      * @return array
      */
-    public function processDatesConversion()
+    public function processDateConversions()
     {
         $array = $this->cal;
         $events = $array['VEVENT'];

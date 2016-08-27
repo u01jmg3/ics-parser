@@ -11,10 +11,11 @@ class EventObject
     public $summary;
     public $dtstart;
     public $dtend;
+    public $duration;
     public $dtstamp;
     public $uid;
     public $created;
-    public $lastModified;
+    public $lastmodified;
     public $description;
     public $location;
     public $sequence;
