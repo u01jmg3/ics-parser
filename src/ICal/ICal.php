@@ -788,6 +788,17 @@ class ICal
                                 $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]} of " . date('F Y H:i:s', $recurringTimestamp);
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
+                                // Prevent 5th day of a month from showing up on the next month
+                                // If BYDAY and the event falls outside the current month, skip the event
+
+                                $compareCurrentMonth = date('F', $recurringTimestamp);
+                                $compareEventMonth   = date('F', $eventStartTimestamp);
+
+                                if ($compareCurrentMonth != $compareEventMonth) {
+                                    $recurringTimestamp = strtotime($offset, $recurringTimestamp);
+                                    continue;
+                                }
+
                                 if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
                                     $anEvent['DTSTART'] = date('Ymd\T', $eventStartTimestamp) . $startTime;
                                     $anEvent['DTEND'] = date(
