@@ -62,6 +62,7 @@ class ICal
      */
     public $defaultSpan = 2;
     public $defaultWeekStart = 'SU';
+    public $default_timeZone = 'UTC';
 
     const UNIX_MIN_YEAR = 1970;
 
@@ -112,8 +113,10 @@ class ICal
      * Creates the iCal Object
      *
      * @param mixed $filename The path to the iCal-file or an array of lines from an iCal file
+     * @param mixed $weekStart The default first day of weeks (SA, SU, MO)
+     * @param mixed $timeZone The default Time Zone
      */
-    public function __construct($filename = false, $weekStart = false)
+    public function __construct($filename = false, $weekStart = false, $timeZone = false)
     {
         if (!$filename) {
             return false;
@@ -129,6 +132,10 @@ class ICal
             $this->defaultWeekStart = $weekStart;
         }
 
+        if ($timeZone) {
+            $this->default_timeZone = $timeZone;
+        }
+        
         $this->initLines($lines);
     }
 
@@ -480,7 +487,10 @@ class ICal
 
         if (isset($date_array[0]['TZID']) && preg_match('/[a-z]*\/[a-z_]*/i', $date_array[0]['TZID'])) {
             $timeZone = $date_array[0]['TZID'];
-        } else {
+        }
+        
+        // Check if the Time Zone is valid
+        if ( !isset($timeZone) or !in_array( $timezone, timezone_identifiers_list() )) {
             $timeZone = $defaultTimeZone;
         }
 
@@ -1005,12 +1015,17 @@ class ICal
     public function calendarTimeZone()
     {
         if (isset($this->cal['VCALENDAR']['X-WR-TIMEZONE'])) {
-            return $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
+            $timezone = $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
         } else if (isset($this->cal['VTIMEZONE']['TZID'])) {
-            return $this->cal['VTIMEZONE']['TZID'];
-        } else {
-            return 'UTC';
+            $timezone = $this->cal['VTIMEZONE']['TZID'];
         }
+        
+        // Check if the Time Zone is valid
+        if ( !in_array( $timezone, timezone_identifiers_list() )) {
+          $timezone = $this->default_timeZone;
+        }
+        
+        return $timezone;
     }
 
     /**
