@@ -490,7 +490,7 @@ class ICal
         }
         
         // Check if the Time Zone is valid
-        if ( !isset($timeZone) or !in_array( $timezone, timezone_identifiers_list() )) {
+        if ( !isset($timeZone) or !in_array( $timeZone, timezone_identifiers_list() )) {
             $timeZone = $defaultTimeZone;
         }
 
