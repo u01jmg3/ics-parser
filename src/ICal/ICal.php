@@ -65,7 +65,9 @@ class ICal
 
     const UNIX_MIN_YEAR = 1970;
 
-    const DATE_TIME_FORMAT = 'Ymd\THis';
+    const DATE_FORMAT = 'Ymd';
+    const TIME_FORMAT = 'His';
+    const DATE_TIME_FORMAT = self::DATE_FORMAT . '\T' . self::TIME_FORMAT;
 
     protected $dayOrdinals = array(
         1 => 'first',
@@ -247,6 +249,7 @@ class ICal
                 }
             }
 
+            $this->processDates();
             $this->processRecurrences();
             $this->processDateConversions();
         }
@@ -434,17 +437,10 @@ class ICal
         }
         // Unix timestamps after 03:14:07 UTC 2038-01-19 might cause an overflow
         // if 32 bit integers are used.
-
         if ($date[8] == 'Z') {
             $convDate = new \DateTime('now', new \DateTimeZone('UTC'));
         } else if (!$tzone) {
-            $defaultTimeZone = $this->calendarTimeZone();
-
-            if (!$defaultTimeZone) {
-                $convDate = new \DateTime('now');
-            } else {
-                $convDate = new \DateTime('now', new \DateTimeZone($defaultTimeZone));
-            }
+            $convDate = new \DateTime('now', new \DateTimeZone($this->calendarTimeZone()));
         } else {
             $convDate = new \DateTime('now', new \DateTimeZone($tzone));
         }
@@ -508,14 +504,36 @@ class ICal
     }
 
     /**
+     * Adds a unix timestamp to all `DT{START|END}_array` arrays
+     */
+    public function processDates()
+    {
+        $events = $this->cal['VEVENT'];
+        if (empty($events)) {
+            return;
+        }
+
+        foreach ($events as $key => $anEvent) {
+            foreach (array("DTSTART", "DTEND") as $type) {
+                if (isset($anEvent[$type])) {
+                    $date = $anEvent[$type . "_array"][1];
+                    if ($anEvent[$type . "_array"][0]["TZID"]) {
+                        $date = "TZID=" . $anEvent[$type . "_array"][0]["TZID"] . ":" . $date;
+                    }
+                    $events[$key][$type . "_array"][] = $this->iCalDateToUnixTimestamp($date);
+                }
+            }
+        }
+
+        $this->cal['VEVENT'] = $events;
+    }
+
+    /**
      * Processes recurrence rules
-     *
-     * @return array
      */
     public function processRecurrences()
     {
-        $array = $this->cal;
-        $events = $array['VEVENT'];
+        $events = $this->cal['VEVENT'];
         if (empty($events)) {
             return false;
         }
@@ -531,9 +549,9 @@ class ICal
                 // Get frequency
                 $frequency = $rrules['FREQ'];
                 // Get Start timestamp
-                $startTimestamp = $this->iCalDateToUnixTimestamp($anEvent['DTSTART']);
+                $startTimestamp = $anEvent['DTSTART_array'][2];
                 if (isset($anEvent['DTEND'])) {
-                    $endTimestamp = $this->iCalDateToUnixTimestamp($anEvent['DTEND']);
+                    $endTimestamp = $anEvent['DTEND_array'][2];
                 } else if (isset($anEvent['DURATION'])) {
                     $duration = end($anEvent['DURATION_array']);
                     $endTimestamp = date_create($anEvent['DTSTART']);
@@ -545,7 +563,7 @@ class ICal
                     $endTimestamp->modify($duration->s . ' second');
                     $endTimestamp = date_format($endTimestamp, 'U');
                 } else {
-                    $endTimestamp = $this->iCalDateToUnixTimestamp($anEvent['DTSTART']);
+                    $endTimestamp = $anEvent['DTSTART_array'][2];
                 }
                 $eventTimestampOffset = $endTimestamp - $startTimestamp;
                 // Get Interval
@@ -575,7 +593,6 @@ class ICal
                 $untilDefault = date_create('now');
                 $untilDefault->modify($this->defaultSpan . ' year');
                 $untilDefault->setTime(23, 59, 59); // End of the day
-                $untilDefault = date_format($untilDefault, self::DATE_TIME_FORMAT);
 
                 if (isset($rrules['UNTIL'])) {
                     // Get Until
@@ -610,7 +627,7 @@ class ICal
 
                     unset($offset);
                 } else {
-                    $until = $this->iCalDateToUnixTimestamp($untilDefault);
+                    $until = $untilDefault->getTimestamp();
                 }
 
                 if(!isset($anEvent['EXDATE_array'])){
@@ -626,14 +643,16 @@ class ICal
 
                         while ($recurringTimestamp <= $until) {
                             // Add event
-                            $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $recurringTimestamp) . 'Z';
-                            $anEvent['DTEND'] = date(
+                            $anEvent['DTSTART'] = gmdate(self::DATE_TIME_FORMAT, $recurringTimestamp) . 'Z';
+                            $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $recurringTimestamp);
+                            $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
+                            $anEvent['DTEND_array'][2] += $eventTimestampOffset;
+                            $anEvent['DTEND'] = gmdate(
                                 self::DATE_TIME_FORMAT,
-                                $recurringTimestamp + $eventTimestampOffset
+                                $anEvent['DTEND_array'][2]
                             ) . 'Z';
-                            if(!isset($anEvent['DTEND_array'])){
-                                $anEvent['DTEND_array'] = array(array(), $anEvent['DTEND']);
-                            }
+                            $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
+                            $this->eventCount++;
 
                             $searchDate = $anEvent['DTSTART'];
                             $isExcluded = array_filter($anEvent['EXDATE_array'], function($val) use ($searchDate) {
@@ -678,14 +697,14 @@ class ICal
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
                             $bydays = explode(',', $rrules['BYDAY']);
                         } else {
-                            $findDay = $weekdays[date('w', $startTimestamp)];
+                            $findDay = $weekdays[gmdate('w', $startTimestamp)];
                             $bydays = array($findDay);
                         }
 
                         // Get timestamp of first day of start week
-                        $weekRecurringTimestamp = (date('w', $startTimestamp) == 0)
+                        $weekRecurringTimestamp = (gmdate('w', $startTimestamp) == 0)
                             ? $startTimestamp
-                            : strtotime("last {$days[$wkst]} " . date('H:i:s', $startTimestamp), $startTimestamp);
+                            : strtotime("last {$days[$wkst]} " . gmdate('H:i:s', $startTimestamp), $startTimestamp);
 
                         // Step through weeks
                         while ($weekRecurringTimestamp <= $until) {
@@ -699,14 +718,16 @@ class ICal
                                     && $dayRecurringTimestamp <= $until
                                 ) {
                                     // Add event
-                                    $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $dayRecurringTimestamp) . 'Z';
-                                    $anEvent['DTEND'] = date(
+                                    $anEvent['DTSTART'] = gmdate(self::DATE_TIME_FORMAT, $dayRecurringTimestamp) . 'Z';
+                                    $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $dayRecurringTimestamp);
+                                    $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
+                                    $anEvent['DTEND_array'][2] += $eventTimestampOffset;
+                                    $anEvent['DTEND'] = gmdate(
                                         self::DATE_TIME_FORMAT,
-                                        $dayRecurringTimestamp + $eventTimestampOffset
+                                        $anEvent['DTEND_array'][2]
                                     ) . 'Z';
-                                    if(!isset($anEvent['DTEND_array'])){
-                                        $anEvent['DTEND_array'] = array(array(), $anEvent['DTEND']);
-                                    }
+                                    $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
+                                    $this->eventCount++;
 
                                     $searchDate = $anEvent['DTSTART'];
                                     $isExcluded = array_filter($anEvent['EXDATE_array'], function($val) use ($searchDate) {
@@ -747,17 +768,19 @@ class ICal
                             while ($recurringTimestamp <= $until) {
                                 foreach ($monthdays as $monthday) {
                                     // Add event
-                                    $anEvent['DTSTART'] = date(
-                                        'Ym' . sprintf('%02d', $monthday) . '\THis',
+                                    $anEvent['DTSTART'] = gmdate(
+                                        'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
                                         $recurringTimestamp
                                     ) . 'Z';
-                                    $anEvent['DTEND'] = date(
+                                    $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $recurringTimestamp);
+                                    $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
+                                    $anEvent['DTEND_array'][2] += $eventTimestampOffset;
+                                    $anEvent['DTEND'] = gmdate(
                                         self::DATE_TIME_FORMAT,
-                                        $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $eventTimestampOffset
+                                        $anEvent['DTEND_array'][2]
                                     ) . 'Z';
-                                    if(!isset($anEvent['DTEND_array'])){
-                                        $anEvent['DTEND_array'] = array(array(), $anEvent['DTEND']);
-                                    }
+                                    $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
+                                    $this->eventCount++;
 
                                     $searchDate = $anEvent['DTSTART'];
                                     $isExcluded = array_filter($anEvent['EXDATE_array'], function($val) use ($searchDate) {
@@ -782,10 +805,10 @@ class ICal
                                 $recurringTimestamp = strtotime($offset, $recurringTimestamp);
                             }
                         } else if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
-                            $startTime = date('His', $startTimestamp);
+                            $startTime = gmdate(self::TIME_FORMAT, $startTimestamp);
 
                             while ($recurringTimestamp <= $until) {
-                                $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]} of " . date('F Y H:i:s', $recurringTimestamp);
+                                $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]} of " . gmdate('F Y H:i:s', $recurringTimestamp);
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
                                 // Prevent 5th day of a month from showing up on the next month
@@ -800,11 +823,16 @@ class ICal
                                 }
 
                                 if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
-                                    $anEvent['DTSTART'] = date('Ymd\T', $eventStartTimestamp) . $startTime;
-                                    $anEvent['DTEND'] = date(
+                                    $anEvent['DTSTART'] = gmdate(self::DATE_FORMAT, $eventStartTimestamp) . '\T' . $startTime . 'Z';
+                                    $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $eventStartTimestamp);
+                                    $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
+                                    $anEvent['DTEND_array'][2] += $eventTimestampOffset;
+                                    $anEvent['DTEND'] = gmdate(
                                         self::DATE_TIME_FORMAT,
-                                        $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $eventTimestampOffset
-                                    );
+                                        $anEvent['DTEND_array'][2]
+                                    ) . 'Z';
+                                    $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
+                                    $this->eventCount++;
 
                                     $searchDate = $anEvent['DTSTART'];
                                     $isExcluded = array_filter($anEvent['EXDATE_array'], function($val) use ($searchDate) {
@@ -837,20 +865,25 @@ class ICal
 
                         // Check if BYDAY rule exists
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
-                            $startTime = date('His', $startTimestamp);
+                            $startTime = gmdate(self::TIME_FORMAT, $startTimestamp);
 
                             while ($recurringTimestamp <= $until) {
                                 $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]}"
                                     . " of {$this->monthNames[$rrules['BYMONTH']]} "
-                                    . date('Y H:i:s', $recurringTimestamp);
+                                    . gmdate('Y H:i:s', $recurringTimestamp);
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
                                 if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
-                                    $anEvent['DTSTART'] = date('Ymd\T', $eventStartTimestamp) . $startTime;
-                                    $anEvent['DTEND'] = date(
+                                    $anEvent['DTSTART'] = gmdate(self::DATE_FORMAT, $eventStartTimestamp) . '\T' . $startTime . 'Z';
+                                    $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $eventStartTimestamp);
+                                    $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
+                                    $anEvent['DTEND_array'][2] += $eventTimestampOffset;
+                                    $anEvent['DTEND'] = gmdate(
                                         self::DATE_TIME_FORMAT,
-                                        $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $eventTimestampOffset
-                                    );
+                                        $anEvent['DTEND_array'][2]
+                                    ) . 'Z';
+                                    $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
+                                    $this->eventCount++;
 
                                     $searchDate = $anEvent['DTSTART'];
                                     $isExcluded = array_filter($anEvent['EXDATE_array'], function($val) use ($searchDate) {
@@ -875,26 +908,31 @@ class ICal
                                 $recurringTimestamp = strtotime($offset, $recurringTimestamp);
                             }
                         } else {
-                            $day = date('d', $startTimestamp);
-                            $startTime = date('His', $startTimestamp);
+                            $day = gmdate('d', $startTimestamp);
+                            $startTime = gmdate(self::TIME_FORMAT, $startTimestamp);
 
                             // Step through years
                             while ($recurringTimestamp <= $until) {
                                 // Add specific month dates
                                 if (isset($rrules['BYMONTH']) && $rrules['BYMONTH'] != '') {
-                                    $eventStartDesc = "$day {$this->monthNames[$rrules['BYMONTH']]} " . date('Y H:i:s', $recurringTimestamp);
+                                    $eventStartDesc = "$day {$this->monthNames[$rrules['BYMONTH']]} " . gmdate('Y H:i:s', $recurringTimestamp);
                                 } else {
-                                    $eventStartDesc = $day . date('F Y H:i:s', $recurringTimestamp);
+                                    $eventStartDesc = $day . gmdate('F Y H:i:s', $recurringTimestamp);
                                 }
 
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
                                 if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
-                                    $anEvent['DTSTART'] = date('Ymd\T', $eventStartTimestamp) . $startTime;
-                                    $anEvent['DTEND'] = date(
+                                    $anEvent['DTSTART'] = gmdate(self::DATE_FORMAT, $eventStartTimestamp) . '\T' . $startTime . 'Z';
+                                    $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $eventStartTimestamp);
+                                    $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
+                                    $anEvent['DTEND_array'][2] += $eventTimestampOffset;
+                                    $anEvent['DTEND'] = gmdate(
                                         self::DATE_TIME_FORMAT,
-                                        $this->iCalDateToUnixTimestamp($anEvent['DTSTART']) + $eventTimestampOffset
-                                    );
+                                        $anEvent['DTEND_array'][2]
+                                    ) . 'Z';
+                                    $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
+                                    $this->eventCount++;
 
                                     $searchDate = $anEvent['DTSTART'];
                                     $isExcluded = array_filter($anEvent['EXDATE_array'], function($val) use ($searchDate) {
@@ -934,9 +972,7 @@ class ICal
      *
      * Add fields DTSTART_tz and DTEND_tz to each event
      * These fields contain dates adapted to the calendar
-     * timezone depending to the event TZID (Ymd\THis)
-     *
-     * @return array
+     * timezone depending on the event TZID
      */
     public function processDateConversions()
     {
@@ -950,7 +986,7 @@ class ICal
         foreach ($events as $key => $anEvent) {
             $events[$key]['DTSTART_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTSTART');
 
-            if($this->iCalDateWithTimeZone($anEvent, 'DTEND')){
+            if ($this->iCalDateWithTimeZone($anEvent, 'DTEND')) {
                 $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTEND');
             }
         }
@@ -959,10 +995,10 @@ class ICal
     }
 
     /**
-     * Returns an array of arrays with all events. Every event is an associative
-     * array and each property is an element it.
+     * Returns an array of EventObjects. Every event is a class
+     * with the event details being properties within it.
      *
-     * @return array|EventObject[]
+     * @return array of EventObjects
      */
     public function events()
     {
@@ -1076,9 +1112,8 @@ class ICal
         $rangeStart = $rangeStart->format('U');
         $rangeEnd   = $rangeEnd->format('U');
 
-        // Loop through all events by adding two new elements
         foreach ($events as $anEvent) {
-            $timestamp = $this->iCalDateToUnixTimestamp($anEvent['DTSTART']);
+            $timestamp = $anEvent->dtstart_array[2];
             if ($timestamp >= $rangeStart && $timestamp <= $rangeEnd) {
                 $extendedEvents[] = $anEvent;
             }
@@ -1088,33 +1123,21 @@ class ICal
     }
 
     /**
-     * Sort events based on the given sort order
+     * Sort events based on a given sort order
      *
-     * @param array $events  An array with events.
-     * @param int $sortOrder Either SORT_ASC, SORT_DESC, SORT_REGULAR, SORT_NUMERIC, SORT_STRING
+     * @param array $events    An array of EventObjects
+     * @param int   $sortOrder Either SORT_ASC, SORT_DESC, SORT_REGULAR, SORT_NUMERIC, SORT_STRING
      *
-     * @return array
+     * @return sorted array of EventObjects
      */
     public function sortEventsWithOrder($events, $sortOrder = SORT_ASC)
     {
         $extendedEvents = array();
         $timestamp = array();
 
-        // Loop through all events by adding two new elements
-        foreach ($events as $anEvent) {
-            if (!array_key_exists('UNIX_TIMESTAMP', $anEvent)) {
-                $anEvent['UNIX_TIMESTAMP'] = $this->iCalDateToUnixTimestamp($anEvent['DTSTART']);
-            }
-
-            if (!array_key_exists('REAL_DATETIME', $anEvent)) {
-                $anEvent['REAL_DATETIME'] = date('d.m.Y', $anEvent['UNIX_TIMESTAMP']);
-            }
-
+        foreach ($events as $key => $anEvent) {
             $extendedEvents[] = $anEvent;
-        }
-
-        foreach ($extendedEvents as $key => $value) {
-            $timestamp[$key] = $value['UNIX_TIMESTAMP'];
+            $timestamp[$key] = $anEvent->dtstart_array[2];
         }
 
         array_multisort($timestamp, $sortOrder, $extendedEvents);
