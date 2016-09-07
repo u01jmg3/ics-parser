@@ -5,18 +5,10 @@
 
 --
 
-## License
-
-This ics-parser is under [MIT License](http://opensource.org/licenses/MIT). You may use it for your own sites for free, but I would like to get a notice when you use it (info@martin-thoma.de). If you use it for another software project, please state the information / links to this project in the files.
-
-It is hosted at [https://github.com/MartinThoma/ics-parser/](https://github.com/MartinThoma/ics-parser/) and the PEAR coding standard is used.
-
-It was modified by John Grogg to properly handle recurring events (specifically with regards to Microsoft Exchange).
-
-## Requirements
-  - PHP 5 >= 5.3.0
-
 ## Installation
+
+### Requirements
+  - PHP 5 >= 5.3.0
 
 ### [Composer](http://getcomposer.org)
 
@@ -34,8 +26,42 @@ $ curl -s https://getcomposer.org/installer | php
 }
 ```
 
+--
+
+## API
+
+|Function                 |Parameter(s)                              |Description                                                                                                                  |
+|-------------------------|------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+|`initLines`              |`$lines`                                  |Initializes lines from file                                                                                                  |
+|`initString`             |`$contents`                               |Initializes lines from a string                                                                                              |
+|`initURL`                |`$url`                                    |Initializes lines from a URL                                                                                                 |
+|`calendarDescription`    |-                                         |Returns the calendar description                                                                                             |
+|`calendarName`           |-                                         |Returns the calendar name                                                                                                    |
+|`calendarTimeZone`       |-                                         |Returns the calendar timezone                                                                                                |
+|`events`                 |-                                         |Returns an array of arrays with all events. Every event is an associative array and each property is an element it.          |
+|`eventsFromRange`        |`$rangeStart = false`, `$rangeEnd = false`|Returns false when the current calendar has no events in range, else the events.                                             |
+|`freeBusyEvents`         |-                                         |Returns an array of arrays with all free/busy events. Every event is an associative array and each property is an element it.|
+|`hasEvents`              |-                                         |Returns a boolean value whether the current calendar has events or not                                                       |
+|`iCalDateToUnixTimestamp`|`$icalDate`                               |Return Unix timestamp from iCal date time format                                                                             |
+|`iCalDateWithTimeZone`   |`$event`, `$key`                          |Return a date adapted to the calendar timezone depending on the event TZID                                                   |
+|`processDateConversions` |-                                         |Processes date conversions using the timezone                                                                                |
+|`processRecurrences`     |-                                         |Processes recurrence rules                                                                                                   |
+|`sortEventsWithOrder`    |`$events`, `$sortOrder = SORT_ASC`        |Sort events based on the given sort order                                                                                    |
+
+--
+
 ## Credits
   - Martin Thoma (programming, bug fixing, project management)
   - Frank Gregor (programming, feedback, testing)
   - John Grogg (programming, addition of event recurrence handling)
   - [Jonathan Goode](https://github.com/u01jmg3) (programming, bug fixing, enhancement, coding standard)
+
+--
+
+## License
+
+This ics-parser is under [MIT License](http://opensource.org/licenses/MIT). You may use it for your own sites for free, but I would like to get a notice when you use it (info@martin-thoma.de). If you use it for another software project, please state the information / links to this project in the files.
+
+It is hosted at [https://github.com/MartinThoma/ics-parser/](https://github.com/MartinThoma/ics-parser/) and the PEAR coding standard is used.
+
+It was modified by John Grogg to properly handle recurring events (specifically with regards to Microsoft Exchange).

@@ -135,7 +135,7 @@ class ICal
     /**
      * Initializes lines from a URL
      *
-     * @param string $url The url of the ical file to download and initialize.
+     * @param string $url The url of the ical file to download and initialize
      *
      * @return ICal
      */
@@ -457,7 +457,7 @@ class ICal
     }
 
     /**
-     * Return a date adapted to the calendar timezone depending to the event TZID
+     * Return a date adapted to the calendar timezone depending on the event TZID
      *
      * @param array $event an event
      * @param string $key an event parameter (DTSTART or DTEND)
@@ -508,7 +508,7 @@ class ICal
     }
 
     /**
-     * Processes recurrences
+     * Processes recurrence rules
      *
      * @return array
      */
@@ -930,10 +930,12 @@ class ICal
     }
 
     /**
-     * Processes dates conversion with timezone
+     * Processes date conversions using the timezone
      *
      * Add fields DTSTART_tz and DTEND_tz to each event
-     * These fields contain dates adapted to the calendar timezone depending to the event TZID (Ymd\THis)
+     * These fields contain dates adapted to the calendar
+     * timezone depending to the event TZID (Ymd\THis)
+     *
      * @return array
      */
     public function processDateConversions()
@@ -1086,7 +1088,9 @@ class ICal
     }
 
     /**
-     * @param array $events    An array with events.
+     * Sort events based on the given sort order
+     *
+     * @param array $events  An array with events.
      * @param int $sortOrder Either SORT_ASC, SORT_DESC, SORT_REGULAR, SORT_NUMERIC, SORT_STRING
      *
      * @return array
