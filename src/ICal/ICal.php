@@ -113,12 +113,15 @@ class ICal
      *
      * @param mixed $filename The path to the iCal-file or an array of lines from an iCal file
      */
-    public function __construct($filename = false, $weekStart = false)
+    public function __construct($filename = false, $weekStart = false, $is_string = false)
     {
         if (!$filename) {
             return false;
         }
-
+        
+        if ($is_string)
+			 $filename = (explode("\n", $filename));
+        
         if (is_array($filename)) {
             $lines = $filename;
         } else {
