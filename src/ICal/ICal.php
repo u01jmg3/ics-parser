@@ -62,7 +62,6 @@ class ICal
      */
     public $defaultSpan = 2;
     public $defaultWeekStart = 'SU';
-    public $default_timeZone = 'UTC';
 
     const UNIX_MIN_YEAR = 1970;
 
@@ -114,9 +113,8 @@ class ICal
      *
      * @param mixed $filename The path to the iCal-file or an array of lines from an iCal file
      * @param mixed $weekStart The default first day of weeks (SA, SU, MO)
-     * @param mixed $timeZone The default Time Zone
      */
-    public function __construct($filename = false, $weekStart = false, $timeZone = false)
+    public function __construct($filename = false, $weekStart = false)
     {
         if (!$filename) {
             return false;
@@ -132,10 +130,6 @@ class ICal
             $this->defaultWeekStart = $weekStart;
         }
 
-        if ($timeZone) {
-            $this->default_timeZone = $timeZone;
-        }
-        
         $this->initLines($lines);
     }
 
@@ -1022,7 +1016,7 @@ class ICal
         
         // Check if the Time Zone is valid
         if ( !in_array( $timezone, timezone_identifiers_list() )) {
-          $timezone = $this->default_timeZone;
+          $timezone = date_default_timezone_get();
         }
         
         return $timezone;
