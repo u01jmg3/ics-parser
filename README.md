@@ -38,15 +38,16 @@ $ curl -s https://getcomposer.org/installer | php
 |`calendarDescription`    |-                                         |Returns the calendar description                                                                                             |
 |`calendarName`           |-                                         |Returns the calendar name                                                                                                    |
 |`calendarTimeZone`       |-                                         |Returns the calendar timezone                                                                                                |
-|`events`                 |-                                         |Returns an array of arrays with all events. Every event is an associative array and each property is an element it.          |
+|`events`                 |-                                         |Returns an array of EventObjects. Every event is a class with the event details being properties within it.                  |
 |`eventsFromRange`        |`$rangeStart = false`, `$rangeEnd = false`|Returns false when the current calendar has no events in range, else the events.                                             |
 |`freeBusyEvents`         |-                                         |Returns an array of arrays with all free/busy events. Every event is an associative array and each property is an element it.|
 |`hasEvents`              |-                                         |Returns a boolean value whether the current calendar has events or not                                                       |
 |`iCalDateToUnixTimestamp`|`$icalDate`                               |Return Unix timestamp from iCal date time format                                                                             |
 |`iCalDateWithTimeZone`   |`$event`, `$key`                          |Return a date adapted to the calendar timezone depending on the event TZID                                                   |
-|`processDateConversions` |-                                         |Processes date conversions using the timezone                                                                                |
+|`processDateConversions` |-                                         |Add fields `DTSTART_tz` and `DTEND_tz` to each event                                                                         |
+|`processDates`           |-                                         |Adds a unix timestamp to all `DT{START|END}_array` arrays                                                                    |
 |`processRecurrences`     |-                                         |Processes recurrence rules                                                                                                   |
-|`sortEventsWithOrder`    |`$events`, `$sortOrder = SORT_ASC`        |Sort events based on the given sort order                                                                                    |
+|`sortEventsWithOrder`    |`$events`, `$sortOrder = SORT_ASC`        |Sort events based on a given sort order                                                                                      |
 
 --
 

@@ -67,7 +67,7 @@ class ICal
 
     const DATE_FORMAT = 'Ymd';
     const TIME_FORMAT = 'His';
-    const DATE_TIME_FORMAT = self::DATE_FORMAT . '\T' . self::TIME_FORMAT;
+    const DATE_TIME_FORMAT = 'Ymd\THis';
 
     protected $dayOrdinals = array(
         1 => 'first',
@@ -514,13 +514,13 @@ class ICal
         }
 
         foreach ($events as $key => $anEvent) {
-            foreach (array("DTSTART", "DTEND") as $type) {
+            foreach (array('DTSTART', 'DTEND') as $type) {
                 if (isset($anEvent[$type])) {
-                    $date = $anEvent[$type . "_array"][1];
-                    if (isset($anEvent[$type . "_array"][0]["TZID"])) {
-                        $date = "TZID=" . $anEvent[$type . "_array"][0]["TZID"] . ":" . $date;
+                    $date = $anEvent[$type . '_array'][1];
+                    if (isset($anEvent[$type . '_array'][0]['TZID'])) {
+                        $date = 'TZID=' . $anEvent[$type . '_array'][0]['TZID'] . ':' . $date;
                     }
-                    $events[$key][$type . "_array"][] = $this->iCalDateToUnixTimestamp($date);
+                    $events[$key][$type . '_array'][] = $this->iCalDateToUnixTimestamp($date);
                 }
             }
         }
