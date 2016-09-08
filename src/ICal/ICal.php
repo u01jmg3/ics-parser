@@ -517,7 +517,7 @@ class ICal
             foreach (array("DTSTART", "DTEND") as $type) {
                 if (isset($anEvent[$type])) {
                     $date = $anEvent[$type . "_array"][1];
-                    if ($anEvent[$type . "_array"][0]["TZID"]) {
+                    if (isset($anEvent[$type . "_array"][0]["TZID"])) {
                         $date = "TZID=" . $anEvent[$type . "_array"][0]["TZID"] . ":" . $date;
                     }
                     $events[$key][$type . "_array"][] = $this->iCalDateToUnixTimestamp($date);
