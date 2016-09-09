@@ -39,7 +39,7 @@ $ curl -s https://getcomposer.org/installer | php
 |`calendarName`           |-                                         |Returns the calendar name                                                                                                    |
 |`calendarTimeZone`       |-                                         |Returns the calendar timezone                                                                                                |
 |`events`                 |-                                         |Returns an array of EventObjects. Every event is a class with the event details being properties within it.                  |
-|`eventsFromRange`        |`$rangeStart = false`, `$rangeEnd = false`|Returns false when the current calendar has no events in range, else the events.                                             |
+|`eventsFromRange`        |`$rangeStart = false`, `$rangeEnd = false`|Returns a sorted array of the events in a given range, or false if no events exist in the range.                             |
 |`freeBusyEvents`         |-                                         |Returns an array of arrays with all free/busy events. Every event is an associative array and each property is an element it.|
 |`hasEvents`              |-                                         |Returns a boolean value whether the current calendar has events or not                                                       |
 |`iCalDateToUnixTimestamp`|`$icalDate`                               |Return Unix timestamp from iCal date time format                                                                             |
