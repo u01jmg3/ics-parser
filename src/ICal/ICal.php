@@ -1074,39 +1074,61 @@ class ICal
     }
 
     /**
-     * Returns false when the current calendar has no events in range, else the
-     * events.
+     * Returns a sorted array of the events in a given range,
+     * or false if no events exist in the range.
      *
-     * Note that this function makes use of a UNIX timestamp. This might be a
-     * problem on January the 29th, 2038.
+     * Events will be returned if they both start on or after the start of
+     * the given range, and finish on or before the end of the given range.
+     *
+     * If a start date is not specified or of a valid format, then the start
+     * of the range will default to the current time and date of the server.
+     *
+     * If an end date is not specified or of a valid format, the the end of
+     * the range will default to the current time and date of the server,
+     * plus 20 years.
+     *
+     * Note that this function makes use of UNIX timestamps. This might be a
+     * problem for events on, during, or after January the 29th, 2038.
      * See http://en.wikipedia.org/wiki/Unix_time#Representing_the_number
      *
-     * @param boolean $rangeStart Either true or false
-     * @param boolean $rangeEnd   Either true or false
+     * @param string $rangeStart Start date of the search range.
+     * @param string $rangeEnd   End date of the search range.
      *
-     * @return mixed
+     * @return array of EventObjects, or boolean false
      */
     public function eventsFromRange($rangeStart = false, $rangeEnd = false)
     {
         $events = $this->sortEventsWithOrder($this->events(), SORT_ASC);
 
-        if (!empty($events)) {
+        if (empty($events)) {
             return false;
         }
 
         $extendedEvents = array();
 
-        if ($rangeStart === false) {
+        if ($rangeStart) {
+            try {
+                $rangeStart = new \DateTime($rangeStart);
+            } catch (\Exception $e) {
+                error_log('ICal::eventsFromRange: Invalid date passed (' . $rangeStart . ')');
+                $rangeStart = false;
+            }
+        }
+        if (!$rangeStart) {
             $rangeStart = new \DateTime();
-        } else {
-            $rangeStart = new \DateTime($rangeStart);
         }
 
-        if ($rangeEnd === false || $rangeEnd <= 0) {
+        if ($rangeEnd) {
+            try {
+                $rangeEnd = new \DateTime($rangeEnd);
+            } catch (\Exception $e) {
+                error_log('ICal::eventsFromRange: Invalid date passed (' . $rangeEnd . ')');
+                $rangeEnd = false;
+            }
+        }
+        if (!$rangeEnd) {
             $rangeEnd = new \DateTime();
-            $rangeEnd = $rangeEnd->modify('+20 years');
-        } else {
-            $rangeEnd = new \DateTime($rangeEnd);
+            $rangeEnd->modify('+20 years');
         }
 
         $rangeStart = $rangeStart->format('U');
@@ -1119,6 +1141,9 @@ class ICal
             }
         }
 
+        if (empty($extendedEvents)) {
+            return false;
+        }
         return $extendedEvents;
     }
 
