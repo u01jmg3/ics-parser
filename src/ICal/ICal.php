@@ -1077,8 +1077,8 @@ class ICal
      * Returns a sorted array of the events in a given range,
      * or false if no events exist in the range.
      *
-     * Events will be returned if they both start on or after the start of
-     * the given range, and finish on or before the end of the given range.
+     * Events will be returned if they begin between the start and end
+     * of the given range, inclusive.
      *
      * If a start date is not specified or of a valid format, then the start
      * of the range will default to the current time and date of the server.
@@ -1131,8 +1131,13 @@ class ICal
             $rangeEnd->modify('+20 years');
         }
 
-        $rangeStart = $rangeStart->format('U');
-        $rangeEnd   = $rangeEnd->format('U');
+        // If start and end are identical and are dates with no times...
+        if ($rangeEnd->format('His') == 0 && $rangeStart->getTimestamp() == $rangeEnd->getTimestamp()) {
+            $rangeEnd->modify('+1 day');
+        }
+
+        $rangeStart = $rangeStart->getTimestamp();
+        $rangeEnd   = $rangeEnd->getTimestamp();
 
         foreach ($events as $anEvent) {
             $timestamp = $anEvent->dtstart_array[2];
