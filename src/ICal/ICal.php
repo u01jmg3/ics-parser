@@ -727,7 +727,7 @@ class ICal
                         // Get timestamp of first day of start week
                         $weekRecurringTimestamp = (gmdate('w', $startTimestamp) == 0)
                             ? $startTimestamp
-                            : strtotime("last {$days[$wkst]} " . gmdate('H:i:s', $startTimestamp), $startTimestamp);
+                            : strtotime("last {$days[$wkst]} " . gmdate('H:i:s\z', $startTimestamp), $startTimestamp);
 
                         // Step through weeks
                         while ($weekRecurringTimestamp <= $until) {
