@@ -537,8 +537,12 @@ class ICal
         if (empty($events)) {
             return false;
         }
-        foreach ($events as $anEvent) {
+        foreach ($events as $anEventKey => $anEvent) {
             if (isset($anEvent['RRULE']) && $anEvent['RRULE'] != '') {
+                
+                //event has recurrences, so remove original event and replace with rules ones. 
+				unset($events[$anEventKey]);
+                
                 // Recurring event, parse RRULE and add appropriate duplicate events
                 $rrules = array();
                 $rruleStrings = explode(';', $anEvent['RRULE']);
@@ -639,7 +643,7 @@ class ICal
                     case 'DAILY':
                         // Simply add a new event each interval of days until UNTIL is reached
                         $offset = "+$interval day";
-                        $recurringTimestamp = strtotime($offset, $startTimestamp);
+                        $recurringTimestamp = $startTimestamp;
 
                         while ($recurringTimestamp <= $until) {
                             // Add event
@@ -759,7 +763,7 @@ class ICal
                     case 'MONTHLY':
                         // Create offset
                         $offset = "+$interval month";
-                        $recurringTimestamp = strtotime($offset, $startTimestamp);
+                        $recurringTimestamp = $startTimestamp;
 
                         if (isset($rrules['BYMONTHDAY']) && $rrules['BYMONTHDAY'] != '') {
                             // Deal with BYMONTHDAY
