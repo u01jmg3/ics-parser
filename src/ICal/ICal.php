@@ -51,6 +51,12 @@ class ICal
     public $cal;
 
     /**
+     * Event recurrence instances that have been altered
+     * @var array
+     */
+    protected $alteredRecurrenceInstances = array();
+
+    /**
      * Which keyword has been added to cal at last?
      * @var string
      */
@@ -249,7 +255,7 @@ class ICal
                 }
             }
 
-            $this->processDates();
+            $this->processEvents();
             $this->processRecurrences();
             $this->processDateConversions();
         }
@@ -504,9 +510,12 @@ class ICal
     }
 
     /**
-     * Adds a unix timestamp to all `DT{START|END}_array` arrays
+     * Performs some admin tasks on all events as taken straight from the ics file.
+     *
+     * - Adds a unix timestamp to all `DT{START|END|RECURRENCE-ID}_array` arrays
+     * - Makes a note of modified recurrence-instances
      */
-    public function processDates()
+    public function processEvents()
     {
         $events = $this->cal['VEVENT'];
         if (empty($events)) {
@@ -514,15 +523,25 @@ class ICal
         }
 
         foreach ($events as $key => $anEvent) {
-            foreach (array('DTSTART', 'DTEND') as $type) {
+            foreach (array('DTSTART', 'DTEND', 'RECURRENCE-ID') as $type) {
                 if (isset($anEvent[$type])) {
                     $date = $anEvent[$type . '_array'][1];
                     if (isset($anEvent[$type . '_array'][0]['TZID'])) {
                         $date = 'TZID=' . $anEvent[$type . '_array'][0]['TZID'] . ':' . $date;
                     }
-                    $events[$key][$type . '_array'][] = $this->iCalDateToUnixTimestamp($date);
+                    $anEvent[$type . '_array'][2] = $this->iCalDateToUnixTimestamp($date);
                 }
             }
+
+            if (isset($anEvent['RECURRENCE-ID'])) {
+                $uid = $anEvent['UID'];
+                if (!isset($this->alteredRecurrenceInstances[$uid])) {
+                    $this->alteredRecurrenceInstances[$uid] = array();
+                }
+                $this->alteredRecurrenceInstances[$uid][] = $anEvent['RECURRENCE-ID_array'][2];
+            }
+
+            $events[$key] = $anEvent;
         }
 
         $this->cal['VEVENT'] = $events;
@@ -652,15 +671,19 @@ class ICal
                                 $anEvent['DTEND_array'][2]
                             ) . 'Z';
                             $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
-                            $this->eventCount++;
 
                             $searchDate = $anEvent['DTSTART'];
                             $isExcluded = array_filter($anEvent['EXDATE_array'], function($val) use ($searchDate) {
                                 return is_string($val) && strpos($searchDate, $val) === 0;
                             });
 
+                            if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                $isExcluded = true;
+                            }
+
                             if (!$isExcluded) {
                                 $events[] = $anEvent;
+                                $this->eventCount++;
 
                                 // If RRULE[COUNT] is reached then break
                                 if (isset($rrules['COUNT'])) {
@@ -704,7 +727,7 @@ class ICal
                         // Get timestamp of first day of start week
                         $weekRecurringTimestamp = (gmdate('w', $startTimestamp) == 0)
                             ? $startTimestamp
-                            : strtotime("last {$days[$wkst]} " . gmdate('H:i:s', $startTimestamp), $startTimestamp);
+                            : strtotime("last {$days[$wkst]} " . gmdate('H:i:s\z', $startTimestamp), $startTimestamp);
 
                         // Step through weeks
                         while ($weekRecurringTimestamp <= $until) {
@@ -727,15 +750,19 @@ class ICal
                                         $anEvent['DTEND_array'][2]
                                     ) . 'Z';
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
-                                    $this->eventCount++;
 
                                     $searchDate = $anEvent['DTSTART'];
                                     $isExcluded = array_filter($anEvent['EXDATE_array'], function($val) use ($searchDate) {
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
+                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                        $isExcluded = true;
+                                    }
+
                                     if (!$isExcluded) {
                                         $events[] = $anEvent;
+                                        $this->eventCount++;
 
                                         // If RRULE[COUNT] is reached then break
                                         if (isset($rrules['COUNT'])) {
@@ -780,15 +807,19 @@ class ICal
                                         $anEvent['DTEND_array'][2]
                                     ) . 'Z';
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
-                                    $this->eventCount++;
 
                                     $searchDate = $anEvent['DTSTART'];
                                     $isExcluded = array_filter($anEvent['EXDATE_array'], function($val) use ($searchDate) {
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
+                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                        $isExcluded = true;
+                                    }
+
                                     if (!$isExcluded) {
                                         $events[] = $anEvent;
+                                        $this->eventCount++;
 
                                         // If RRULE[COUNT] is reached then break
                                         if (isset($rrules['COUNT'])) {
@@ -832,15 +863,19 @@ class ICal
                                         $anEvent['DTEND_array'][2]
                                     ) . 'Z';
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
-                                    $this->eventCount++;
 
                                     $searchDate = $anEvent['DTSTART'];
                                     $isExcluded = array_filter($anEvent['EXDATE_array'], function($val) use ($searchDate) {
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
+                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                        $isExcluded = true;
+                                    }
+
                                     if (!$isExcluded) {
                                         $events[] = $anEvent;
+                                        $this->eventCount++;
 
                                         // If RRULE[COUNT] is reached then break
                                         if (isset($rrules['COUNT'])) {
@@ -883,15 +918,19 @@ class ICal
                                         $anEvent['DTEND_array'][2]
                                     ) . 'Z';
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
-                                    $this->eventCount++;
 
                                     $searchDate = $anEvent['DTSTART'];
                                     $isExcluded = array_filter($anEvent['EXDATE_array'], function($val) use ($searchDate) {
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
+                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                        $isExcluded = true;
+                                    }
+
                                     if (!$isExcluded) {
                                         $events[] = $anEvent;
+                                        $this->eventCount++;
 
                                         // If RRULE[COUNT] is reached then break
                                         if (isset($rrules['COUNT'])) {
@@ -932,15 +971,19 @@ class ICal
                                         $anEvent['DTEND_array'][2]
                                     ) . 'Z';
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
-                                    $this->eventCount++;
 
                                     $searchDate = $anEvent['DTSTART'];
                                     $isExcluded = array_filter($anEvent['EXDATE_array'], function($val) use ($searchDate) {
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
+                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                        $isExcluded = true;
+                                    }
+
                                     if (!$isExcluded) {
                                         $events[] = $anEvent;
+                                        $this->eventCount++;
 
                                         // If RRULE[COUNT] is reached then break
                                         if (isset($rrules['COUNT'])) {
