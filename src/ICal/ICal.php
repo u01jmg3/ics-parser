@@ -1137,7 +1137,7 @@ class ICal
      * @param string $rangeStart Start date of the search range.
      * @param string $rangeEnd   End date of the search range.
      *
-     * @return array of EventObjects, or boolean false
+     * @return array of EventObjects
      */
     public function eventsFromRange($rangeStart = false, $rangeEnd = false)
     {
@@ -1190,7 +1190,7 @@ class ICal
         }
 
         if (empty($extendedEvents)) {
-            return false;
+            return array();
         }
         return $extendedEvents;
     }
