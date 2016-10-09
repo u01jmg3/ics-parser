@@ -33,7 +33,7 @@ $ical = new ICal('MyCal.ics');
     <div class="row">
     <?php
     $events = $ical->eventsFromRange('2016-03-01', '2016-04-31');
-    foreach ($events as $event): ?>
+    foreach ($events as $event) : ?>
         <div class="col-sm-6 col-md-4">
             <div class="thumbnail">
                 <div class="caption">
@@ -56,14 +56,16 @@ $ical = new ICal('MyCal.ics');
                 </div>
             </div>
         </div>
-    <?php endforeach ?>
+    <?php
+    endforeach
+    ?>
     </div>
 
     <h4>All Events:</h4>
     <div class="row">
     <?php
-        $events = $ical->events();
-        foreach ($events as $event): ?>
+    $events = $ical->events();
+    foreach ($events as $event) : ?>
         <div class="col-sm-6 col-md-4">
             <div class="thumbnail">
                 <div class="caption">
@@ -86,7 +88,9 @@ $ical = new ICal('MyCal.ics');
                 </div>
             </div>
         </div>
-    <?php endforeach ?>
+    <?php
+    endforeach
+    ?>
     </div>
 </div>
 </body>
