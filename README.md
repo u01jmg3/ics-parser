@@ -66,3 +66,10 @@ This ics-parser is under [MIT License](http://opensource.org/licenses/MIT). You 
 It is hosted at [https://github.com/MartinThoma/ics-parser/](https://github.com/MartinThoma/ics-parser/) and the PEAR coding standard is used.
 
 It was modified by John Grogg to properly handle recurring events (specifically with regards to Microsoft Exchange).
+
+---
+
+## Tools for Testing
+
+- https://jkbrzt.github.io/rrule/
+- http://www.unixtimestamp.com/

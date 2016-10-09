@@ -120,6 +120,9 @@ class ICal
      * Creates the iCal Object
      *
      * @param mixed $filename The path to the iCal-file or an array of lines from an iCal file
+     * @param mixed $weekStart The default first day of the week (SU or MO, etc.)
+     *
+     * @return void or false if no filename is provided
      */
     public function __construct($filename = false, $weekStart = false)
     {

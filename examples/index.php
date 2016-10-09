@@ -13,6 +13,7 @@ $ical = new ICal('MyCal.ics');
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <title>PHP ICS Parser example</title>
+    <style>.caption { overflow-x: scroll }</style>
 </head>
 <body style="background-color: #eee">
 <div class="container">
