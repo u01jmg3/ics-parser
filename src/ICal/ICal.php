@@ -799,12 +799,29 @@ class ICal
                             $monthdays = explode(',', $rrules['BYMONTHDAY']);
 
                             while ($recurringTimestamp <= $until) {
-                                foreach ($monthdays as $monthday) {
+                                foreach ($monthdays as $key => $monthday) {
+                                    if($key === 0){
+                                        // Ensure original event conforms to monthday rule
+                                        $events[0]['DTSTART'] = gmdate(
+                                            'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
+                                            strtotime($events[0]['DTSTART'])
+                                        ) . 'Z';
+                                        $events[0]['DTEND'] = gmdate(
+                                            'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
+                                            strtotime($events[0]['DTEND'])
+                                        ) . 'Z';
+                                        $events[0]['DTSTART_array'][1] = $events[0]['DTSTART'];
+                                        $events[0]['DTSTART_array'][2] = $this->iCalDateToUnixTimestamp($events[0]['DTSTART']);
+                                        $events[0]['DTEND_array'][1] = $events[0]['DTEND'];
+                                        $events[0]['DTEND_array'][2] = $this->iCalDateToUnixTimestamp($events[0]['DTEND']);
+                                    }
+
                                     // Add event
                                     $anEvent['DTSTART'] = gmdate(
                                         'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
                                         $recurringTimestamp
                                     ) . 'Z';
+                                    $recurringTimestamp = $this->iCalDateToUnixTimestamp($anEvent['DTSTART']);
                                     $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $recurringTimestamp);
                                     $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                                     $anEvent['DTEND_array'][2] += $eventTimestampOffset;
