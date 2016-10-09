@@ -485,7 +485,10 @@ class ICal
 
         if (isset($date_array[0]['TZID']) && preg_match('/[a-z]*\/[a-z_]*/i', $date_array[0]['TZID'])) {
             $timeZone = $date_array[0]['TZID'];
-        } else {
+        }
+
+        // Check if the defined timezone is valid
+        if (!isset($timeZone) || !in_array($timeZone, timezone_identifiers_list())) {
             $timeZone = $defaultTimeZone;
         }
 
@@ -1089,12 +1092,19 @@ class ICal
     public function calendarTimeZone()
     {
         if (isset($this->cal['VCALENDAR']['X-WR-TIMEZONE'])) {
-            return $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
+            $timezone = $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
         } else if (isset($this->cal['VTIMEZONE']['TZID'])) {
-            return $this->cal['VTIMEZONE']['TZID'];
+            $timezone = $this->cal['VTIMEZONE']['TZID'];
         } else {
-            return 'UTC';
+            $timezone = 'UTC';
         }
+
+        // Use default timezone if defined is invalid
+        if (!in_array($timezone, timezone_identifiers_list())) {
+            $timezone = date_default_timezone_get();
+        }
+
+        return $timezone;
     }
 
     /**
