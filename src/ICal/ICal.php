@@ -120,6 +120,7 @@ class ICal
      * Creates the iCal Object
      *
      * @param mixed $filename The path to the iCal-file or an array of lines from an iCal file
+     * @param mixed $weekStart The default first day of weeks (SA, SU, MO)
      */
     public function __construct($filename = false, $weekStart = false)
     {
@@ -482,7 +483,10 @@ class ICal
 
         if (isset($date_array[0]['TZID']) && preg_match('/[a-z]*\/[a-z_]*/i', $date_array[0]['TZID'])) {
             $timeZone = $date_array[0]['TZID'];
-        } else {
+        }
+        
+        // Check if the Time Zone is valid
+        if ( !isset($timeZone) or !in_array( $timeZone, timezone_identifiers_list() )) {
             $timeZone = $defaultTimeZone;
         }
 
@@ -1086,12 +1090,17 @@ class ICal
     public function calendarTimeZone()
     {
         if (isset($this->cal['VCALENDAR']['X-WR-TIMEZONE'])) {
-            return $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
+            $timezone = $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
         } else if (isset($this->cal['VTIMEZONE']['TZID'])) {
-            return $this->cal['VTIMEZONE']['TZID'];
-        } else {
-            return 'UTC';
+            $timezone = $this->cal['VTIMEZONE']['TZID'];
         }
+        
+        // Check if the Time Zone is valid
+        if ( !in_array( $timezone, timezone_identifiers_list() )) {
+          $timezone = date_default_timezone_get();
+        }
+        
+        return $timezone;
     }
 
     /**
