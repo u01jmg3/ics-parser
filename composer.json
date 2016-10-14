@@ -1,7 +1,7 @@
 {
-    "name": "u01jmg3/ics-parser",
-    "version": "2.0.0",
+    "name": "johngrogg/ics-parser",
     "description": "ICS file parser",
+    "homepage": "https://github.com/u01jmg3/ics-parser",
     "keywords": ["ics", "ical"],
     "type":"library",
     "license": "MIT",
