@@ -2,8 +2,11 @@
     "name": "u01jmg3/ics-parser",
     "description": "ICS file parser",
     "homepage": "https://github.com/u01jmg3/ics-parser",
-    "keywords": ["ics", "ical"],
-    "type":"library",
+    "keywords": [
+        "ics",
+        "ical"
+    ],
+    "type": "library",
     "license": "MIT",
     "authors": [
         {
@@ -23,7 +26,6 @@
     ],
     "require": {
         "php": ">=5.3.0"
-
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.5"
