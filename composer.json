@@ -1,5 +1,5 @@
 {
-    "name": "johngrogg/ics-parser",
+    "name": "u01jmg3/ics-parser",
     "description": "ICS file parser",
     "homepage": "https://github.com/u01jmg3/ics-parser",
     "keywords": ["ics", "ical"],
@@ -32,5 +32,8 @@
         "psr-0": {
             "ICal": "src/"
         }
+    },
+    "replace": {
+        "johngrogg/ics-parser": "*"
     }
 }
