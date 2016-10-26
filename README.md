@@ -17,6 +17,7 @@ $ curl -s https://getcomposer.org/installer | php
 ```
 
 - `composer.json`
+  - :warning: **Packagist owner is `johngrogg` and not `u01jmg3`**
 
 ```yaml
 {
