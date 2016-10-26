@@ -1,7 +1,7 @@
 # PHP ICS Parser
 
-[![Latest Stable Version](https://poser.pugx.org/u01jmg3/ics-parser/v/stable.png)](https://packagist.org/packages/u01jmg3/ics-parser)
-[![Total Downloads](https://poser.pugx.org/u01jmg3/ics-parser/downloads.png)](https://packagist.org/packages/u01jmg3/ics-parser)
+[![Latest Stable Version](https://poser.pugx.org/johngrogg/ics-parser/v/stable.png)](https://packagist.org/packages/johngrogg/ics-parser)
+[![Total Downloads](https://poser.pugx.org/johngrogg/ics-parser/downloads.png)](https://packagist.org/packages/johngrogg/ics-parser)
 
 --
 
@@ -21,7 +21,7 @@ $ curl -s https://getcomposer.org/installer | php
 ```yaml
 {
     "require": {
-        "u01jmg3/ics-parser": "dev-master"
+        "johngrogg/ics-parser": "dev-master"
     }
 }
 ```
