@@ -453,10 +453,8 @@ class ICal
         // if 32 bit integers are used.
         if ($date[8] == 'Z') {
             $convDate = new \DateTime('now', new \DateTimeZone('UTC'));
-        } else if (!$tzone) {
-            $convDate = new \DateTime('now', new \DateTimeZone($this->calendarTimeZone()));
         } else {
-            $convDate = new \DateTime('now', new \DateTimeZone($tzone));
+            $convDate = new \DateTime('now', new \DateTimeZone($this->calendarTimeZone()));
         }
 
         $convDate->setDate((int) $date[2], (int) $date[3], (int) $date[4]);
