@@ -528,7 +528,8 @@ class ICal
      */
     public function processEvents()
     {
-        $events = $this->cal['VEVENT'];
+        $events = (isset($this->cal['VEVENT'])) ? $this->cal['VEVENT'] : array();
+
         if (empty($events)) {
             return;
         }
@@ -563,10 +564,12 @@ class ICal
      */
     public function processRecurrences()
     {
-        $events = $this->cal['VEVENT'];
+        $events = (isset($this->cal['VEVENT'])) ? $this->cal['VEVENT'] : array();
+
         if (empty($events)) {
             return false;
         }
+
         foreach ($events as $anEvent) {
             if (isset($anEvent['RRULE']) && $anEvent['RRULE'] != '') {
                 // Recurring event, parse RRULE and add appropriate duplicate events
@@ -1050,8 +1053,7 @@ class ICal
      */
     public function processDateConversions()
     {
-        $array = $this->cal;
-        $events = $array['VEVENT'];
+        $events = (isset($this->cal['VEVENT'])) ? $this->cal['VEVENT'] : array();
 
         if (empty($events)) {
             return false;
