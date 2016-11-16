@@ -138,9 +138,9 @@ class ICal
     }
 
     /**
-     * Initializes lines from a URL
+     * Initialises lines from a URL
      *
-     * @param string $url The url of the ical file to download and initialize
+     * @param string $url The url of the ical file to download and initialise
      *
      * @return ICal
      */
@@ -154,9 +154,9 @@ class ICal
     }
 
     /**
-     * Initializes lines from a string
+     * Initialises lines from a string
      *
-     * @param string $contents The contents of the ical file to initialize
+     * @param string $contents The contents of the ical file to initialise
      *
      * @return ICal
      */
@@ -168,9 +168,9 @@ class ICal
     }
 
     /**
-     * Initializes lines from file
+     * Initialises lines from file
      *
-     * @param array $lines The lines to initialize
+     * @param array $lines The lines to initialise
      *
      * @return ICal
      */

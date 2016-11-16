@@ -33,9 +33,9 @@ $ curl -s https://getcomposer.org/installer | php
 
 |Function                 |Parameter(s)                              |Description                                                                                                                  |
 |-------------------------|------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
-|`initLines`              |`$lines`                                  |Initializes lines from file                                                                                                  |
-|`initString`             |`$contents`                               |Initializes lines from a string                                                                                              |
-|`initURL`                |`$url`                                    |Initializes lines from a URL                                                                                                 |
+|`initLines`              |`$lines`                                  |Initialises lines from file                                                                                                  |
+|`initString`             |`$contents`                               |Initialises lines from a string                                                                                              |
+|`initURL`                |`$url`                                    |Initialises lines from a URL                                                                                                 |
 |`calendarDescription`    |-                                         |Returns the calendar description                                                                                             |
 |`calendarName`           |-                                         |Returns the calendar name                                                                                                    |
 |`calendarTimeZone`       |-                                         |Returns the calendar timezone                                                                                                |
