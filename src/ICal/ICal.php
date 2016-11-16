@@ -688,7 +688,7 @@ class ICal
                                 return is_string($val) && strpos($searchDate, $val) === 0;
                             });
 
-                            if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                            if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                 $isExcluded = true;
                             }
 
@@ -843,7 +843,7 @@ class ICal
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
-                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                         $isExcluded = true;
                                     }
 
@@ -899,7 +899,7 @@ class ICal
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
-                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                         $isExcluded = true;
                                     }
 
@@ -955,7 +955,7 @@ class ICal
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
-                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                         $isExcluded = true;
                                     }
 
@@ -1008,7 +1008,7 @@ class ICal
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
-                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                         $isExcluded = true;
                                     }
 
