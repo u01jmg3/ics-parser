@@ -18,29 +18,23 @@ namespace ICal;
 
 use ICal\EventObject;
 
-/**
- * This is the ICal class
- *
- * @param {string} filename The name of the file which should be parsed
- * @constructor
- */
 class ICal
 {
     /**
      * How many ToDos are in this iCal?
-     * @var int
+     * @var integer
      */
     public $todoCount = 0;
 
     /**
      * How many events are in this iCal?
-     * @var int
+     * @var integer
      */
     public $eventCount = 0;
 
     /**
      * How many freebusy are in this iCal?
-     * @var int
+     * @var integer
      */
     public $freebusyCount = 0;
 
@@ -64,7 +58,7 @@ class ICal
 
     /**
      * The value in years to use for indefinite, recurring events
-     * @var int
+     * @var integer
      */
     public $defaultSpan = 2;
     public $defaultWeekStart = 'SU';
@@ -119,7 +113,7 @@ class ICal
     /**
      * Creates the iCal Object
      *
-     * @param mixed $filename The path to the iCal-file or an array of lines from an iCal file
+     * @param mixed $filename  The path to the iCal-file or an array of lines from an iCal file
      * @param mixed $weekStart The default first day of the week (SU or MO, etc.)
      *
      * @return void or false if no filename is provided
@@ -269,9 +263,9 @@ class ICal
     /**
      * Add to $this->ical array one value and key.
      *
-     * @param string $component         This could be VTODO, VEVENT, VCALENDAR, ...
+     * @param string         $component This could be VTODO, VEVENT, VCALENDAR, ...
      * @param string|boolean $keyword   The keyword, for example DTSTART
-     * @param string $value             The value, for example 20110105T090000Z
+     * @param string         $value     The value, for example 20110105T090000Z
      *
      * @return void
      */
@@ -420,7 +414,7 @@ class ICal
      *                           YYYYMMDD[T]HHMMSS or
      *                           TZID=Timezone:YYYYMMDD[T]HHMMSS
      *
-     * @return int
+     * @return integer
      */
     public function iCalDateToUnixTimestamp($icalDate)
     {
@@ -469,8 +463,8 @@ class ICal
     /**
      * Return a date adapted to the calendar timezone depending on the event TZID
      *
-     * @param array $event an event
-     * @param string $key an event parameter (DTSTART or DTEND)
+     * @param array  $event an event
+     * @param string $key   an event parameter (DTSTART or DTEND)
      *
      * @return string Ymd\THis date
      */
@@ -522,9 +516,10 @@ class ICal
 
     /**
      * Performs some admin tasks on all events as taken straight from the ics file.
+     * Adds a unix timestamp to all `DT{START|END|RECURRENCE-ID}_array` arrays
+     * Makes a note of modified recurrence-instances
      *
-     * - Adds a unix timestamp to all `DT{START|END|RECURRENCE-ID}_array` arrays
-     * - Makes a note of modified recurrence-instances
+     * @return void or false if no Events exist
      */
     public function processEvents()
     {
@@ -561,6 +556,8 @@ class ICal
 
     /**
      * Processes recurrence rules
+     *
+     * @return void or false if no Events exist
      */
     public function processRecurrences()
     {
@@ -1050,6 +1047,8 @@ class ICal
      * Add fields DTSTART_tz and DTEND_tz to each event
      * These fields contain dates adapted to the calendar
      * timezone depending on the event TZID
+     *
+     * @return void or false if no Events exist
      */
     public function processDateConversions()
     {
@@ -1238,8 +1237,8 @@ class ICal
     /**
      * Sort events based on a given sort order
      *
-     * @param array $events    An array of EventObjects
-     * @param int   $sortOrder Either SORT_ASC, SORT_DESC, SORT_REGULAR, SORT_NUMERIC, SORT_STRING
+     * @param array   $events    An array of EventObjects
+     * @param integer $sortOrder Either SORT_ASC, SORT_DESC, SORT_REGULAR, SORT_NUMERIC, SORT_STRING
      *
      * @return sorted array of EventObjects
      */
