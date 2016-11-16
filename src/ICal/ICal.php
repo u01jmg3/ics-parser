@@ -531,7 +531,7 @@ class ICal
         $events = (isset($this->cal['VEVENT'])) ? $this->cal['VEVENT'] : array();
 
         if (empty($events)) {
-            return;
+            return false;
         }
 
         foreach ($events as $key => $anEvent) {
@@ -1184,7 +1184,7 @@ class ICal
         $events = $this->sortEventsWithOrder($this->events(), SORT_ASC);
 
         if (empty($events)) {
-            return false;
+            return array();
         }
 
         $extendedEvents = array();
