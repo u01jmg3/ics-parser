@@ -13,7 +13,7 @@ $ical = new ICal('MyCal.ics');
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <title>PHP ICS Parser example</title>
-    <style>.caption { overflow-x: scroll }</style>
+    <style>.caption { overflow-x: auto }</style>
 </head>
 <body style="background-color: #eee">
 <div class="container">
@@ -29,10 +29,12 @@ $ical = new ICal('MyCal.ics');
         </li>
     </ul>
 
-    <h4>Events March through April:</h4>
+    <?php
+        $events = $ical->eventsFromRange('2016-03-01', '2016-04-31');
+        if ($events) echo '<h4>Events March through April:</h4>';
+    ?>
     <div class="row">
     <?php
-    $events = $ical->eventsFromRange('2016-03-01', '2016-04-31');
     foreach ($events as $event) : ?>
         <div class="col-sm-6 col-md-4">
             <div class="thumbnail">
@@ -61,7 +63,7 @@ $ical = new ICal('MyCal.ics');
     ?>
     </div>
 
-    <h4>All Events:</h4>
+    <?php if ($events) echo '<h4>All Events:</h4>' ?>
     <div class="row">
     <?php
     $events = $ical->events();
