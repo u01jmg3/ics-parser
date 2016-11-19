@@ -569,6 +569,13 @@ class ICal
 
         foreach ($events as $anEvent) {
             if (isset($anEvent['RRULE']) && $anEvent['RRULE'] != '') {
+                $initialStart = new \DateTime($anEvent['DTSTART_array'][1], isset($anEvent['DTSTART_array'][0]['TZID']) ? new \DateTimeZone($anEvent['DTSTART_array'][0]['TZID']) : null);
+                $initialStartOffset = $initialStart->getOffset();
+                if (isset($anEvent['DTEND'])) {
+                    $initialEnd = new \DateTime($anEvent['DTEND_array'][1], isset($anEvent['DTEND_array'][0]['TZID']) ? new \DateTimeZone($anEvent['DTEND_array'][0]['TZID']) : null);
+                    $initialEndOffset = $initialEnd->getOffset();
+                }
+
                 // Recurring event, parse RRULE and add appropriate duplicate events
                 $rrules = array();
                 $rruleStrings = explode(';', $anEvent['RRULE']);
@@ -579,9 +586,9 @@ class ICal
                 // Get frequency
                 $frequency = $rrules['FREQ'];
                 // Get Start timestamp
-                $startTimestamp = $anEvent['DTSTART_array'][2];
+                $startTimestamp = $initialStart->getTimeStamp();
                 if (isset($anEvent['DTEND'])) {
-                    $endTimestamp = $anEvent['DTEND_array'][2];
+                    $endTimestamp = $initialEnd->getTimestamp();
                 } else if (isset($anEvent['DURATION'])) {
                     $duration = end($anEvent['DURATION_array']);
                     $endTimestamp = date_create($anEvent['DTSTART']);
@@ -672,9 +679,16 @@ class ICal
                         $recurringTimestamp = strtotime($offset, $startTimestamp);
 
                         while ($recurringTimestamp <= $until) {
+                            $dayRecurringTimestamp = $recurringTimestamp;
+
+                            // Adjust timezone from initial event
+                            $recurringTimezone = \DateTime::createFromFormat('U', $dayRecurringTimestamp);
+                            $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimezone);
+                            $dayRecurringTimestamp += ($timezoneOffset != $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
+
                             // Add event
-                            $anEvent['DTSTART'] = gmdate(self::DATE_TIME_FORMAT, $recurringTimestamp) . 'Z';
-                            $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $recurringTimestamp);
+                            $anEvent['DTSTART'] = gmdate(self::DATE_TIME_FORMAT, $dayRecurringTimestamp) . 'Z';
+                            $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $dayRecurringTimestamp);
                             $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                             $anEvent['DTEND_array'][2] += $eventTimestampOffset;
                             $anEvent['DTEND'] = gmdate(
@@ -688,7 +702,7 @@ class ICal
                                 return is_string($val) && strpos($searchDate, $val) === 0;
                             });
 
-                            if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                            if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                 $isExcluded = true;
                             }
 
@@ -743,8 +757,12 @@ class ICal
 
                         // Step through weeks
                         while ($weekRecurringTimestamp <= $until) {
-                            // Add events for bydays
                             $dayRecurringTimestamp = $weekRecurringTimestamp;
+
+                            // Adjust timezone from initial event
+                            $dayRecurringTimezone = \DateTime::createFromFormat('U', $dayRecurringTimestamp, new \DateTimeZone('UTC'));
+                            $timezoneOffset = $initialStart->getTimezone()->getOffset($dayRecurringTimezone);
+                            $dayRecurringTimestamp += ($timezoneOffset != $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                             foreach ($weekdays as $day) {
                                 // Check if day should be added
@@ -813,23 +831,37 @@ class ICal
                                             'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
                                             strtotime($events[0]['DTSTART'])
                                         ) . 'Z';
+
                                         $events[0]['DTEND'] = gmdate(
                                             'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
                                             strtotime($events[0]['DTEND'])
                                         ) . 'Z';
+
                                         $events[0]['DTSTART_array'][1] = $events[0]['DTSTART'];
                                         $events[0]['DTSTART_array'][2] = $this->iCalDateToUnixTimestamp($events[0]['DTSTART']);
-                                        $events[0]['DTEND_array'][1] = $events[0]['DTEND'];
-                                        $events[0]['DTEND_array'][2] = $this->iCalDateToUnixTimestamp($events[0]['DTEND']);
+                                        $events[0]['DTEND_array'][1]   = $events[0]['DTEND'];
+                                        $events[0]['DTEND_array'][2]   = $this->iCalDateToUnixTimestamp($events[0]['DTEND']);
+
+                                        // Ensure recurring timestamp confirms to monthday rule
+                                        $monthRecurringTimestamp = $this->iCalDateToUnixTimestamp(
+                                            gmdate(
+                                                'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
+                                                $recurringTimestamp
+                                            ) . 'Z'
+                                        );
                                     }
+
+                                    // Adjust timezone from initial event
+                                    $recurringTimezone = \DateTime::createFromFormat('U', $monthRecurringTimestamp);
+                                    $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimezone);
+                                    $monthRecurringTimestamp += ($timezoneOffset != $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                                     // Add event
                                     $anEvent['DTSTART'] = gmdate(
                                         'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
-                                        $recurringTimestamp
+                                        $monthRecurringTimestamp
                                     ) . 'Z';
-                                    $recurringTimestamp = $this->iCalDateToUnixTimestamp($anEvent['DTSTART']);
-                                    $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $recurringTimestamp);
+                                    $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $monthRecurringTimestamp);
                                     $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                                     $anEvent['DTEND_array'][2] += $eventTimestampOffset;
                                     $anEvent['DTEND'] = gmdate(
@@ -843,7 +875,7 @@ class ICal
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
-                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($monthRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                         $isExcluded = true;
                                     }
 
@@ -866,25 +898,30 @@ class ICal
                                 $recurringTimestamp = strtotime($offset, $recurringTimestamp);
                             }
                         } else if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
-                            $startTime = gmdate(self::TIME_FORMAT, $startTimestamp);
-
                             while ($recurringTimestamp <= $until) {
-                                $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]} of " . gmdate('F Y H:i:s', $recurringTimestamp);
+                                $monthRecurringTimestamp = $recurringTimestamp;
+
+                                // Adjust timezone from initial event
+                                $recurringTimezone = \DateTime::createFromFormat('U', $monthRecurringTimestamp);
+                                $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimezone);
+                                $monthRecurringTimestamp += ($timezoneOffset != $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
+
+                                $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]} of " . gmdate('F Y H:i:s', $monthRecurringTimestamp);
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
                                 // Prevent 5th day of a month from showing up on the next month
                                 // If BYDAY and the event falls outside the current month, skip the event
 
-                                $compareCurrentMonth = date('F', $recurringTimestamp);
+                                $compareCurrentMonth = date('F', $monthRecurringTimestamp);
                                 $compareEventMonth   = date('F', $eventStartTimestamp);
 
                                 if ($compareCurrentMonth != $compareEventMonth) {
-                                    $recurringTimestamp = strtotime($offset, $recurringTimestamp);
+                                    $monthRecurringTimestamp = strtotime($offset, $monthRecurringTimestamp);
                                     continue;
                                 }
 
                                 if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
-                                    $anEvent['DTSTART'] = gmdate(self::DATE_FORMAT, $eventStartTimestamp) . 'T' . $startTime . 'Z';
+                                    $anEvent['DTSTART'] = gmdate(self::DATE_TIME_FORMAT, $eventStartTimestamp) . 'Z';
                                     $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $eventStartTimestamp);
                                     $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                                     $anEvent['DTEND_array'][2] += $eventTimestampOffset;
@@ -899,7 +936,7 @@ class ICal
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
-                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($monthRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                         $isExcluded = true;
                                     }
 
@@ -931,16 +968,21 @@ class ICal
 
                         // Check if BYDAY rule exists
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] != '') {
-                            $startTime = gmdate(self::TIME_FORMAT, $startTimestamp);
-
                             while ($recurringTimestamp <= $until) {
+                                $yearRecurringTimestamp = $recurringTimestamp;
+
+                                // Adjust timezone from initial event
+                                $recurringTimezone = \DateTime::createFromFormat('U', $yearRecurringTimestamp);
+                                $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimezone);
+                                $yearRecurringTimestamp += ($timezoneOffset != $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
+
                                 $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]}"
                                     . " of {$this->monthNames[$rrules['BYMONTH']]} "
-                                    . gmdate('Y H:i:s', $recurringTimestamp);
+                                    . gmdate('Y H:i:s', $yearRecurringTimestamp);
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
                                 if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
-                                    $anEvent['DTSTART'] = gmdate(self::DATE_FORMAT, $eventStartTimestamp) . 'T' . $startTime . 'Z';
+                                    $anEvent['DTSTART'] = gmdate(self::DATE_TIME_FORMAT, $eventStartTimestamp) . 'Z';
                                     $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $eventStartTimestamp);
                                     $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                                     $anEvent['DTEND_array'][2] += $eventTimestampOffset;
@@ -955,7 +997,7 @@ class ICal
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
-                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($yearRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                         $isExcluded = true;
                                     }
 
@@ -979,21 +1021,27 @@ class ICal
                             }
                         } else {
                             $day = gmdate('d', $startTimestamp);
-                            $startTime = gmdate(self::TIME_FORMAT, $startTimestamp);
 
                             // Step through years
                             while ($recurringTimestamp <= $until) {
+                                $yearRecurringTimestamp = $recurringTimestamp;
+
+                                // Adjust timezone from initial event
+                                $recurringTimezone = \DateTime::createFromFormat('U', $yearRecurringTimestamp);
+                                $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimezone);
+                                $yearRecurringTimestamp += ($timezoneOffset != $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
+
                                 // Add specific month dates
                                 if (isset($rrules['BYMONTH']) && $rrules['BYMONTH'] != '') {
-                                    $eventStartDesc = "$day {$this->monthNames[$rrules['BYMONTH']]} " . gmdate('Y H:i:s', $recurringTimestamp);
+                                    $eventStartDesc = "$day {$this->monthNames[$rrules['BYMONTH']]} " . gmdate('Y H:i:s', $yearRecurringTimestamp);
                                 } else {
-                                    $eventStartDesc = $day . gmdate('F Y H:i:s', $recurringTimestamp);
+                                    $eventStartDesc = $day . gmdate('F Y H:i:s', $yearRecurringTimestamp);
                                 }
 
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
                                 if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
-                                    $anEvent['DTSTART'] = gmdate(self::DATE_FORMAT, $eventStartTimestamp) . 'T' . $startTime . 'Z';
+                                    $anEvent['DTSTART'] = gmdate(self::DATE_TIME_FORMAT, $eventStartTimestamp) . 'Z';
                                     $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $eventStartTimestamp);
                                     $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                                     $anEvent['DTEND_array'][2] += $eventTimestampOffset;
@@ -1008,7 +1056,7 @@ class ICal
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
-                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($yearRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                         $isExcluded = true;
                                     }
 
