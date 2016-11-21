@@ -1273,10 +1273,10 @@ class ICal
             $eventStart = $anEvent->dtstart_array[2];
             $eventEnd = $anEvent->dtend_array[2];
             
-            if ($eventStart >= $rangeStart && $eventStart < $rangeEnd)  // event start date contained in the range
+            if (($eventStart >= $rangeStart && $eventStart < $rangeEnd)  // event start date contained in the range
                 || ($eventEnd > $rangeStart && $eventEnd <= $rangeEnd)  // event end date contained in the range
                 || ($eventStart < $rangeStart && $eventEnd > $rangeEnd) // event starts before and finishes after range
-            {
+            ) {
                 $extendedEvents[] = $anEvent;
             }
         }
