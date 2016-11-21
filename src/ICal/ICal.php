@@ -1270,8 +1270,13 @@ class ICal
         $rangeEnd   = $rangeEnd->getTimestamp();
 
         foreach ($events as $anEvent) {
-            $timestamp = $anEvent->dtstart_array[2];
-            if ($timestamp >= $rangeStart && $timestamp <= $rangeEnd) {
+            $eventStart = $anEvent->dtstart_array[2];
+            $eventEnd = $anEvent->dtend_array[2];
+            
+            if ($eventStart >= $rangeStart && $eventStart < $rangeEnd)  // event start date contained in the range
+                || ($eventEnd > $rangeStart && $eventEnd <= $rangeEnd)  // event end date contained in the range
+                || ($eventStart < $rangeStart && $eventEnd > $rangeEnd) // event starts before and finishes after range
+            {
                 $extendedEvents[] = $anEvent;
             }
         }
