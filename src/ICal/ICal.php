@@ -1271,11 +1271,15 @@ class ICal
 
         foreach ($events as $anEvent) {
             $eventStart = $anEvent->dtstart_array[2];
-            $eventEnd = $anEvent->dtend_array[2];
-            
-            if (($eventStart >= $rangeStart && $eventStart < $rangeEnd) // event start date contained in the range
-                || ($eventEnd > $rangeStart && $eventEnd <= $rangeEnd)  // event end date contained in the range
-                || ($eventStart < $rangeStart && $eventEnd > $rangeEnd) // event starts before and finishes after range
+            $eventEnd   = (isset($anEvent->dtend_array[2])) ? $anEvent->dtend_array[2] : null;
+
+            if (($eventStart >= $rangeStart && $eventStart < $rangeEnd)         // Event start date contained in the range
+                || ($eventEnd !== null
+                    && (
+                        ($eventEnd > $rangeStart && $eventEnd <= $rangeEnd)     // Event end date contained in the range
+                        || ($eventStart < $rangeStart && $eventEnd > $rangeEnd) // Event starts before and finishes after range
+                    )
+                )
             ) {
                 $extendedEvents[] = $anEvent;
             }
