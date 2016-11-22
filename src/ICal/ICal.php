@@ -1281,6 +1281,25 @@ class ICal
         }
         return $extendedEvents;
     }
+    
+    /**
+     * Returns a sorted array of the events following a given string,
+     * or false if no events exist in the range.
+     *
+     * @param string $interval
+     *
+     * @return array of EventObjects
+     */
+    public function eventsFromInterval($interval)
+    {
+        $rangeStart = new \DateTime();
+        $rangeEnd = new \DateTime();
+        
+        $dateInterval = \DateInterval::createFromDateString($interval);
+        $rangeEnd->add($dateInterval);
+        
+        return $this->eventsFromRange($rangeStart->format('Y-m-d'), $rangeEnd->format('Y-m-d'));
+    }
 
     /**
      * Sort events based on a given sort order

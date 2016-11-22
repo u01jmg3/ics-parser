@@ -62,6 +62,40 @@ $ical = new ICal('MyCal.ics');
     endforeach
     ?>
     </div>
+    
+    <?php
+        $events = $ical->eventsFromInterval('1 week');
+        if ($events) echo '<h4>Events in the next 7 days:</h4>';
+    ?>
+    <div class="row">
+    <?php
+    foreach ($events as $event) : ?>
+        <div class="col-sm-6 col-md-4">
+            <div class="thumbnail">
+                <div class="caption">
+                    <h3><?php echo $event->summary . ' (' . date('d-m-Y H:i', $ical->iCalDateToUnixTimestamp($event->dtstart)) . ')' ?></h3>
+                    <p>SUMMARY: <?php echo $event->summary ?></p>
+                    <p>DTSTART: <?php echo $event->dtstart ?></p>
+                    <p>DTEND: <?php echo $event->dtend ?></p>
+                    <p>DURATION: <?php echo $event->duration ?></p>
+                    <p>DTSTAMP: <?php echo $event->dtstamp ?></p>
+                    <p>UID: <?php echo $event->uid ?></p>
+                    <p>CREATED: <?php echo $event->created ?></p>
+                    <p>LAST-MODIFIED: <?php echo $event->lastmodified ?></p>
+                    <p>DESCRIPTION: <?php echo $event->description ?></p>
+                    <p>LOCATION: <?php echo $event->location ?></p>
+                    <p>SEQUENCE: <?php echo $event->sequence ?></p>
+                    <p>STATUS: <?php echo $event->status ?></p>
+                    <p>TRANSP: <?php echo $event->transp ?></p>
+                    <p>ORGANISER: <?php echo $event->organizer ?></p>
+                    <p>ATTENDEE(S): <?php echo $event->attendee ?></p>
+                </div>
+            </div>
+        </div>
+    <?php
+    endforeach
+    ?>
+    </div>
 
     <?php if ($events) echo '<h4>All Events:</h4>' ?>
     <div class="row">
