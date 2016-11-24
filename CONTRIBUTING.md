@@ -9,5 +9,6 @@ We appreciate pull requests, here are our guidelines:
   - It is also extremely useful to be provided with an iCal snippet causing the parser to behave incorrectly
 1. Please follow the coding standards already adhered to in the file you're editing before committing
   - This includes the use of *4 spaces* over tabs for indentation
+  - Trimming all trailing whitespace
   - Using single quotes (`'`) where possible
-  - Using the [1TBS](https://en.wikipedia.org/wiki/Indent_style#Variant:_1TBS) indent style
+  - Using the [1TBS](https://en.wikipedia.org/wiki/Indent_style#Variant:_1TBS_.28OTBS.29) indent style
