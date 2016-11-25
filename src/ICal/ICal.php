@@ -11,7 +11,7 @@
  * @license  http://www.opensource.org/licenses/mit-license.php MIT License
  * @link     https://github.com/MartinThoma/ics-parser/
  * @example  $ical = new ical('MyCal.ics'); print_r($ical->events());
- * @version  2.0.0
+ * @version  2.0.1
  */
 
 namespace ICal;
