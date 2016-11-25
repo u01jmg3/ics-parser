@@ -293,11 +293,20 @@ class ICal
                         $this->cal[$component][$this->eventCount - 1][$keyword] = $value;
                     }
 
-                    $this->cal[$component][$this->eventCount - 1][$keyword . '_array'][] = $value;
+                    if ($keyword === 'EXDATE') {
+                        if (trim($value) === $value) {
+                            $this->cal[$component][$this->eventCount - 1][$keyword . '_array'][] = explode(',', $value);
+                        } else {
+                            $value = explode(',', implode(',', $this->cal[$component][$this->eventCount - 1][$keyword . '_array'][1]) . trim($value));
+                            $this->cal[$component][$this->eventCount - 1][$keyword . '_array'][1] = $value;
+                        }
+                    } else {
+                        $this->cal[$component][$this->eventCount - 1][$keyword . '_array'][] = $value;
 
-                    if ($keyword === 'DURATION') {
-                        $duration = new \DateInterval($value);
-                        array_push($this->cal[$component][$this->eventCount - 1][$keyword . '_array'], $duration);
+                        if ($keyword === 'DURATION') {
+                            $duration = new \DateInterval($value);
+                            array_push($this->cal[$component][$this->eventCount - 1][$keyword . '_array'], $duration);
+                        }
                     }
 
                     // Glue back together for multi-line content
@@ -310,18 +319,18 @@ class ICal
 
                         // Account for multiple definitions of current keyword (e.g. ATTENDEE)
                         if (is_array($this->cal[$component][$this->eventCount - 1][$keyword . '_array'][1])) {
-                            // Concat value *with separator* as content spans multiple lines
-                            $this->cal[$component][$this->eventCount - 1][$keyword] .= ';' . $value;
-                        } else {
                             if ($keyword === 'EXDATE') {
                                 // This will give out a comma separated EXDATE string as per RFC2445
                                 // Example: EXDATE:19960402T010000Z,19960403T010000Z,19960404T010000Z
                                 // Usage: $event['EXDATE'] will print out 19960402T010000Z,19960403T010000Z,19960404T010000Z
-                                $this->cal[$component][$this->eventCount - 1][$keyword] .= ',' . $value;
+                                $this->cal[$component][$this->eventCount - 1][$keyword] .= implode(',', $value);
                             } else {
-                                // Concat value as content spans multiple lines
-                                $this->cal[$component][$this->eventCount - 1][$keyword] .= $value;
+                                // Concat value *with separator* as content spans multiple lines
+                                $this->cal[$component][$this->eventCount - 1][$keyword] .= ';' . $value;
                             }
+                        } else {
+                            // Concat value as content spans multiple lines
+                            $this->cal[$component][$this->eventCount - 1][$keyword] .= $value;
                         }
                     }
                 }
@@ -679,7 +688,7 @@ class ICal
                 }
 
                 if (!isset($anEvent['EXDATE_array'])) {
-                    $anEvent['EXDATE_array'] = array();
+                    $anEvent['EXDATE_array'][1] = array();
                 }
 
                 // Decide how often to add events and do so
@@ -709,7 +718,7 @@ class ICal
                             $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                             $searchDate = $anEvent['DTSTART'];
-                            $isExcluded = array_filter($anEvent['EXDATE_array'], function ($val) use ($searchDate) {
+                            $isExcluded = array_filter($anEvent['EXDATE_array'][1], function ($val) use ($searchDate) {
                                 return is_string($val) && strpos($searchDate, $val) === 0;
                             });
 
@@ -793,7 +802,7 @@ class ICal
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                     $searchDate = $anEvent['DTSTART'];
-                                    $isExcluded = array_filter($anEvent['EXDATE_array'], function ($val) use ($searchDate) {
+                                    $isExcluded = array_filter($anEvent['EXDATE_array'][1], function ($val) use ($searchDate) {
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
@@ -882,7 +891,7 @@ class ICal
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                     $searchDate = $anEvent['DTSTART'];
-                                    $isExcluded = array_filter($anEvent['EXDATE_array'], function ($val) use ($searchDate) {
+                                    $isExcluded = array_filter($anEvent['EXDATE_array'][1], function ($val) use ($searchDate) {
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
@@ -943,7 +952,7 @@ class ICal
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                     $searchDate = $anEvent['DTSTART'];
-                                    $isExcluded = array_filter($anEvent['EXDATE_array'], function ($val) use ($searchDate) {
+                                    $isExcluded = array_filter($anEvent['EXDATE_array'][1], function ($val) use ($searchDate) {
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
@@ -1004,7 +1013,7 @@ class ICal
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                     $searchDate = $anEvent['DTSTART'];
-                                    $isExcluded = array_filter($anEvent['EXDATE_array'], function ($val) use ($searchDate) {
+                                    $isExcluded = array_filter($anEvent['EXDATE_array'][1], function ($val) use ($searchDate) {
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
@@ -1063,7 +1072,7 @@ class ICal
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                     $searchDate = $anEvent['DTSTART'];
-                                    $isExcluded = array_filter($anEvent['EXDATE_array'], function ($val) use ($searchDate) {
+                                    $isExcluded = array_filter($anEvent['EXDATE_array'][1], function ($val) use ($searchDate) {
                                         return is_string($val) && strpos($searchDate, $val) === 0;
                                     });
 
