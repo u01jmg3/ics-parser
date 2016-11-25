@@ -437,7 +437,7 @@ class ICal
         $pattern .= '([0-9]{0,2})';        // 7: SS
         $pattern .= '(Z?)/';               // 8: UTC flag
         preg_match($pattern, $icalDate, $date);
-        $tzone = str_replace(':', '', $date[1]);
+        $timezone = str_replace(':', '', $date[1]);
 
         // Unix timestamp can't represent dates before 1970
         if ($date[2] <= self::UNIX_MIN_YEAR) {
@@ -447,10 +447,12 @@ class ICal
         // if 32 bit integers are used.
         if ($date[8] == 'Z') {
             $convDate = new \DateTime('now', new \DateTimeZone('UTC'));
-        } else if (!$tzone) {
+        } else if (!$timezone) {
             $convDate = new \DateTime('now', new \DateTimeZone($this->calendarTimeZone()));
+        } else if ($this->isValidTimeZoneId($timezone)) {
+            $convDate = new \DateTime('now', new \DateTimeZone($timezone));
         } else {
-            $convDate = new \DateTime('now', new \DateTimeZone($tzone));
+            $convDate = new \DateTime('now', new \DateTimeZone(date_default_timezone_get()));
         }
 
         $convDate->setDate((int) $date[2], (int) $date[3], (int) $date[4]);
@@ -569,10 +571,19 @@ class ICal
 
         foreach ($events as $anEvent) {
             if (isset($anEvent['RRULE']) && $anEvent['RRULE'] != '') {
-                $initialStart = new \DateTime($anEvent['DTSTART_array'][1], isset($anEvent['DTSTART_array'][0]['TZID']) ? new \DateTimeZone($anEvent['DTSTART_array'][0]['TZID']) : null);
+                if (isset($anEvent['DTSTART_array'][0]['TZID']) && $this->isValidTimeZoneId($anEvent['DTSTART_array'][0]['TZID'])) {
+                    $initialStartTimeZone = $anEvent['DTSTART_array'][0]['TZID'];
+                }
+
+                $initialStart       = new \DateTime($anEvent['DTSTART_array'][1], isset($initialStartTimeZone) ? new \DateTimeZone($initialStartTimeZone) : null);
                 $initialStartOffset = $initialStart->getOffset();
+
                 if (isset($anEvent['DTEND'])) {
-                    $initialEnd = new \DateTime($anEvent['DTEND_array'][1], isset($anEvent['DTEND_array'][0]['TZID']) ? new \DateTimeZone($anEvent['DTEND_array'][0]['TZID']) : null);
+                    if (isset($anEvent['DTEND_array'][0]['TZID']) && $this->isValidTimeZoneId($anEvent['DTSTART_array'][0]['TZID'])) {
+                        $initialEndTimeZone = $anEvent['DTSTART_array'][0]['TZID'];
+                    }
+
+                    $initialEnd       = new \DateTime($anEvent['DTEND_array'][1], isset($initialEndTimeZone) ? new \DateTimeZone($initialEndTimeZone) : null);
                     $initialEndOffset = $initialEnd->getOffset();
                 }
 
@@ -682,8 +693,8 @@ class ICal
                             $dayRecurringTimestamp = $recurringTimestamp;
 
                             // Adjust timezone from initial event
-                            $recurringTimezone = \DateTime::createFromFormat('U', $dayRecurringTimestamp);
-                            $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimezone);
+                            $recurringTimeZone = \DateTime::createFromFormat('U', $dayRecurringTimestamp);
+                            $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimeZone);
                             $dayRecurringTimestamp += ($timezoneOffset != $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                             // Add event
@@ -760,8 +771,8 @@ class ICal
                             $dayRecurringTimestamp = $weekRecurringTimestamp;
 
                             // Adjust timezone from initial event
-                            $dayRecurringTimezone = \DateTime::createFromFormat('U', $dayRecurringTimestamp, new \DateTimeZone('UTC'));
-                            $timezoneOffset = $initialStart->getTimezone()->getOffset($dayRecurringTimezone);
+                            $dayRecurringTimeZone = \DateTime::createFromFormat('U', $dayRecurringTimestamp, new \DateTimeZone('UTC'));
+                            $timezoneOffset = $initialStart->getTimezone()->getOffset($dayRecurringTimeZone);
                             $dayRecurringTimestamp += ($timezoneOffset != $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                             foreach ($weekdays as $day) {
@@ -852,8 +863,8 @@ class ICal
                                     }
 
                                     // Adjust timezone from initial event
-                                    $recurringTimezone = \DateTime::createFromFormat('U', $monthRecurringTimestamp);
-                                    $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimezone);
+                                    $recurringTimeZone = \DateTime::createFromFormat('U', $monthRecurringTimestamp);
+                                    $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimeZone);
                                     $monthRecurringTimestamp += ($timezoneOffset != $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                                     // Add event
@@ -902,8 +913,8 @@ class ICal
                                 $monthRecurringTimestamp = $recurringTimestamp;
 
                                 // Adjust timezone from initial event
-                                $recurringTimezone = \DateTime::createFromFormat('U', $monthRecurringTimestamp);
-                                $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimezone);
+                                $recurringTimeZone = \DateTime::createFromFormat('U', $monthRecurringTimestamp);
+                                $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimeZone);
                                 $monthRecurringTimestamp += ($timezoneOffset != $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                                 $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]} of " . gmdate('F Y H:i:s', $monthRecurringTimestamp);
@@ -972,8 +983,8 @@ class ICal
                                 $yearRecurringTimestamp = $recurringTimestamp;
 
                                 // Adjust timezone from initial event
-                                $recurringTimezone = \DateTime::createFromFormat('U', $yearRecurringTimestamp);
-                                $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimezone);
+                                $recurringTimeZone = \DateTime::createFromFormat('U', $yearRecurringTimestamp);
+                                $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimeZone);
                                 $yearRecurringTimestamp += ($timezoneOffset != $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                                 $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]}"
@@ -1027,8 +1038,8 @@ class ICal
                                 $yearRecurringTimestamp = $recurringTimestamp;
 
                                 // Adjust timezone from initial event
-                                $recurringTimezone = \DateTime::createFromFormat('U', $yearRecurringTimestamp);
-                                $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimezone);
+                                $recurringTimeZone = \DateTime::createFromFormat('U', $yearRecurringTimestamp);
+                                $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimeZone);
                                 $yearRecurringTimestamp += ($timezoneOffset != $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                                 // Add specific month dates
@@ -1165,17 +1176,19 @@ class ICal
      */
     public function calendarTimeZone()
     {
+        $default_timezone = date_default_timezone_get();
+
         if (isset($this->cal['VCALENDAR']['X-WR-TIMEZONE'])) {
             $timezone = $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
         } else if (isset($this->cal['VTIMEZONE']['TZID'])) {
             $timezone = $this->cal['VTIMEZONE']['TZID'];
         } else {
-            $timezone = 'UTC';
+            return $default_timezone;
         }
 
         // Use default timezone if defined is invalid
-        if (!in_array($timezone, timezone_identifiers_list())) {
-            $timezone = date_default_timezone_get();
+        if (!$this->isValidTimeZoneId($timezone)) {
+            return $default_timezone;
         }
 
         return $timezone;
@@ -1331,5 +1344,27 @@ class ICal
         array_multisort($timestamp, $sortOrder, $extendedEvents);
 
         return $extendedEvents;
+    }
+
+    /**
+     * Check if a timezone is valid
+     *
+     * @param string $timezone A timezone
+     *
+     * @return boolean
+     */
+    function isValidTimeZoneId($timezone){
+        $valid = array();
+        $tza = timezone_abbreviations_list();
+
+        foreach ($tza as $zone) {
+            foreach ($zone as $item) {
+                $valid[$item['timezone_id']] = true;
+            }
+        }
+
+        unset($valid['']);
+
+        return (isset($valid[$timezone]));
     }
 }
