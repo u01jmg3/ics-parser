@@ -323,7 +323,8 @@ class ICal
                                 // This will give out a comma separated EXDATE string as per RFC2445
                                 // Example: EXDATE:19960402T010000Z,19960403T010000Z,19960404T010000Z
                                 // Usage: $event['EXDATE'] will print out 19960402T010000Z,19960403T010000Z,19960404T010000Z
-                                $this->cal[$component][$this->eventCount - 1][$keyword] .= implode(',', $value);
+                                $value = (is_array($value)) ? implode(',', $value) : $value;
+                                $this->cal[$component][$this->eventCount - 1][$keyword] = $value;
                             } else {
                                 // Concat value *with separator* as content spans multiple lines
                                 $this->cal[$component][$this->eventCount - 1][$keyword] .= ';' . $value;
