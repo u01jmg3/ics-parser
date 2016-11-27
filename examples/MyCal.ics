@@ -20,6 +20,7 @@ SEQUENCE:2
 STATUS:CONFIRMED
 SUMMARY;LANGUAGE=en-gb:My Holidays
 TRANSP:TRANSPARENT
+ORGANIZER;CN="My Name":mailto:my.name@mydomain.com
 END:VEVENT
 BEGIN:VEVENT
 ATTENDEE;CN="Page, Larry <l.page@google.com> (l.page@google.com)";ROLE=REQ-PARTICIPANT;RSVP=FALSE:mailto:l.page@google.com
