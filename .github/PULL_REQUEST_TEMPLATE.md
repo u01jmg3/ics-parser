@@ -6,3 +6,4 @@
 >   - Trimming all trailing whitespace
 >   - Using single quotes (`'`) where possible
 >   - Using the [1TBS](https://en.wikipedia.org/wiki/Indent_style#Variant:_1TBS_.28OTBS.29) indent style
+> - If a function is added or changed, please remember to update the [API documentation in the README](https://github.com/u01jmg3/ics-parser/blob/master/README.md#api)
