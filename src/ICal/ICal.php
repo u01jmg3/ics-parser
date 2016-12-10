@@ -494,7 +494,7 @@ class ICal
         $dateTime = new \DateTime($event[$key]);
 
         if (substr($date, -1) === 'Z') {
-            $date = substr($date, 0, -1);
+            $date = substr($date, 0, -1); // Remove 'Z'
             $tz = new \DateTimeZone($defaultTimeZone);
             $offset = timezone_offset_get($tz, $dateTime);
         } else {
@@ -568,15 +568,18 @@ class ICal
         }
 
         foreach ($events as $anEvent) {
-            if (isset($anEvent['RRULE']) && $anEvent['RRULE'] != '') {
+            if (isset($anEvent['RRULE']) && $anEvent['RRULE'] !== '') {
                 if (isset($anEvent['DTSTART_array'][0]['TZID']) && $this->isValidTimeZoneId($anEvent['DTSTART_array'][0]['TZID'])) {
                     $initialStartTimeZone = $anEvent['DTSTART_array'][0]['TZID'];
                 } else {
                     unset($initialStartTimeZone);
                 }
 
-                $initialStart       = new \DateTime($anEvent['DTSTART_array'][1], isset($initialStartTimeZone) ? new \DateTimeZone($initialStartTimeZone) : null);
-                $initialStartOffset = $initialStart->getOffset();
+                $isAllDayEvent = strlen($anEvent['DTSTART_array'][1]) === 8 ? true : false;
+
+                $initialStart             = new \DateTime($anEvent['DTSTART_array'][1], isset($initialStartTimeZone) ? new \DateTimeZone($initialStartTimeZone) : null);
+                $initialStartOffset       = $initialStart->getOffset();
+                $initialStartTimeZoneName = $initialStart->getTimezone()->getName();
 
                 if (isset($anEvent['DTEND'])) {
                     if (isset($anEvent['DTEND_array'][0]['TZID']) && $this->isValidTimeZoneId($anEvent['DTSTART_array'][0]['TZID'])) {
@@ -585,8 +588,11 @@ class ICal
                         unset($initialEndTimeZone);
                     }
 
-                    $initialEnd       = new \DateTime($anEvent['DTEND_array'][1], isset($initialEndTimeZone) ? new \DateTimeZone($initialEndTimeZone) : null);
-                    $initialEndOffset = $initialEnd->getOffset();
+                    $initialEnd             = new \DateTime($anEvent['DTEND_array'][1], isset($initialEndTimeZone) ? new \DateTimeZone($initialEndTimeZone) : null);
+                    $initialEndOffset       = $initialEnd->getOffset();
+                    $initialEndTimeZoneName = $initialEnd->getTimezone()->getName();
+                } else {
+                    $initialEndTimeZoneName = $initialStartTimeZoneName;
                 }
 
                 // Recurring event, parse RRULE and add appropriate duplicate events
@@ -700,14 +706,14 @@ class ICal
                             $dayRecurringTimestamp += ($timezoneOffset != $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                             // Add event
-                            $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $dayRecurringTimestamp) . 'Z';
+                            $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $dayRecurringTimestamp) . ($isAllDayEvent || $initialStartTimeZoneName === 'Z' ? 'Z' : '');
                             $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $dayRecurringTimestamp);
                             $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                             $anEvent['DTEND_array'][2] += $eventTimestampOffset;
                             $anEvent['DTEND'] = date(
                                 self::DATE_TIME_FORMAT,
                                 $anEvent['DTEND_array'][2]
-                            ) . 'Z';
+                            ) . ($isAllDayEvent || $initialEndTimeZoneName === 'Z' ? 'Z' : '');
                             $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                             $searchDate = $anEvent['DTSTART'];
@@ -784,14 +790,14 @@ class ICal
                                     && $dayRecurringTimestamp <= $until
                                 ) {
                                     // Add event
-                                    $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $dayRecurringTimestamp) . 'Z';
+                                    $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $dayRecurringTimestamp) . ($isAllDayEvent || $initialStartTimeZoneName === 'Z' ? 'Z' : '');
                                     $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $dayRecurringTimestamp);
                                     $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                                     $anEvent['DTEND_array'][2] += $eventTimestampOffset;
                                     $anEvent['DTEND'] = date(
                                         self::DATE_TIME_FORMAT,
                                         $anEvent['DTEND_array'][2]
-                                    ) . 'Z';
+                                    ) . ($isAllDayEvent || $initialEndTimeZoneName === 'Z' ? 'Z' : '');
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                     $searchDate = $anEvent['DTSTART'];
@@ -843,24 +849,24 @@ class ICal
                                         $events[0]['DTSTART'] = gmdate(
                                             'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
                                             strtotime($events[0]['DTSTART'])
-                                        ) . 'Z';
+                                        ) . ($isAllDayEvent || $initialStartTimeZoneName === 'Z' ? 'Z' : '');
 
                                         $events[0]['DTEND'] = gmdate(
                                             'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
                                             strtotime($events[0]['DTEND'])
-                                        ) . 'Z';
+                                        ) . ($isAllDayEvent || $initialEndTimeZoneName === 'Z' ? 'Z' : '');
 
                                         $events[0]['DTSTART_array'][1] = $events[0]['DTSTART'];
                                         $events[0]['DTSTART_array'][2] = $this->iCalDateToUnixTimestamp($events[0]['DTSTART']);
                                         $events[0]['DTEND_array'][1]   = $events[0]['DTEND'];
                                         $events[0]['DTEND_array'][2]   = $this->iCalDateToUnixTimestamp($events[0]['DTEND']);
 
-                                        // Ensure recurring timestamp confirms to monthday rule
+                                        // Ensure recurring timestamp confirms to BYMONTHDAY rule
                                         $monthRecurringTimestamp = $this->iCalDateToUnixTimestamp(
                                             gmdate(
                                                 'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
                                                 $recurringTimestamp
-                                            ) . 'Z'
+                                            ) . ($isAllDayEvent || $initialStartTimeZoneName === 'Z' ? 'Z' : '')
                                         );
                                     }
 
@@ -873,14 +879,14 @@ class ICal
                                     $anEvent['DTSTART'] = date(
                                         'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
                                         $monthRecurringTimestamp
-                                    ) . 'Z';
+                                    ) . ($isAllDayEvent || $initialStartTimeZoneName === 'Z' ? 'Z' : '');
                                     $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $monthRecurringTimestamp);
                                     $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                                     $anEvent['DTEND_array'][2] += $eventTimestampOffset;
                                     $anEvent['DTEND'] = date(
                                         self::DATE_TIME_FORMAT,
                                         $anEvent['DTEND_array'][2]
-                                    ) . 'Z';
+                                    ) . ($isAllDayEvent || $initialEndTimeZoneName === 'Z' ? 'Z' : '');
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                     $searchDate = $anEvent['DTSTART'];
@@ -934,14 +940,14 @@ class ICal
                                 }
 
                                 if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
-                                    $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . 'Z';
+                                    $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . ($isAllDayEvent || $initialStartTimeZoneName === 'Z' ? 'Z' : '');
                                     $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $eventStartTimestamp);
                                     $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                                     $anEvent['DTEND_array'][2] += $eventTimestampOffset;
                                     $anEvent['DTEND'] = date(
                                         self::DATE_TIME_FORMAT,
                                         $anEvent['DTEND_array'][2]
-                                    ) . 'Z';
+                                    ) . ($isAllDayEvent || $initialEndTimeZoneName === 'Z' ? 'Z' : '');
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                     $searchDate = $anEvent['DTSTART'];
@@ -997,14 +1003,14 @@ class ICal
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
                                 if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
-                                    $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . 'Z';
+                                    $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . ($isAllDayEvent || $initialStartTimeZoneName === 'Z' ? 'Z' : '');
                                     $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $eventStartTimestamp);
                                     $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                                     $anEvent['DTEND_array'][2] += $eventTimestampOffset;
                                     $anEvent['DTEND'] = date(
                                         self::DATE_TIME_FORMAT,
                                         $anEvent['DTEND_array'][2]
-                                    ) . 'Z';
+                                    ) . ($isAllDayEvent || $initialEndTimeZoneName === 'Z' ? 'Z' : '');
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                     $searchDate = $anEvent['DTSTART'];
@@ -1056,14 +1062,14 @@ class ICal
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
                                 if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
-                                    $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . 'Z';
+                                    $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . ($isAllDayEvent || $initialStartTimeZoneName === 'Z' ? 'Z' : '');
                                     $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $eventStartTimestamp);
                                     $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                                     $anEvent['DTEND_array'][2] += $eventTimestampOffset;
                                     $anEvent['DTEND'] = date(
                                         self::DATE_TIME_FORMAT,
                                         $anEvent['DTEND_array'][2]
-                                    ) . 'Z';
+                                    ) . ($isAllDayEvent || $initialEndTimeZoneName === 'Z' ? 'Z' : '');
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                     $searchDate = $anEvent['DTSTART'];
