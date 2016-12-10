@@ -15,7 +15,7 @@ $ical = new ICal('MyCal.ics');
     <style>.caption { overflow-x: auto }</style>
 </head>
 <body style="background-color: #eee">
-<div class="container">
+<div class="container-fluid">
     <h3>PHP ICS Parser example</h3>
     <ul class="list-group">
         <li class="list-group-item">
@@ -29,13 +29,14 @@ $ical = new ICal('MyCal.ics');
     </ul>
 
     <?php
-        $events = $ical->eventsFromRange('2016-03-01', '2016-04-31');
+        $events = $ical->sortEventsWithOrder($ical->eventsFromRange('2016-03-01', '2016-04-31'));
         if ($events) echo '<h4>Events March through April:</h4>';
+        $count = 1;
     ?>
     <div class="row">
     <?php
     foreach ($events as $event) : ?>
-        <div class="col-sm-6 col-md-4">
+        <div class="col-md-4">
             <div class="thumbnail">
                 <div class="caption">
                     <h3><?php echo $event->summary . ' (' . date('d-m-Y H:i', $ical->iCalDateToUnixTimestamp($event->dtstart)) . ')' ?></h3>
@@ -43,19 +44,22 @@ $ical = new ICal('MyCal.ics');
                 </div>
             </div>
         </div>
+        <?php if ($count > 1 && $count % 3 === 0) { echo '<div class="clearfix visible-md-block"></div>'; } ?>
+        <?php $count++; ?>
     <?php
     endforeach
     ?>
     </div>
 
     <?php
-        $events = $ical->eventsFromInterval('1 week');
+        $events = $ical->sortEventsWithOrder($ical->eventsFromInterval('1 week'));
         if ($events) echo '<h4>Events in the next 7 days:</h4>';
+        $count = 1;
     ?>
     <div class="row">
     <?php
     foreach ($events as $event) : ?>
-        <div class="col-sm-6 col-md-4">
+        <div class="col-md-4">
             <div class="thumbnail">
                 <div class="caption">
                     <h3><?php echo $event->summary . ' (' . date('d-m-Y H:i', $ical->iCalDateToUnixTimestamp($event->dtstart)) . ')' ?></h3>
@@ -63,17 +67,22 @@ $ical = new ICal('MyCal.ics');
                 </div>
             </div>
         </div>
+        <?php if ($count > 1 && $count % 3 === 0) { echo '<div class="clearfix visible-md-block"></div>'; } ?>
+        <?php $count++; ?>
     <?php
     endforeach
     ?>
     </div>
 
-    <?php if ($events) echo '<h4>All Events:</h4>' ?>
+    <?php
+        $events = $ical->sortEventsWithOrder($ical->events());
+        if ($events) echo '<h4>All Events:</h4>';
+    ?>
     <div class="row">
     <?php
-    $events = $ical->events();
+    $count = 1;
     foreach ($events as $event) : ?>
-        <div class="col-sm-6 col-md-4">
+        <div class="col-md-4">
             <div class="thumbnail">
                 <div class="caption">
                     <h3><?php echo $event->summary . ' (' . date('d-m-Y H:i', $ical->iCalDateToUnixTimestamp($event->dtstart)) . ')' ?></h3>
@@ -81,6 +90,8 @@ $ical = new ICal('MyCal.ics');
                 </div>
             </div>
         </div>
+        <?php if ($count > 1 && $count % 3 === 0) { echo '<div class="clearfix visible-md-block"></div>'; } ?>
+        <?php $count++; ?>
     <?php
     endforeach
     ?>
