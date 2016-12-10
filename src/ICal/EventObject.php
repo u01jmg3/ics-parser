@@ -53,6 +53,8 @@ class EventObject
             'SUMMARY'       => $this->summary,
             'DTSTART'       => $this->dtstart,
             'DTEND'         => $this->dtend,
+            'DTSTART_TZ'    => $this->dtstart_tz,
+            'DTEND_TZ'      => $this->dtend_tz,
             'DURATION'      => $this->duration,
             'DTSTAMP'       => $this->dtstamp,
             'UID'           => $this->uid,
