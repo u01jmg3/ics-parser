@@ -571,6 +571,8 @@ class ICal
             if (isset($anEvent['RRULE']) && $anEvent['RRULE'] != '') {
                 if (isset($anEvent['DTSTART_array'][0]['TZID']) && $this->isValidTimeZoneId($anEvent['DTSTART_array'][0]['TZID'])) {
                     $initialStartTimeZone = $anEvent['DTSTART_array'][0]['TZID'];
+                } else {
+                    unset($initialStartTimeZone);
                 }
 
                 $initialStart       = new \DateTime($anEvent['DTSTART_array'][1], isset($initialStartTimeZone) ? new \DateTimeZone($initialStartTimeZone) : null);
@@ -579,6 +581,8 @@ class ICal
                 if (isset($anEvent['DTEND'])) {
                     if (isset($anEvent['DTEND_array'][0]['TZID']) && $this->isValidTimeZoneId($anEvent['DTSTART_array'][0]['TZID'])) {
                         $initialEndTimeZone = $anEvent['DTSTART_array'][0]['TZID'];
+                    } else {
+                        unset($initialEndTimeZone);
                     }
 
                     $initialEnd       = new \DateTime($anEvent['DTEND_array'][1], isset($initialEndTimeZone) ? new \DateTimeZone($initialEndTimeZone) : null);
