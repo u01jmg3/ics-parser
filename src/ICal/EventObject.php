@@ -39,7 +39,6 @@ class EventObject
      * within an HTML template
      *
      * @param string $html HTML template to use
-     *
      * @return string
      */
     public function printData($html = '<p>%s: %s</p>')
