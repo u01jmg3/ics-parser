@@ -30,6 +30,12 @@ class EventObject
             foreach ($data as $key => $value) {
                 $variable = lcfirst(str_replace(' ', '', ucwords(str_replace('-', ' ', strtolower($key)))));
                 $this->{$variable} = $value;
+
+                if (is_array($value)) {
+                     $this->{$variable} = $value;
+                } else {
+                    $this->{$variable} = stripslashes(trim(str_replace('\n', "\n", $value)));
+                }
             }
         }
     }
