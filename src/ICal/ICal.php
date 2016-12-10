@@ -700,11 +700,11 @@ class ICal
                             $dayRecurringTimestamp += ($timezoneOffset != $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                             // Add event
-                            $anEvent['DTSTART'] = gmdate(self::DATE_TIME_FORMAT, $dayRecurringTimestamp) . 'Z';
+                            $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $dayRecurringTimestamp) . 'Z';
                             $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $dayRecurringTimestamp);
                             $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                             $anEvent['DTEND_array'][2] += $eventTimestampOffset;
-                            $anEvent['DTEND'] = gmdate(
+                            $anEvent['DTEND'] = date(
                                 self::DATE_TIME_FORMAT,
                                 $anEvent['DTEND_array'][2]
                             ) . 'Z';
@@ -712,7 +712,7 @@ class ICal
 
                             $searchDate = $anEvent['DTSTART'];
                             $isExcluded = array_filter($anEvent['EXDATE_array'][1], function ($val) use ($searchDate) {
-                                return is_string($val) && strpos($searchDate, $val) === 0;
+                                return $this->iCalDateToUnixTimestamp($searchDate) === $this->iCalDateToUnixTimestamp($val);
                             });
 
                             if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
@@ -784,11 +784,11 @@ class ICal
                                     && $dayRecurringTimestamp <= $until
                                 ) {
                                     // Add event
-                                    $anEvent['DTSTART'] = gmdate(self::DATE_TIME_FORMAT, $dayRecurringTimestamp) . 'Z';
+                                    $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $dayRecurringTimestamp) . 'Z';
                                     $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $dayRecurringTimestamp);
                                     $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                                     $anEvent['DTEND_array'][2] += $eventTimestampOffset;
-                                    $anEvent['DTEND'] = gmdate(
+                                    $anEvent['DTEND'] = date(
                                         self::DATE_TIME_FORMAT,
                                         $anEvent['DTEND_array'][2]
                                     ) . 'Z';
@@ -796,7 +796,7 @@ class ICal
 
                                     $searchDate = $anEvent['DTSTART'];
                                     $isExcluded = array_filter($anEvent['EXDATE_array'][1], function ($val) use ($searchDate) {
-                                        return is_string($val) && strpos($searchDate, $val) === 0;
+                                        return $this->iCalDateToUnixTimestamp($searchDate) === $this->iCalDateToUnixTimestamp($val);
                                     });
 
                                     if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
@@ -870,14 +870,14 @@ class ICal
                                     $monthRecurringTimestamp += ($timezoneOffset != $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                                     // Add event
-                                    $anEvent['DTSTART'] = gmdate(
+                                    $anEvent['DTSTART'] = date(
                                         'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
                                         $monthRecurringTimestamp
                                     ) . 'Z';
                                     $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $monthRecurringTimestamp);
                                     $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                                     $anEvent['DTEND_array'][2] += $eventTimestampOffset;
-                                    $anEvent['DTEND'] = gmdate(
+                                    $anEvent['DTEND'] = date(
                                         self::DATE_TIME_FORMAT,
                                         $anEvent['DTEND_array'][2]
                                     ) . 'Z';
@@ -885,7 +885,7 @@ class ICal
 
                                     $searchDate = $anEvent['DTSTART'];
                                     $isExcluded = array_filter($anEvent['EXDATE_array'][1], function ($val) use ($searchDate) {
-                                        return is_string($val) && strpos($searchDate, $val) === 0;
+                                        return $this->iCalDateToUnixTimestamp($searchDate) === $this->iCalDateToUnixTimestamp($val);
                                     });
 
                                     if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($monthRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
@@ -934,11 +934,11 @@ class ICal
                                 }
 
                                 if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
-                                    $anEvent['DTSTART'] = gmdate(self::DATE_TIME_FORMAT, $eventStartTimestamp) . 'Z';
+                                    $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . 'Z';
                                     $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $eventStartTimestamp);
                                     $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                                     $anEvent['DTEND_array'][2] += $eventTimestampOffset;
-                                    $anEvent['DTEND'] = gmdate(
+                                    $anEvent['DTEND'] = date(
                                         self::DATE_TIME_FORMAT,
                                         $anEvent['DTEND_array'][2]
                                     ) . 'Z';
@@ -946,7 +946,7 @@ class ICal
 
                                     $searchDate = $anEvent['DTSTART'];
                                     $isExcluded = array_filter($anEvent['EXDATE_array'][1], function ($val) use ($searchDate) {
-                                        return is_string($val) && strpos($searchDate, $val) === 0;
+                                        return $this->iCalDateToUnixTimestamp($searchDate) === $this->iCalDateToUnixTimestamp($val);
                                     });
 
                                     if (isset($anEvent['UID'])) {
@@ -997,11 +997,11 @@ class ICal
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
                                 if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
-                                    $anEvent['DTSTART'] = gmdate(self::DATE_TIME_FORMAT, $eventStartTimestamp) . 'Z';
+                                    $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . 'Z';
                                     $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $eventStartTimestamp);
                                     $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                                     $anEvent['DTEND_array'][2] += $eventTimestampOffset;
-                                    $anEvent['DTEND'] = gmdate(
+                                    $anEvent['DTEND'] = date(
                                         self::DATE_TIME_FORMAT,
                                         $anEvent['DTEND_array'][2]
                                     ) . 'Z';
@@ -1009,7 +1009,7 @@ class ICal
 
                                     $searchDate = $anEvent['DTSTART'];
                                     $isExcluded = array_filter($anEvent['EXDATE_array'][1], function ($val) use ($searchDate) {
-                                        return is_string($val) && strpos($searchDate, $val) === 0;
+                                        return $this->iCalDateToUnixTimestamp($searchDate) === $this->iCalDateToUnixTimestamp($val);
                                     });
 
                                     if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($yearRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
@@ -1056,11 +1056,11 @@ class ICal
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
                                 if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
-                                    $anEvent['DTSTART'] = gmdate(self::DATE_TIME_FORMAT, $eventStartTimestamp) . 'Z';
+                                    $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . 'Z';
                                     $anEvent['DTSTART_array'] = array(array(), $anEvent['DTSTART'], $eventStartTimestamp);
                                     $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
                                     $anEvent['DTEND_array'][2] += $eventTimestampOffset;
-                                    $anEvent['DTEND'] = gmdate(
+                                    $anEvent['DTEND'] = date(
                                         self::DATE_TIME_FORMAT,
                                         $anEvent['DTEND_array'][2]
                                     ) . 'Z';
@@ -1068,7 +1068,7 @@ class ICal
 
                                     $searchDate = $anEvent['DTSTART'];
                                     $isExcluded = array_filter($anEvent['EXDATE_array'][1], function ($val) use ($searchDate) {
-                                        return is_string($val) && strpos($searchDate, $val) === 0;
+                                        return $this->iCalDateToUnixTimestamp($searchDate) === $this->iCalDateToUnixTimestamp($val);
                                     });
 
                                     if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($yearRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
