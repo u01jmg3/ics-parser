@@ -65,10 +65,10 @@ $ curl -s https://getcomposer.org/installer | php
 --
 
 ## Credits
-  - [Martin Thoma](info@martin-thoma.de) (programming, bug fixing, project management)
-  - Frank Gregor (programming, feedback, testing)
-  - [John Grogg](john.grogg@gmail.com) (programming, addition of event recurrence handling)
   - [Jonathan Goode](https://github.com/u01jmg3) (programming, bug fixing, enhancement, coding standard)
+  - [John Grogg](john.grogg@gmail.com) (programming, addition of event recurrence handling)
+  - Frank Gregor (programming, feedback, testing)
+  - [Martin Thoma](info@martin-thoma.de) (programming, bug fixing, project management, initial concept)
 
 ---
 

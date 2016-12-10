@@ -1,17 +1,13 @@
 <?php
 /**
- * This PHP class should only read an iCal file (*.ics), parse it and return an
+ * This PHP class will read an iCal file (*.ics), parse it and return an
  * array with its content.
  *
  * PHP Version >= 5.3.0
  *
- * @category Parser
- * @package  ics-parser
- * @author   Martin Thoma <info@martin-thoma.de>, John Grogg <john.grogg@gmail.com>, Jonathan Goode <https://github.com/u01jmg3>
- * @license  http://www.opensource.org/licenses/mit-license.php MIT License
- * @link     https://github.com/MartinThoma/ics-parser/
- * @example  $ical = new ical('MyCal.ics'); print_r($ical->events());
- * @version  2.0.1
+ * @author  Jonathan Goode <https://github.com/u01jmg3>, John Grogg <john.grogg@gmail.com>, Martin Thoma <info@martin-thoma.de>
+ * @license http://www.opensource.org/licenses/mit-license.php MIT License
+ * @version 2.0.1
  */
 
 namespace ICal;
@@ -520,7 +516,7 @@ class ICal
 
     /**
      * Performs some admin tasks on all events as taken straight from the ics file.
-     * Adds a Unix timestamp to all `DT{START|END|RECURRENCE-ID}_array` arrays
+     * Adds a Unix timestamp to all `{DTSTART|DTEND|RECURRENCE-ID}_array` arrays
      * Makes a note of modified recurrence-instances
      *
      * @return void or false if no Events exist
