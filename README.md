@@ -48,7 +48,7 @@ $ curl -s https://getcomposer.org/installer | php
 | `eventsFromInterval`      | `$interval`                                | Returns a sorted array of the events following a given string, or false if no events exist in the range.                      |
 | `freeBusyEvents`          | -                                          | Returns an array of arrays with all free/busy events. Every event is an associative array and each property is an element it. |
 | `hasEvents`               | -                                          | Returns a boolean value whether the current calendar has events or not                                                        |
-| `iCalDateToUnixTimestamp` | `$icalDate`                                | Return Unix timestamp from iCal date time format                                                                              |
+| `iCalDateToUnixTimestamp` | `$icalDate`, `$useTimeZone`                | Return Unix timestamp from iCal date time format                                                                              |
 | `iCalDateWithTimeZone`    | `$event`, `$key`                           | Return a date adapted to the calendar timezone depending on the event TZID                                                    |
 | `isValidTimeZoneId`       | `$timezone`                                | Check if a timezone is valid                                                                                                  |
 | `processDateConversions`  | -                                          | Add fields `DTSTART_tz` and `DTEND_tz` to each event                                                                          |
