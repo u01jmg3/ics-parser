@@ -733,8 +733,10 @@ class ICal
                                 return $this->iCalDateToUnixTimestamp($searchDate) === $this->iCalDateToUnixTimestamp($val);
                             });
 
-                            if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                $isExcluded = true;
+                            if (isset($anEvent['UID'])) {
+                                if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                    $isExcluded = true;
+                                }
                             }
 
                             if (!$isExcluded) {
@@ -817,8 +819,10 @@ class ICal
                                         return $this->iCalDateToUnixTimestamp($searchDate) === $this->iCalDateToUnixTimestamp($val);
                                     });
 
-                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                        $isExcluded = true;
+                                    if (isset($anEvent['UID'])) {
+                                        if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($dayRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                            $isExcluded = true;
+                                        }
                                     }
 
                                     if (!$isExcluded) {
@@ -906,8 +910,10 @@ class ICal
                                         return $this->iCalDateToUnixTimestamp($searchDate) === $this->iCalDateToUnixTimestamp($val);
                                     });
 
-                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($monthRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                        $isExcluded = true;
+                                    if (isset($anEvent['UID'])) {
+                                        if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($monthRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                            $isExcluded = true;
+                                        }
                                     }
 
                                     if (!$isExcluded) {
@@ -1030,8 +1036,10 @@ class ICal
                                         return $this->iCalDateToUnixTimestamp($searchDate) === $this->iCalDateToUnixTimestamp($val);
                                     });
 
-                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($yearRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                        $isExcluded = true;
+                                    if (isset($anEvent['UID'])) {
+                                        if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($yearRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                            $isExcluded = true;
+                                        }
                                     }
 
                                     if (!$isExcluded) {
@@ -1089,8 +1097,10 @@ class ICal
                                         return $this->iCalDateToUnixTimestamp($searchDate) === $this->iCalDateToUnixTimestamp($val);
                                     });
 
-                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($yearRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                        $isExcluded = true;
+                                    if (isset($anEvent['UID'])) {
+                                        if (isset($this->alteredRecurrenceInstances[$anEvent['UID']]) && in_array($yearRecurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                            $isExcluded = true;
+                                        }
                                     }
 
                                     if (!$isExcluded) {
