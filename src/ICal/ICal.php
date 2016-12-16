@@ -16,55 +16,72 @@ use ICal\EventObject;
 
 class ICal
 {
+    const UNIX_MIN_YEAR    = 1970;
+    const DATE_FORMAT      = 'Ymd';
+    const TIME_FORMAT      = 'His';
+    const DATE_TIME_FORMAT = 'Ymd\THis';
+
     /**
-     * How many ToDos are in this iCal?
+     * Track the number of todos in the current iCal feed
+     *
      * @var integer
      */
     public $todoCount = 0;
 
     /**
-     * How many events are in this iCal?
+     * Track the number of events in the current iCal feed
+     *
      * @var integer
      */
     public $eventCount = 0;
 
     /**
-     * How many freebusy are in this iCal?
+     * Track the freebusy count in the current iCal feed
+     *
      * @var integer
      */
     public $freebusyCount = 0;
 
     /**
      * The parsed calendar
+     *
      * @var array
      */
     public $cal;
 
     /**
-     * Event recurrence instances that have been altered
-     * @var array
+     * The value in years to use for indefinite, recurring events
+     *
+     * @var integer
      */
-    protected $alteredRecurrenceInstances = array();
+    public $defaultSpan = 2;
+
+    /**
+     * The two letter representation of the first day of the week
+     *
+     * @var string
+     */
+    public $defaultWeekStart = 'MO';
 
     /**
      * Variable to track the previous keyword
+     *
      * @var string
      */
     private $lastKeyword;
 
     /**
-     * The value in years to use for indefinite, recurring events
-     * @var integer
+     * Event recurrence instances that have been altered
+     *
+     * @var array
      */
-    public $defaultSpan = 2;
-    public $defaultWeekStart = 'SU';
+    protected $alteredRecurrenceInstances = array();
 
-    const UNIX_MIN_YEAR = 1970;
-
-    const DATE_FORMAT = 'Ymd';
-    const TIME_FORMAT = 'His';
-    const DATE_TIME_FORMAT = 'Ymd\THis';
-
+    /**
+     * An associative array containing ordinal data
+     *
+     * @var array
+     */
     protected $dayOrdinals = array(
         1 => 'first',
         2 => 'second',
@@ -74,6 +91,11 @@ class ICal
         6 => 'last',
     );
 
+    /**
+     * An associative array containing weekday conversion data
+     *
+     * @var array
+     */
     protected $weekdays = array(
         'SU' => 'sunday',
         'MO' => 'monday',
@@ -84,6 +106,11 @@ class ICal
         'SA' => 'saturday',
     );
 
+    /**
+     * An associative array containing month names
+     *
+     * @var array
+     */
     protected $monthNames = array(
          1 => 'January',
          2 => 'February',
@@ -99,6 +126,11 @@ class ICal
         12 => 'December',
     );
 
+    /**
+     * An associative array containing frequency conversion terms
+     *
+     * @var array
+     */
     protected $frequencyConversion = array(
         'DAILY'   => 'day',
         'WEEKLY'  => 'week',
