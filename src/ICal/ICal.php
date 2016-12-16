@@ -591,8 +591,8 @@ class ICal
                 $initialStartTimeZoneName = $initialStart->getTimezone()->getName();
 
                 if (isset($anEvent['DTEND'])) {
-                    if (isset($anEvent['DTEND_array'][0]['TZID']) && $this->isValidTimeZoneId($anEvent['DTSTART_array'][0]['TZID'])) {
-                        $initialEndTimeZone = $anEvent['DTSTART_array'][0]['TZID'];
+                    if (isset($anEvent['DTEND_array'][0]['TZID']) && $this->isValidTimeZoneId($anEvent['DTEND_array'][0]['TZID'])) {
+                        $initialEndTimeZone = $anEvent['DTEND_array'][0]['TZID'];
                     } else {
                         unset($initialEndTimeZone);
                     }
