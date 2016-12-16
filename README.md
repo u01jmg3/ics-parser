@@ -37,18 +37,19 @@ $ curl -s https://getcomposer.org/installer | php
 
 #### Configurable Constants / Variables
 
-| Name                | Type     | Description                                                |
-|---------------------|----------|------------------------------------------------------------|
-| `UNIX_MIN_YEAR`     | Constant | Minimum UNIX year to use                                   |
-| `DATE_FORMAT`       | Constant | Default date format to use                                 |
-| `TIME_FORMAT`       | Constant | Default time format to use                                 |
-| `DATE_TIME_FORMAT`  | Constant | Default datetime format to use                             |
-| `$todoCount`        | Variable | Track the number of todos in the current iCal feed         |
-| `$eventCount`       | Variable | Track the number of events in the current iCal feed        |
-| `$freebusyCount`    | Variable | Track the freebusy count in the current iCal feed          |
-| `$cal`              | Variable | The parsed calendar                                        |
-| `$defaultSpan`      | Variable | The value in years to use for indefinite, recurring events |
-| `$defaultWeekStart` | Variable | The two letter representation of the first day of the week |
+| Name                     | Type     | Description                                                        |
+|--------------------------|----------|--------------------------------------------------------------------|
+| `UNIX_MIN_YEAR`          | Constant | Minimum UNIX year to use                                           |
+| `DATE_FORMAT`            | Constant | Default date format to use                                         |
+| `TIME_FORMAT`            | Constant | Default time format to use                                         |
+| `DATE_TIME_FORMAT`       | Constant | Default datetime format to use                                     |
+| `$todoCount`             | Variable | Track the number of todos in the current iCal feed                 |
+| `$eventCount`            | Variable | Track the number of events in the current iCal feed                |
+| `$freebusyCount`         | Variable | Track the freebusy count in the current iCal feed                  |
+| `$cal`                   | Variable | The parsed calendar                                                |
+| `$defaultSpan`           | Variable | The value in years to use for indefinite, recurring events         |
+| `$defaultWeekStart`      | Variable | The two letter representation of the first day of the week         |
+| `$useTimeZoneWithRRules` | Variable | Toggle whether to use time zone info when parsing recurrence rules |
 
 #### Functions
 

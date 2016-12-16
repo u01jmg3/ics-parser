@@ -64,6 +64,13 @@ class ICal
     public $defaultWeekStart = 'MO';
 
     /**
+     * Toggle whether to use time zone info when parsing recurrence rules
+     *
+     * @var boolean
+     */
+    public $useTimeZoneWithRRules = false;
+
+    /**
      * Variable to track the previous keyword
      *
      * @var string
@@ -627,7 +634,7 @@ class ICal
 
                 $isAllDayEvent = strlen($anEvent['DTSTART_array'][1]) === 8 ? true : false;
 
-                $initialStart             = new \DateTime($anEvent['DTSTART_array'][1], isset($initialStartTimeZone) ? new \DateTimeZone($initialStartTimeZone) : null);
+                $initialStart             = new \DateTime($anEvent['DTSTART_array'][1], ($this->useTimeZoneWithRRules && isset($initialStartTimeZone)) ? new \DateTimeZone($initialStartTimeZone) : null);
                 $initialStartOffset       = $initialStart->getOffset();
                 $initialStartTimeZoneName = $initialStart->getTimezone()->getName();
 
@@ -638,7 +645,7 @@ class ICal
                         unset($initialEndTimeZone);
                     }
 
-                    $initialEnd             = new \DateTime($anEvent['DTEND_array'][1], isset($initialEndTimeZone) ? new \DateTimeZone($initialEndTimeZone) : null);
+                    $initialEnd             = new \DateTime($anEvent['DTEND_array'][1], ($this->useTimeZoneWithRRules && isset($initialEndTimeZone)) ? new \DateTimeZone($initialEndTimeZone) : null);
                     $initialEndOffset       = $initialEnd->getOffset();
                     $initialEndTimeZoneName = $initialEnd->getTimezone()->getName();
                 } else {
@@ -751,7 +758,7 @@ class ICal
 
                             // Adjust timezone from initial event
                             $recurringTimeZone = \DateTime::createFromFormat('U', $dayRecurringTimestamp);
-                            $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimeZone);
+                            $timezoneOffset = ($this->useTimeZoneWithRRules) ? $initialStart->getTimezone()->getOffset($recurringTimeZone) : 0;
                             $dayRecurringTimestamp += ($timezoneOffset !== $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                             // Add event
@@ -831,7 +838,7 @@ class ICal
 
                             // Adjust timezone from initial event
                             $dayRecurringTimeZone = \DateTime::createFromFormat('U', $dayRecurringTimestamp);
-                            $timezoneOffset = $initialStart->getTimezone()->getOffset($dayRecurringTimeZone);
+                            $timezoneOffset = ($this->useTimeZoneWithRRules) ? $initialStart->getTimezone()->getOffset($dayRecurringTimeZone) : 0;
                             $dayRecurringTimestamp += ($timezoneOffset !== $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                             foreach ($weekdays as $day) {
@@ -927,7 +934,7 @@ class ICal
 
                                     // Adjust timezone from initial event
                                     $recurringTimeZone = \DateTime::createFromFormat('U', $monthRecurringTimestamp);
-                                    $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimeZone);
+                                    $timezoneOffset = ($this->useTimeZoneWithRRules) ? $initialStart->getTimezone()->getOffset($recurringTimeZone) : 0;
                                     $monthRecurringTimestamp += ($timezoneOffset !== $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                                     // Add event
@@ -979,7 +986,7 @@ class ICal
 
                                 // Adjust timezone from initial event
                                 $recurringTimeZone = \DateTime::createFromFormat('U', $monthRecurringTimestamp);
-                                $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimeZone);
+                                $timezoneOffset = ($this->useTimeZoneWithRRules) ? $initialStart->getTimezone()->getOffset($recurringTimeZone) : 0;
                                 $monthRecurringTimestamp += ($timezoneOffset !== $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                                 $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]} of " . gmdate('F Y H:i:s', $monthRecurringTimestamp);
@@ -1051,7 +1058,7 @@ class ICal
 
                                 // Adjust timezone from initial event
                                 $recurringTimeZone = \DateTime::createFromFormat('U', $yearRecurringTimestamp);
-                                $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimeZone);
+                                $timezoneOffset = ($this->useTimeZoneWithRRules) ? $initialStart->getTimezone()->getOffset($recurringTimeZone) : 0;
                                 $yearRecurringTimestamp += ($timezoneOffset !== $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                                 $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]}"
@@ -1108,7 +1115,7 @@ class ICal
 
                                 // Adjust timezone from initial event
                                 $recurringTimeZone = \DateTime::createFromFormat('U', $yearRecurringTimestamp);
-                                $timezoneOffset = $initialStart->getTimezone()->getOffset($recurringTimeZone);
+                                $timezoneOffset = ($this->useTimeZoneWithRRules) ? $initialStart->getTimezone()->getOffset($recurringTimeZone) : 0;
                                 $yearRecurringTimestamp += ($timezoneOffset !== $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                                 // Add specific month dates
