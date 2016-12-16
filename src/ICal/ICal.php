@@ -510,11 +510,8 @@ class ICal
             $tz = new \DateTimeZone($defaultTimeZone);
             $offset = timezone_offset_get($tz, $dateTime);
         } else {
-            $tz = new \DateTimeZone($defaultTimeZone);
-            $offset1 = timezone_offset_get($tz, $dateTime);
             $tz = new \DateTimeZone($timeZone);
-            $offset2 = timezone_offset_get($tz, $dateTime);
-            $offset = $offset1 - $offset2;
+            $offset = timezone_offset_get($tz, $dateTime);
         }
 
         if ($offset >= 0) {
