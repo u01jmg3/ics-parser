@@ -665,8 +665,14 @@ class ICal
                     // Get Until
                     $until = strtotime($rrules['UNTIL']);
                 } else if (isset($rrules['COUNT'])) {
-                    $countOrig = (is_numeric($rrules['COUNT']) && $rrules['COUNT'] > 1) ? $rrules['COUNT'] : 0;
-                    $count = ($countOrig - 1); // Remove one to exclude the occurrence that initialises the rule
+                    $countOrig  = (is_numeric($rrules['COUNT']) && $rrules['COUNT'] > 1) ? $rrules['COUNT'] : 0;
+
+                    // Increment count by the number of excluded dates
+                    $countOrig += (isset($anEvent['EXDATE'])) ? sizeof($anEvent['EXDATE_array'][1]) : 0;
+
+                    // Remove one to exclude the occurrence that initialises the rule
+                    $count = ($countOrig - 1);
+
                     $count += ($count > 0) ? $count * ($interval - 1) : 0;
                     $countNb = 1;
                     $offset = "+$count " . $this->frequencyConversion[$frequency];
