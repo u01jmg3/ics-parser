@@ -496,6 +496,15 @@ class ICal
         $date_array = $event[$key . '_array'];
         $date       = $event[$key];
 
+        if ($key === 'DURATION') {
+            $duration  = end($date_array);
+            $timestamp = $this->parseDuration($event['DTSTART'], $duration);
+            $dateTime  = \DateTime::createFromFormat('U', $timestamp);
+            $date      = $dateTime->format(self::DATE_TIME_FORMAT);
+        } else {
+            $dateTime = new \DateTime($date);
+        }
+
         if (isset($date_array[0]['TZID']) && preg_match('/[a-z]*\/[a-z_]*/i', $date_array[0]['TZID'])) {
             $timeZone = $date_array[0]['TZID'];
         }
@@ -619,14 +628,7 @@ class ICal
                     $endTimestamp = $initialEnd->getTimestamp();
                 } else if (isset($anEvent['DURATION'])) {
                     $duration = end($anEvent['DURATION_array']);
-                    $endTimestamp = date_create($anEvent['DTSTART']);
-                    $endTimestamp->modify($duration->y . ' year');
-                    $endTimestamp->modify($duration->m . ' month');
-                    $endTimestamp->modify($duration->d . ' day');
-                    $endTimestamp->modify($duration->h . ' hour');
-                    $endTimestamp->modify($duration->i . ' minute');
-                    $endTimestamp->modify($duration->s . ' second');
-                    $endTimestamp = date_format($endTimestamp, 'U');
+                    $endTimestamp = $this->parseDuration($anEvent['DTSTART'], $duration);
                 } else {
                     $endTimestamp = $anEvent['DTSTART_array'][2];
                 }
@@ -859,20 +861,22 @@ class ICal
                                 foreach ($monthdays as $key => $monthday) {
                                     if ($key === 0) {
                                         // Ensure original event conforms to monthday rule
-                                        $events[0]['DTSTART'] = gmdate(
+                                        $anEvent['DTSTART'] = gmdate(
                                             'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
-                                            strtotime($events[0]['DTSTART'])
+                                            strtotime($anEvent['DTSTART'])
                                         ) . ($isAllDayEvent || $initialStartTimeZoneName === 'Z' ? 'Z' : '');
 
-                                        $events[0]['DTEND'] = gmdate(
+                                        $anEvent['DTEND'] = gmdate(
                                             'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
-                                            strtotime($events[0]['DTEND'])
+                                            isset($anEvent['DURATION'])
+                                                ? $this->parseDuration($anEvent['DTSTART'], end($anEvent['DURATION_array']))
+                                                : strtotime($anEvent['DTEND'])
                                         ) . ($isAllDayEvent || $initialEndTimeZoneName === 'Z' ? 'Z' : '');
 
-                                        $events[0]['DTSTART_array'][1] = $events[0]['DTSTART'];
-                                        $events[0]['DTSTART_array'][2] = $this->iCalDateToUnixTimestamp($events[0]['DTSTART']);
-                                        $events[0]['DTEND_array'][1]   = $events[0]['DTEND'];
-                                        $events[0]['DTEND_array'][2]   = $this->iCalDateToUnixTimestamp($events[0]['DTEND']);
+                                        $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
+                                        $anEvent['DTSTART_array'][2] = $this->iCalDateToUnixTimestamp($anEvent['DTSTART']);
+                                        $anEvent['DTEND_array'][1]   = $anEvent['DTEND'];
+                                        $anEvent['DTEND_array'][2]   = $this->iCalDateToUnixTimestamp($anEvent['DTEND']);
 
                                         // Ensure recurring timestamp confirms to BYMONTHDAY rule
                                         $monthRecurringTimestamp = $this->iCalDateToUnixTimestamp(
@@ -1151,6 +1155,8 @@ class ICal
 
             if ($this->iCalDateWithTimeZone($anEvent, 'DTEND')) {
                 $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTEND');
+            } else if ($this->iCalDateWithTimeZone($anEvent, 'DURATION')) {
+                $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DURATION');
             }
         }
 
@@ -1391,5 +1397,25 @@ class ICal
         unset($valid['']);
 
         return (isset($valid[$timezone]));
+    }
+
+    /**
+     * Parse a duration and apply it to a date
+     *
+     * @param string        $date     A date to add a duration to
+     * @param \DateInterval $timezone A duration to parse
+     * @return integer Unix timestamp
+     */
+    function parseDuration($date, $duration){
+        $timestamp = date_create($date);
+        $timestamp->modify($duration->y . ' year');
+        $timestamp->modify($duration->m . ' month');
+        $timestamp->modify($duration->d . ' day');
+        $timestamp->modify($duration->h . ' hour');
+        $timestamp->modify($duration->i . ' minute');
+        $timestamp->modify($duration->s . ' second');
+        $timestamp = date_format($timestamp, 'U');
+
+        return $timestamp;
     }
 }

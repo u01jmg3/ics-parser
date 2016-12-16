@@ -51,6 +51,7 @@ $ curl -s https://getcomposer.org/installer | php
 | `iCalDateToUnixTimestamp` | `$icalDate`, `$useTimeZone`                | Return Unix timestamp from iCal date time format                                                                              |
 | `iCalDateWithTimeZone`    | `$event`, `$key`                           | Return a date adapted to the calendar timezone depending on the event TZID                                                    |
 | `isValidTimeZoneId`       | `$timezone`                                | Check if a timezone is valid                                                                                                  |
+| `parseDuration`           | `$date`, `$duration`                       | Parse a duration and apply it to a date                                                                                       |
 | `processDateConversions`  | -                                          | Add fields `DTSTART_tz` and `DTEND_tz` to each event                                                                          |
 | `processEvents`           | -                                          | Performs some admin tasks on all events as taken straight from the ics file.                                                  |
 | `processRecurrences`      | -                                          | Processes recurrence rules                                                                                                    |
