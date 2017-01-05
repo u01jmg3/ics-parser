@@ -820,9 +820,9 @@ class ICal
                             'MO' => array('MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'),
                         );
 
-                        $wkst = (isset($rrules['WKST']) && in_array($rrules['WKST'], array('SA', 'SU', 'MO'))) ? $rrules['WKST'] : $this->defaultWeekStart;
+                        $wkst  = (isset($rrules['WKST']) && in_array($rrules['WKST'], array('SA', 'SU', 'MO'))) ? $rrules['WKST'] : $this->defaultWeekStart;
                         $aWeek = $weeks[$wkst];
-                        $days = array('SA' => 'Saturday', 'SU' => 'Sunday', 'MO' => 'Monday');
+                        $days  = array('SA' => 'Saturday', 'SU' => 'Sunday', 'MO' => 'Monday');
 
                         // Build list of days of week to add events
                         $weekdays = $aWeek;
@@ -830,12 +830,12 @@ class ICal
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] !== '') {
                             $bydays = explode(',', $rrules['BYDAY']);
                         } else {
-                            $findDay = $weekdays[gmdate('w', $startTimestamp)];
-                            $bydays = array($findDay);
+                            // A textual representation of a day, two letters (e.g. SU)
+                            $bydays = array(mb_substr(strtoupper(date('D', $startTimestamp)), 0, 2));
                         }
 
                         // Get timestamp of first day of start week
-                        $weekRecurringTimestamp = (gmdate('w', $startTimestamp) == 0)
+                        $weekRecurringTimestamp = (date('w', $startTimestamp) == 0)
                             ? $startTimestamp
                             : strtotime("last {$days[$wkst]} " . gmdate('H:i:s\z', $startTimestamp), $startTimestamp);
 
