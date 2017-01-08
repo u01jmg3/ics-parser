@@ -720,7 +720,7 @@ class ICal
 
                     $count += ($count > 0) ? $count * ($interval - 1) : 0;
                     $countNb = 1;
-                    $offset = "+$count " . $this->frequencyConversion[$frequency];
+                    $offset = "+{$count} " . $this->frequencyConversion[$frequency];
                     $until = strtotime($offset, $startTimestamp);
 
                     if (in_array($frequency, array('MONTHLY', 'YEARLY'))
@@ -756,7 +756,7 @@ class ICal
                 switch ($frequency) {
                     case 'DAILY':
                         // Simply add a new event each interval of days until UNTIL is reached
-                        $offset = "+$interval day";
+                        $offset = "+{$interval} day";
                         $recurringTimestamp = strtotime($offset, $startTimestamp);
 
                         while ($recurringTimestamp <= $until) {
@@ -811,7 +811,7 @@ class ICal
 
                     case 'WEEKLY':
                         // Create offset
-                        $offset = "+$interval week";
+                        $offset = "+{$interval} week";
 
                         // Use RRULE['WKST'] setting or a default week start (UK = SU, Europe = MO)
                         $weeks = array(
@@ -903,7 +903,7 @@ class ICal
 
                     case 'MONTHLY':
                         // Create offset
-                        $offset = "+$interval month";
+                        $offset = "+{$interval} month";
                         $recurringTimestamp = strtotime($offset, $startTimestamp);
 
                         if (isset($rrules['BYMONTHDAY']) && $rrules['BYMONTHDAY'] !== '') {
@@ -1058,7 +1058,7 @@ class ICal
 
                     case 'YEARLY':
                         // Create offset
-                        $offset = "+$interval year";
+                        $offset = "+{$interval} year";
                         $recurringTimestamp = strtotime($offset, $startTimestamp);
 
                         // Check if BYDAY rule exists
