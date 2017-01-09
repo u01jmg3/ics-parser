@@ -718,7 +718,9 @@ class ICal
                     // Remove one to exclude the occurrence that initialises the rule
                     $count = ($countOrig - 1);
 
-                    $count += ($count > 0) ? $count * ($interval - 1) : 0;
+                    if ($interval >= 2) {
+                        $count += ($count > 0) ? ($count * $interval) : 0;
+                    }
                     $countNb = 1;
                     $offset = "+{$count} " . $this->frequencyConversion[$frequency];
                     $until = strtotime($offset, $startTimestamp);
