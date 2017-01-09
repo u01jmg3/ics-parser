@@ -904,7 +904,7 @@ class ICal
                     case 'MONTHLY':
                         // Create offset
                         $offset = "+{$interval} month";
-                        $recurringTimestamp = strtotime($offset, $startTimestamp);
+                        $recurringTimestamp = ($interval >= 2) ? strtotime($offset, $startTimestamp) : $startTimestamp;
 
                         if (isset($rrules['BYMONTHDAY']) && $rrules['BYMONTHDAY'] !== '') {
                             // Deal with BYMONTHDAY
@@ -1059,7 +1059,7 @@ class ICal
                     case 'YEARLY':
                         // Create offset
                         $offset = "+{$interval} year";
-                        $recurringTimestamp = strtotime($offset, $startTimestamp);
+                        $recurringTimestamp = ($interval >= 2) ? strtotime($offset, $startTimestamp) : $startTimestamp;
 
                         // Check if BYDAY rule exists
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] !== '') {
