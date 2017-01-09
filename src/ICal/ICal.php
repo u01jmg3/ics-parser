@@ -799,7 +799,7 @@ class ICal
                                     $countNb++;
 
                                     if ($countNb >= $countOrig) {
-                                        break 2;
+                                        break;
                                     }
                                 }
                             }
