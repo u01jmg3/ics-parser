@@ -148,8 +148,8 @@ class ICal
     /**
      * Creates the iCal Object
      *
-     * @param mixed $filename  The path to the iCal-file or an array of lines from an iCal file
-     * @param mixed $weekStart The default first day of the week (SU or MO, etc.)
+     * @param  mixed $filename  The path to the iCal-file or an array of lines from an iCal file
+     * @param  mixed $weekStart The default first day of the week (SU or MO, etc.)
      * @return void or false if no filename is provided
      */
     public function __construct($filename = false, $weekStart = false)
@@ -174,7 +174,7 @@ class ICal
     /**
      * Initialises lines from a URL
      *
-     * @param string $url The url of the iCal file to download and initialise
+     * @param  string $url The url of the iCal file to download and initialise
      * @return ICal
      */
     public function initURL($url)
@@ -189,7 +189,7 @@ class ICal
     /**
      * Initialises lines from a string
      *
-     * @param string $contents The contents of the ical file to initialise
+     * @param  string $contents The contents of the ical file to initialise
      * @return ICal
      */
     public function initString($contents)
@@ -202,7 +202,7 @@ class ICal
     /**
      * Initialises lines from file
      *
-     * @param array $lines The lines to initialise
+     * @param  array $lines The lines to initialise
      * @return ICal
      */
     public function initLines($lines)
@@ -294,9 +294,9 @@ class ICal
     /**
      * Add to $this->ical array one value and key.
      *
-     * @param string         $component This could be VTODO, VEVENT, VCALENDAR, ...
-     * @param string|boolean $keyword   The keyword, for example DTSTART
-     * @param string         $value     The value, for example 20110105T090000Z
+     * @param  string         $component This could be VTODO, VEVENT, VCALENDAR, ...
+     * @param  string|boolean $keyword   The keyword, for example DTSTART
+     * @param  string         $value     The value, for example 20110105T090000Z
      * @return void
      */
     protected function addCalendarComponentWithKeyAndValue($component, $keyword, $value)
@@ -382,7 +382,7 @@ class ICal
     /**
      * Get a key-value pair of a string.
      *
-     * @param string $text which is like "VCALENDAR:Begin" or "LOCATION:"
+     * @param  string $text which is like "VCALENDAR:Begin" or "LOCATION:"
      * @return array
      */
     protected function keyValueFromString($text)
@@ -450,10 +450,10 @@ class ICal
     /**
      * Return Unix timestamp from iCal date time format
      *
-     * @param string  $icalDate    A Date in the format YYYYMMDD[T]HHMMSS[Z] or
-     *                             YYYYMMDD[T]HHMMSS or
-     *                             TZID=Timezone:YYYYMMDD[T]HHMMSS
-     * @param boolean $useTimeZone Toggle whether to apply the timezone during conversion
+     * @param  string  $icalDate    A Date in the format YYYYMMDD[T]HHMMSS[Z] or
+     *                              YYYYMMDD[T]HHMMSS or
+     *                              TZID=Timezone:YYYYMMDD[T]HHMMSS
+     * @param  boolean $useTimeZone Toggle whether to apply the timezone during conversion
      * @return integer
      */
     public function iCalDateToUnixTimestamp($icalDate, $useTimeZone = true)
@@ -523,8 +523,8 @@ class ICal
     /**
      * Return a date adapted to the calendar timezone depending on the event TZID
      *
-     * @param array  $event An event
-     * @param string $key   An event parameter (DTSTART or DTEND)
+     * @param  array  $event An event
+     * @param  string $key   An event parameter (DTSTART or DTEND)
      * @return string Ymd\THis date
      */
     public function iCalDateWithTimeZone($event, $key)
@@ -1368,8 +1368,8 @@ class ICal
      * problem for events on, during, or after January the 29th, 2038.
      * See http://en.wikipedia.org/wiki/Unix_time#Representing_the_number
      *
-     * @param string $rangeStart Start date of the search range.
-     * @param string $rangeEnd   End date of the search range.
+     * @param  string $rangeStart Start date of the search range.
+     * @param  string $rangeEnd   End date of the search range.
      * @return array of EventObjects
      */
     public function eventsFromRange($rangeStart = false, $rangeEnd = false)
@@ -1441,7 +1441,7 @@ class ICal
      * Returns a sorted array of the events following a given string,
      * or false if no events exist in the range.
      *
-     * @param string $interval
+     * @param  string $interval
      * @return array of EventObjects
      */
     public function eventsFromInterval($interval)
@@ -1458,8 +1458,8 @@ class ICal
     /**
      * Sort events based on a given sort order
      *
-     * @param array   $events    An array of EventObjects
-     * @param integer $sortOrder Either SORT_ASC, SORT_DESC, SORT_REGULAR, SORT_NUMERIC, SORT_STRING
+     * @param  array   $events    An array of EventObjects
+     * @param  integer $sortOrder Either SORT_ASC, SORT_DESC, SORT_REGULAR, SORT_NUMERIC, SORT_STRING
      * @return sorted array of EventObjects
      */
     public function sortEventsWithOrder($events, $sortOrder = SORT_ASC)
@@ -1480,7 +1480,7 @@ class ICal
     /**
      * Check if a timezone is valid
      *
-     * @param string $timezone A timezone
+     * @param  string $timezone A timezone
      * @return boolean
      */
     function isValidTimeZoneId($timezone){
@@ -1501,8 +1501,8 @@ class ICal
     /**
      * Parse a duration and apply it to a date
      *
-     * @param string        $date     A date to add a duration to
-     * @param \DateInterval $timezone A duration to parse
+     * @param  string        $date     A date to add a duration to
+     * @param  \DateInterval $timezone A duration to parse
      * @return integer Unix timestamp
      */
     function parseDuration($date, $duration){
