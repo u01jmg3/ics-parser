@@ -58,27 +58,29 @@ $ curl -s https://getcomposer.org/installer | php
 
 #### Functions
 
-| Function                  | Parameter(s)                               | Description                                                                                                                   |
-|---------------------------|--------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| `initLines`               | `$lines`                                   | Initialises lines from file                                                                                                   |
-| `initString`              | `$contents`                                | Initialises lines from a string                                                                                               |
-| `initURL`                 | `$url`                                     | Initialises lines from a URL                                                                                                  |
-| `calendarDescription`     | -                                          | Returns the calendar description                                                                                              |
-| `calendarName`            | -                                          | Returns the calendar name                                                                                                     |
-| `calendarTimeZone`        | -                                          | Returns the calendar timezone                                                                                                 |
-| `events`                  | -                                          | Returns an array of EventObjects. Every event is a class with the event details being properties within it.                   |
-| `eventsFromRange`         | `$rangeStart = false`, `$rangeEnd = false` | Returns a sorted array of the events in a given range, or an empty array if no events exist in the range.                     |
-| `eventsFromInterval`      | `$interval`                                | Returns a sorted array of the events following a given string, or false if no events exist in the range.                      |
-| `freeBusyEvents`          | -                                          | Returns an array of arrays with all free/busy events. Every event is an associative array and each property is an element it. |
-| `hasEvents`               | -                                          | Returns a boolean value whether the current calendar has events or not                                                        |
-| `iCalDateToUnixTimestamp` | `$icalDate`, `$useTimeZone`                | Return Unix timestamp from iCal date time format                                                                              |
-| `iCalDateWithTimeZone`    | `$event`, `$key`                           | Return a date adapted to the calendar timezone depending on the event TZID                                                    |
-| `isValidTimeZoneId`       | `$timezone`                                | Check if a timezone is valid                                                                                                  |
-| `parseDuration`           | `$date`, `$duration`                       | Parse a duration and apply it to a date                                                                                       |
-| `processDateConversions`  | -                                          | Add fields `DTSTART_tz` and `DTEND_tz` to each event                                                                          |
-| `processEvents`           | -                                          | Performs some admin tasks on all events as taken straight from the ics file.                                                  |
-| `processRecurrences`      | -                                          | Processes recurrence rules                                                                                                    |
-| `sortEventsWithOrder`     | `$events`, `$sortOrder = SORT_ASC`         | Sort events based on a given sort order                                                                                       |
+| Function                      | Parameter(s)                               | Description                                                                                                                   |
+|-------------------------------|--------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| `initLines`                   | `$lines`                                   | Initialises lines from file                                                                                                   |
+| `initString`                  | `$contents`                                | Initialises lines from a string                                                                                               |
+| `initURL`                     | `$url`                                     | Initialises lines from a URL                                                                                                  |
+| `calendarDescription`         | -                                          | Returns the calendar description                                                                                              |
+| `calendarName`                | -                                          | Returns the calendar name                                                                                                     |
+| `calendarTimeZone`            | -                                          | Returns the calendar timezone                                                                                                 |
+| `convertDayOrdinalToPositive` | `$dayNumber`, `$weekday`, `$timestamp`     | Convert a negative day ordinal to its equivalent positive form                                                                |
+| `events`                      | -                                          | Returns an array of EventObjects. Every event is a class with the event details being properties within it.                   |
+| `eventsFromRange`             | `$rangeStart = false`, `$rangeEnd = false` | Returns a sorted array of the events in a given range, or an empty array if no events exist in the range.                     |
+| `eventsFromInterval`          | `$interval`                                | Returns a sorted array of the events following a given string, or false if no events exist in the range.                      |
+| `freeBusyEvents`              | -                                          | Returns an array of arrays with all free/busy events. Every event is an associative array and each property is an element it. |
+| `hasEvents`                   | -                                          | Returns a boolean value whether the current calendar has events or not                                                        |
+| `iCalDateToUnixTimestamp`     | `$icalDate`, `$useTimeZone`                | Return Unix timestamp from iCal date time format                                                                              |
+| `iCalDateWithTimeZone`        | `$event`, `$key`                           | Return a date adapted to the calendar timezone depending on the event TZID                                                    |
+| `isValidTimeZoneId`           | `$timezone`                                | Check if a timezone is valid                                                                                                  |
+| `numberOfDays`                | `$days`, `$start`, `$end`                  | Get the number of days between a start and end date                                                                           |
+| `parseDuration`               | `$date`, `$duration`                       | Parse a duration and apply it to a date                                                                                       |
+| `processDateConversions`      | -                                          | Add fields `DTSTART_tz` and `DTEND_tz` to each event                                                                          |
+| `processEvents`               | -                                          | Performs some admin tasks on all events as taken straight from the ics file.                                                  |
+| `processRecurrences`          | -                                          | Processes recurrence rules                                                                                                    |
+| `sortEventsWithOrder`         | `$events`, `$sortOrder = SORT_ASC`         | Sort events based on a given sort order                                                                                       |
 
 --
 
