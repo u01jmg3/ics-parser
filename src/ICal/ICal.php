@@ -224,8 +224,8 @@ class ICal
                 if (!is_array($values)) {
                     if (!empty($values)) {
                         $values = array($values); // Make an array as not already
-                        $blank_array = array(); // Empty placeholder array
-                        array_push($values, $blank_array);
+                        $blankArray = array(); // Empty placeholder array
+                        array_push($values, $blankArray);
                     } else {
                         $values = array(); // Use blank array to ignore this line
                     }
@@ -538,11 +538,11 @@ class ICal
             return false;
         }
 
-        $date_array = $event[$key . '_array'];
-        $date       = $event[$key];
+        $dateArray = $event[$key . '_array'];
+        $date      = $event[$key];
 
         if ($key === 'DURATION') {
-            $duration  = end($date_array);
+            $duration  = end($dateArray);
             $timestamp = $this->parseDuration($event['DTSTART'], $duration);
             $dateTime  = \DateTime::createFromFormat('U', $timestamp);
             $date      = $dateTime->format(self::DATE_TIME_FORMAT);
@@ -550,8 +550,8 @@ class ICal
             $dateTime = new \DateTime($date);
         }
 
-        if (isset($date_array[0]['TZID']) && preg_match('/[a-z]*\/[a-z_]*/i', $date_array[0]['TZID'])) {
-            $timeZone = $date_array[0]['TZID'];
+        if (isset($dateArray[0]['TZID']) && preg_match('/[a-z]*\/[a-z_]*/i', $dateArray[0]['TZID'])) {
+            $timeZone = $dateArray[0]['TZID'];
         }
 
         // Check if the defined timezone is valid
@@ -684,7 +684,7 @@ class ICal
                     : 1;
 
                 $dayNumber = null;
-                $weekDay = null;
+                $weekday   = null;
 
                 if (in_array($frequency, array('MONTHLY', 'YEARLY'))
                     && isset($rrules['BYDAY']) && $rrules['BYDAY'] !== ''
@@ -699,7 +699,7 @@ class ICal
                         }
                     }
                     $dayNumber = ($dayNumber == -1) ? 6 : $dayNumber; // Override for our custom key (6 => 'last')
-                    $weekDay = substr($rrules['BYDAY'], -2);
+                    $weekday = substr($rrules['BYDAY'], -2);
                 }
 
                 $untilDefault = date_create('now');
@@ -732,7 +732,7 @@ class ICal
                         for ($i = 1; $i <= $count; $i++) {
                             $dtstartClone = clone $dtstart;
                             $dtstartClone->modify('next ' . $this->frequencyConversion[$frequency]);
-                            $offset = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]} of " . $dtstartClone->format('F Y H:i:01');
+                            $offset = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekday]} of " . $dtstartClone->format('F Y H:i:01');
                             $dtstart->modify($offset);
                         }
 
@@ -830,10 +830,10 @@ class ICal
                         $weekdays = $aWeek;
 
                         if (isset($rrules['BYDAY']) && $rrules['BYDAY'] !== '') {
-                            $bydays = explode(',', $rrules['BYDAY']);
+                            $byDays = explode(',', $rrules['BYDAY']);
                         } else {
                             // A textual representation of a day, two letters (e.g. SU)
-                            $bydays = array(mb_substr(strtoupper(date('D', $startTimestamp)), 0, 2));
+                            $byDays = array(mb_substr(strtoupper(date('D', $startTimestamp)), 0, 2));
                         }
 
                         // Get timestamp of first day of start week
@@ -853,7 +853,7 @@ class ICal
                             foreach ($weekdays as $day) {
                                 // Check if day should be added
 
-                                if (in_array($day, $bydays) && $dayRecurringTimestamp > $startTimestamp
+                                if (in_array($day, $byDays) && $dayRecurringTimestamp > $startTimestamp
                                     && $dayRecurringTimestamp <= $until
                                 ) {
                                     // Add event
@@ -1000,15 +1000,15 @@ class ICal
                                 $timezoneOffset = ($this->useTimeZoneWithRRules) ? $initialStart->getTimezone()->getOffset($recurringTimeZone) : 0;
                                 $monthRecurringTimestamp += ($timezoneOffset !== $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
-                                $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]} of "
+                                $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekday]} of "
                                     . gmdate('F Y H:i:s', $monthRecurringTimestamp);
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
                                 if (intval($rrules['BYDAY']) === 0) {
-                                    $lastDayDesc = "last {$this->weekdays[$weekDay]} of"
+                                    $lastDayDesc = "last {$this->weekdays[$weekday]} of"
                                         . gmdate('F Y H:i:s', $monthRecurringTimestamp);
                                 } else {
-                                    $lastDayDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]} of"
+                                    $lastDayDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekday]} of"
                                         . gmdate('F Y H:i:s', $monthRecurringTimestamp);
                                 }
                                 $lastDayTimestamp = strtotime($lastDayDesc);
@@ -1093,17 +1093,17 @@ class ICal
                                 $yearRecurringTimestamp += ($timezoneOffset !== $initialStartOffset) ? $initialStartOffset - $timezoneOffset : 0;
 
                                 foreach ($bymonths as $bymonth) {
-                                    $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekDay]}"
+                                    $eventStartDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekday]}"
                                         . " of {$this->monthNames[$bymonth]} "
                                         . gmdate('Y H:i:s', $yearRecurringTimestamp);
                                     $eventStartTimestamp = strtotime($eventStartDesc);
 
                                     if (intval($rrules['BYDAY']) === 0) {
-                                        $lastDayDesc = "last {$this->weekdays[$weekDay]}"
+                                        $lastDayDesc = "last {$this->weekdays[$weekday]}"
                                             . " of {$this->monthNames[$bymonth]} "
                                             . gmdate('Y H:i:s', $yearRecurringTimestamp);
                                     } else {
-                                        $lastDayDesc = "{$this->dayOrdinals[$dayNumber]}  {$this->weekdays[$weekDay]}"
+                                        $lastDayDesc = "{$this->dayOrdinals[$dayNumber]} {$this->weekdays[$weekday]}"
                                             . " of {$this->monthNames[$bymonth]} "
                                             . gmdate('Y H:i:s', $yearRecurringTimestamp);
                                     }
@@ -1310,19 +1310,19 @@ class ICal
      */
     public function calendarTimeZone()
     {
-        $default_timezone = date_default_timezone_get();
+        $defaultTimezone = date_default_timezone_get();
 
         if (isset($this->cal['VCALENDAR']['X-WR-TIMEZONE'])) {
             $timezone = $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
         } else if (isset($this->cal['VTIMEZONE']['TZID'])) {
             $timezone = $this->cal['VTIMEZONE']['TZID'];
         } else {
-            return $default_timezone;
+            return $defaultTimezone;
         }
 
         // Use default timezone if defined is invalid
         if (!$this->isValidTimeZoneId($timezone)) {
-            return $default_timezone;
+            return $defaultTimezone;
         }
 
         return $timezone;
