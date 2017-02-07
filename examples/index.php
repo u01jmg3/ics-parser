@@ -29,7 +29,7 @@ $ical = new ICal('MyCal.ics');
     </ul>
 
     <?php
-        $events = $ical->sortEventsWithOrder($ical->eventsFromRange('2016-03-01', '2016-04-31'));
+        $events = $ical->sortEventsWithOrder($ical->eventsFromRange('2017-03-01 12:00:00', '2017-04-31 17:00:00'));
         if ($events) echo '<h4>Events March through April:</h4>';
         $count = 1;
     ?>
