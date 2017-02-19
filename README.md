@@ -10,7 +10,7 @@
 ## Installation
 
 ### Requirements
-  - PHP 5 >= 5.3.0
+  - PHP 5 ≥ 5.3.0
 
 ### [Composer](http://getcomposer.org)
 
@@ -44,17 +44,17 @@ $ curl -s https://getcomposer.org/installer | php
 | `TIME_FORMAT`      | Default time format to use     |
 | `DATE_TIME_FORMAT` | Default datetime format to use |
 
-#### Configurable Variables
+#### Variables
 
-| Name                     | Description                                                        |
-|--------------------------|--------------------------------------------------------------------|
-| `$todoCount`             | Track the number of todos in the current iCal feed                 |
-| `$eventCount`            | Track the number of events in the current iCal feed                |
-| `$freebusyCount`         | Track the freebusy count in the current iCal feed                  |
-| `$cal`                   | The parsed calendar                                                |
-| `$defaultSpan`           | The value in years to use for indefinite, recurring events         |
-| `$defaultWeekStart`      | The two letter representation of the first day of the week         |
-| `$useTimeZoneWithRRules` | Toggle whether to use time zone info when parsing recurrence rules |
+| Name                     | Description                                                        | Configurable       |
+|--------------------------|--------------------------------------------------------------------|:------------------:|
+| `$todoCount`             | Track the number of todos in the current iCal feed                 |         :x:        |
+| `$eventCount`            | Track the number of events in the current iCal feed                |         :x:        |
+| `$freebusyCount`         | Track the freebusy count in the current iCal feed                  |         :x:        |
+| `$cal`                   | The parsed calendar                                                |         :x:        |
+| `$defaultSpan`           | The value in years to use for indefinite, recurring events         | :white_check_mark: |
+| `$defaultWeekStart`      | The two letter representation of the first day of the week         | :white_check_mark: |
+| `$useTimeZoneWithRRules` | Toggle whether to use time zone info when parsing recurrence rules | :white_check_mark: |
 
 #### Functions
 
@@ -104,5 +104,5 @@ $ curl -s https://getcomposer.org/installer | php
 
 ## Tools for Testing
 
-- https://jkbrzt.github.io/rrule/
-- http://www.unixtimestamp.com/
+- [https://jkbrzt.github.io/rrule/](https://jkbrzt.github.io/rrule/)
+- [http://www.unixtimestamp.com/](http://www.unixtimestamp.com/)
