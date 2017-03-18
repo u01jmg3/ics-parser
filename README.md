@@ -40,7 +40,6 @@ $ curl -s https://getcomposer.org/installer | php
 | Name               | Description                    |
 |--------------------|--------------------------------|
 | `UNIX_MIN_YEAR`    | Minimum UNIX year to use       |
-| `DATE_FORMAT`      | Default date format to use     |
 | `TIME_FORMAT`      | Default time format to use     |
 | `DATE_TIME_FORMAT` | Default datetime format to use |
 

@@ -17,7 +17,6 @@ use ICal\EventObject;
 class ICal
 {
     const UNIX_MIN_YEAR    = 1970;
-    const DATE_FORMAT      = 'Ymd';
     const TIME_FORMAT      = 'His';
     const DATE_TIME_FORMAT = 'Ymd\THis';
 
