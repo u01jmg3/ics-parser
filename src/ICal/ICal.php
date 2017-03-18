@@ -833,13 +833,13 @@ class ICal
                             $byDays = explode(',', $rrules['BYDAY']);
                         } else {
                             // A textual representation of a day, two letters (e.g. SU)
-                            $byDays = array(mb_substr(strtoupper(date('D', $startTimestamp)), 0, 2));
+                            $byDays = array(mb_substr(strtoupper($initialStart->format('D')), 0, 2));
                         }
 
                         // Get timestamp of first day of start week
-                        $weekRecurringTimestamp = (date('w', $startTimestamp) == 0)
+                        $weekRecurringTimestamp = ($initialStart->format('w') == 0)
                             ? $startTimestamp
-                            : strtotime("last {$days[$wkst]} " . gmdate('H:i:s\z', $startTimestamp), $startTimestamp);
+                            : strtotime("last {$days[$wkst]} " . $initialStart->format('H:i:s'), $startTimestamp);
 
                         // Step through weeks
                         while ($weekRecurringTimestamp <= $until) {
@@ -1156,7 +1156,7 @@ class ICal
                                 $recurringTimestamp = strtotime($offset, $recurringTimestamp);
                             }
                         } else {
-                            $day = gmdate('d', $startTimestamp);
+                            $day = $initialStart->format('d');
 
                             // Step through years
                             while ($recurringTimestamp <= $until) {
