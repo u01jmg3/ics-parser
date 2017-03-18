@@ -43,10 +43,8 @@ workbench
 ####################
 auth.json
 composer.lock
-composer.phar
-**/bower_components
-**/node_modules
-**/vendor
+node_modules
+vendor
 
 ##########
 # Custom #
