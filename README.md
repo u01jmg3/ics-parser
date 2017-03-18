@@ -104,5 +104,5 @@ $ curl -s https://getcomposer.org/installer | php
 
 ## Tools for Testing
 
-- [https://jkbrzt.github.io/rrule/](https://jkbrzt.github.io/rrule/)
+- [https://jakubroztocil.github.io/rrule/](https://jakubroztocil.github.io/rrule/)
 - [http://www.unixtimestamp.com/](http://www.unixtimestamp.com/)
