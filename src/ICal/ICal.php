@@ -19,6 +19,7 @@ class ICal
     const UNIX_MIN_YEAR    = 1970;
     const TIME_FORMAT      = 'His';
     const DATE_TIME_FORMAT = 'Ymd\THis';
+    const DEFAULT_TIMEZONE = 'UTC';
 
     /**
      * Track the number of todos in the current iCal feed
@@ -465,55 +466,54 @@ class ICal
          * to process floating times.
          */
         if (stripos($icalDate, 'TZID') === false) {
-            $date = date_create($icalDate);
-
-            return date_timestamp_get($date);
-        }
-
-        $pattern  = '/\AT?Z?I?D?=?(.*):?'; // 1: TimeZone
-        $pattern .= '([0-9]{4})';          // 2: YYYY
-        $pattern .= '([0-9]{2})';          // 3: MM
-        $pattern .= '([0-9]{2})';          // 4: DD
-        $pattern .= 'T?';                  //    Time delimiter
-        $pattern .= '([0-9]{0,2})';        // 5: HH
-        $pattern .= '([0-9]{0,2})';        // 6: MM
-        $pattern .= '([0-9]{0,2})';        // 7: SS
-        $pattern .= '(Z?)/';               // 8: UTC flag
-        preg_match($pattern, $icalDate, $date);
-
-        if (isset($date[1])) {
-            $eventTimeZone = rtrim($date[1], ':');
-        }
-
-        // Unix timestamp can't represent dates before 1970
-        if ($date[2] <= self::UNIX_MIN_YEAR) {
-            return false;
-        }
-
-        // Unix timestamps after 03:14:07 UTC 2038-01-19 might cause an overflow
-        // if 32 bit integers are used.
-        $timeZone = null;
-        if ($useTimeZone) {
-            if ($date[8] === 'Z') {
-                $timeZone = new \DateTimeZone('UTC');
-            } else if (isset($eventTimeZone) && $this->isValidTimeZoneId($eventTimeZone)) {
-                $timeZone = new \DateTimeZone($eventTimeZone);
-            } else if ($this->isValidTimeZoneId($eventTimeZone)) {
-                $timeZone = new \DateTimeZone($this->calendarTimeZone());
-            } else {
-                $timeZone = new \DateTimeZone(date_default_timezone_get());
-            }
-        }
-
-        if (is_null($timeZone)) {
-            $convDate = new \DateTime('now');
+            $date = new \DateTime($icalDate, new \DateTimeZone(self::DEFAULT_TIMEZONE));
+            $timestamp = date_timestamp_get($date);
         } else {
-            $convDate = new \DateTime('now', $timeZone);
-        }
+            $pattern  = '/\AT?Z?I?D?=?(.*):?'; // 1: TimeZone
+            $pattern .= '([0-9]{4})';          // 2: YYYY
+            $pattern .= '([0-9]{2})';          // 3: MM
+            $pattern .= '([0-9]{2})';          // 4: DD
+            $pattern .= 'T?';                  //    Time delimiter
+            $pattern .= '([0-9]{0,2})';        // 5: HH
+            $pattern .= '([0-9]{0,2})';        // 6: MM
+            $pattern .= '([0-9]{0,2})';        // 7: SS
+            $pattern .= '(Z?)/';               // 8: UTC flag
+            preg_match($pattern, $icalDate, $date);
 
-        $convDate->setDate((int) $date[2], (int) $date[3], (int) $date[4]);
-        $convDate->setTime((int) $date[5], (int) $date[6], (int) $date[7]);
-        $timestamp = $convDate->getTimestamp();
+            if (isset($date[1])) {
+                $eventTimeZone = rtrim($date[1], ':');
+            }
+
+            // Unix timestamp can't represent dates before 1970
+            if ($date[2] <= self::UNIX_MIN_YEAR) {
+                return 0;
+            }
+
+            // Unix timestamps after 03:14:07 UTC 2038-01-19 might cause an overflow
+            // if 32 bit integers are used.
+            $timeZone = null;
+            if ($useTimeZone) {
+                if ($date[8] === 'Z') {
+                    $timeZone = new \DateTimeZone(self::DEFAULT_TIMEZONE);
+                } else if (isset($eventTimeZone) && $this->isValidTimeZoneId($eventTimeZone)) {
+                    $timeZone = new \DateTimeZone($eventTimeZone);
+                } else if ($this->isValidTimeZoneId($eventTimeZone)) {
+                    $timeZone = new \DateTimeZone($this->calendarTimeZone());
+                } else {
+                    $timeZone = new \DateTimeZone(date_default_timezone_get());
+                }
+            }
+
+            if (is_null($timeZone)) {
+                $convDate = new \DateTime('now');
+            } else {
+                $convDate = new \DateTime('now', $timeZone);
+            }
+
+            $convDate->setDate((int) $date[2], (int) $date[3], (int) $date[4]);
+            $convDate->setTime((int) $date[5], (int) $date[6], (int) $date[7]);
+            $timestamp = $convDate->getTimestamp();
+        }
 
         return $timestamp;
     }
@@ -527,11 +527,6 @@ class ICal
      */
     public function iCalDateWithTimeZone($event, $key)
     {
-        $defaultTimeZone = $this->calendarTimeZone();
-        if (!$defaultTimeZone) {
-            return false;
-        }
-
         if (!isset($event[$key . '_array']) || !isset($event[$key])) {
             return false;
         }
@@ -554,12 +549,12 @@ class ICal
 
         // Check if the defined timezone is valid
         if (!isset($timeZone) || !in_array($timeZone, timezone_identifiers_list())) {
-            $timeZone = $defaultTimeZone;
+            $timeZone = self::DEFAULT_TIMEZONE;
         }
 
         if (substr($date, -1) === 'Z') {
             $date = substr($date, 0, -1); // Remove 'Z'
-            $tz = new \DateTimeZone($defaultTimeZone);
+            $tz = new \DateTimeZone(self::DEFAULT_TIMEZONE);
             $offset = timezone_offset_get($tz, $dateTime);
         } else {
             $tz = new \DateTimeZone($timeZone);
@@ -638,7 +633,7 @@ class ICal
 
                 $isAllDayEvent = strlen($anEvent['DTSTART_array'][1]) === 8 ? true : false;
 
-                $initialStart             = new \DateTime($anEvent['DTSTART_array'][1], ($this->useTimeZoneWithRRules && isset($initialStartTimeZone)) ? new \DateTimeZone($initialStartTimeZone) : null);
+                $initialStart             = new \DateTime($anEvent['DTSTART_array'][1], ($this->useTimeZoneWithRRules && isset($initialStartTimeZone)) ? new \DateTimeZone($initialStartTimeZone) : new \DateTimeZone(self::DEFAULT_TIMEZONE));
                 $initialStartOffset       = $initialStart->getOffset();
                 $initialStartTimeZoneName = $initialStart->getTimezone()->getName();
 
@@ -649,7 +644,7 @@ class ICal
                         unset($initialEndTimeZone);
                     }
 
-                    $initialEnd             = new \DateTime($anEvent['DTEND_array'][1], ($this->useTimeZoneWithRRules && isset($initialEndTimeZone)) ? new \DateTimeZone($initialEndTimeZone) : null);
+                    $initialEnd             = new \DateTime($anEvent['DTEND_array'][1], ($this->useTimeZoneWithRRules && isset($initialEndTimeZone)) ? new \DateTimeZone($initialEndTimeZone) : new \DateTimeZone(self::DEFAULT_TIMEZONE));
                     $initialEndOffset       = $initialEnd->getOffset();
                     $initialEndTimeZoneName = $initialEnd->getTimezone()->getName();
                 } else {
@@ -1374,6 +1369,7 @@ class ICal
      */
     public function eventsFromRange($rangeStart = false, $rangeEnd = false)
     {
+        // Sort events before processing range
         $events = $this->sortEventsWithOrder($this->events(), SORT_ASC);
 
         if (empty($events)) {
@@ -1384,26 +1380,24 @@ class ICal
 
         if ($rangeStart) {
             try {
-                $rangeStart = new \DateTime($rangeStart);
+                $rangeStart = new \DateTime($rangeStart, new \DateTimeZone(self::DEFAULT_TIMEZONE));
             } catch (\Exception $e) {
-                error_log('ICal::eventsFromRange: Invalid date passed (' . $rangeStart . ')');
+                error_log("ICal::eventsFromRange: Invalid date passed ({$rangeStart})");
                 $rangeStart = false;
             }
-        }
-        if (!$rangeStart) {
-            $rangeStart = new \DateTime();
+        } else {
+            $rangeStart = new \DateTime('now', new \DateTimeZone(self::DEFAULT_TIMEZONE));
         }
 
         if ($rangeEnd) {
             try {
-                $rangeEnd = new \DateTime($rangeEnd);
+                $rangeEnd = new \DateTime($rangeEnd, new \DateTimeZone(self::DEFAULT_TIMEZONE));
             } catch (\Exception $e) {
-                error_log('ICal::eventsFromRange: Invalid date passed (' . $rangeEnd . ')');
+                error_log("ICal::eventsFromRange: Invalid date passed ({$rangeEnd})");
                 $rangeEnd = false;
             }
-        }
-        if (!$rangeEnd) {
-            $rangeEnd = new \DateTime();
+        } else {
+            $rangeEnd = new \DateTime('now', new \DateTimeZone(self::DEFAULT_TIMEZONE));
             $rangeEnd->modify('+20 years');
         }
 
@@ -1446,8 +1440,8 @@ class ICal
      */
     public function eventsFromInterval($interval)
     {
-        $rangeStart = new \DateTime();
-        $rangeEnd   = new \DateTime();
+        $rangeStart = new \DateTime('now', new \DateTimeZone(self::DEFAULT_TIMEZONE));
+        $rangeEnd   = new \DateTime('now', new \DateTimeZone(self::DEFAULT_TIMEZONE));
 
         $dateInterval = \DateInterval::createFromDateString($interval);
         $rangeEnd->add($dateInterval);
