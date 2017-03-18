@@ -39,7 +39,10 @@ $ical = new ICal('MyCal.ics');
         <div class="col-md-4">
             <div class="thumbnail">
                 <div class="caption">
-                    <h3><?php echo $event->summary . ' (' . date('d-m-Y H:i', $ical->iCalDateToUnixTimestamp($event->dtstart, false)) . ')' ?></h3>
+                    <h3><?php
+                        $dtstart = new \DateTime('@' . (int) $ical->iCalDateToUnixTimestamp($event->dtstart, false));
+                        echo $event->summary . ' (' . $dtstart->format('d-m-Y H:i') . ')';
+                    ?></h3>
                     <?php echo $event->printData() ?>
                 </div>
             </div>
@@ -62,7 +65,10 @@ $ical = new ICal('MyCal.ics');
         <div class="col-md-4">
             <div class="thumbnail">
                 <div class="caption">
-                    <h3><?php echo $event->summary . ' (' . date('d-m-Y H:i', $ical->iCalDateToUnixTimestamp($event->dtstart, false)) . ')' ?></h3>
+                    <h3><?php
+                        $dtstart = new \DateTime('@' . (int) $ical->iCalDateToUnixTimestamp($event->dtstart, false));
+                        echo $event->summary . ' (' . $dtstart->format('d-m-Y H:i') . ')';
+                    ?></h3>
                     <?php echo $event->printData() ?>
                 </div>
             </div>
@@ -85,7 +91,10 @@ $ical = new ICal('MyCal.ics');
         <div class="col-md-4">
             <div class="thumbnail">
                 <div class="caption">
-                    <h3><?php echo $event->summary . ' (' . date('d-m-Y H:i', $ical->iCalDateToUnixTimestamp($event->dtstart, false)) . ')' ?></h3>
+                    <h3><?php
+                        $dtstart = new \DateTime('@' . (int) $ical->iCalDateToUnixTimestamp($event->dtstart, false));
+                        echo $event->summary . ' (' . $dtstart->format('d-m-Y H:i') . ')';
+                    ?></h3>
                     <?php echo $event->printData() ?>
                 </div>
             </div>
