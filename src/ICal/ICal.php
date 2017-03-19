@@ -453,10 +453,9 @@ class ICal
      * @param  string  $icalDate    A Date in the format YYYYMMDD[T]HHMMSS[Z] or
      *                              YYYYMMDD[T]HHMMSS or
      *                              TZID=Timezone:YYYYMMDD[T]HHMMSS
-     * @param  boolean $useTimeZone Toggle whether to apply the timezone during conversion
      * @return integer
      */
-    public function iCalDateToUnixTimestamp($icalDate, $useTimeZone = true)
+    public function iCalDateToUnixTimestamp($icalDate)
     {
         /**
          * iCal times may be in 3 formats, ref http://www.kanzaki.com/docs/ical/dateTime.html
@@ -466,55 +465,46 @@ class ICal
          * Use DateTime class objects to get around limitations with mktime and gmmktime. Must have a local timezone set
          * to process floating times.
          */
-        if (stripos($icalDate, 'TZID') === false) {
-            $date = new \DateTime($icalDate, new \DateTimeZone(self::DEFAULT_TIMEZONE));
-            $timestamp = date_timestamp_get($date);
-        } else {
-            $pattern  = '/\AT?Z?I?D?=?(.*):?'; // 1: TimeZone
-            $pattern .= '([0-9]{4})';          // 2: YYYY
-            $pattern .= '([0-9]{2})';          // 3: MM
-            $pattern .= '([0-9]{2})';          // 4: DD
-            $pattern .= 'T?';                  //    Time delimiter
-            $pattern .= '([0-9]{0,2})';        // 5: HH
-            $pattern .= '([0-9]{0,2})';        // 6: MM
-            $pattern .= '([0-9]{0,2})';        // 7: SS
-            $pattern .= '(Z?)/';               // 8: UTC flag
-            preg_match($pattern, $icalDate, $date);
+        $pattern  = '/\AT?Z?I?D?=?(.*):?'; // 1: TimeZone
+        $pattern .= '([0-9]{4})';          // 2: YYYY
+        $pattern .= '([0-9]{2})';          // 3: MM
+        $pattern .= '([0-9]{2})';          // 4: DD
+        $pattern .= 'T?';                  //    Time delimiter
+        $pattern .= '([0-9]{0,2})';        // 5: HH
+        $pattern .= '([0-9]{0,2})';        // 6: MM
+        $pattern .= '([0-9]{0,2})';        // 7: SS
+        $pattern .= '(Z?)/';               // 8: UTC flag
+        preg_match($pattern, $icalDate, $date);
 
-            if (isset($date[1])) {
-                $eventTimeZone = rtrim($date[1], ':');
-            }
-
-            // Unix timestamp can't represent dates before 1970
-            if ($date[2] <= self::UNIX_MIN_YEAR) {
-                return 0;
-            }
-
-            // Unix timestamps after 03:14:07 UTC 2038-01-19 might cause an overflow
-            // if 32 bit integers are used.
-            $timeZone = null;
-            if ($useTimeZone) {
-                if ($date[8] === 'Z') {
-                    $timeZone = new \DateTimeZone(self::DEFAULT_TIMEZONE);
-                } else if (isset($eventTimeZone) && $this->isValidTimeZoneId($eventTimeZone)) {
-                    $timeZone = new \DateTimeZone($eventTimeZone);
-                } else if ($this->isValidTimeZoneId($eventTimeZone)) {
-                    $timeZone = new \DateTimeZone($this->calendarTimeZone());
-                } else {
-                    $timeZone = new \DateTimeZone(date_default_timezone_get());
-                }
-            }
-
-            if (is_null($timeZone)) {
-                $convDate = new \DateTime('now');
-            } else {
-                $convDate = new \DateTime('now', $timeZone);
-            }
-
-            $convDate->setDate((int) $date[2], (int) $date[3], (int) $date[4]);
-            $convDate->setTime((int) $date[5], (int) $date[6], (int) $date[7]);
-            $timestamp = $convDate->getTimestamp();
+        if (isset($date[1])) {
+            $eventTimeZone = rtrim($date[1], ':');
         }
+
+        // Unix timestamp can't represent dates before 1970
+        if ($date[2] <= self::UNIX_MIN_YEAR) {
+            $date = new \DateTime($icalDate, new \DateTimeZone(self::DEFAULT_TIMEZONE));
+
+            return date_timestamp_get($date);
+        }
+
+        // Unix timestamps after 03:14:07 UTC 2038-01-19 might cause an overflow
+        // if 32 bit integers are used.
+        $timeZone = new \DateTimeZone(self::DEFAULT_TIMEZONE);
+        if ($date[8] !== 'Z') {
+            if (isset($eventTimeZone) && $this->isValidTimeZoneId($eventTimeZone)) {
+                $timeZone = new \DateTimeZone($eventTimeZone);
+            } else if ($this->isValidTimeZoneId($eventTimeZone)) {
+                $timeZone = new \DateTimeZone($this->calendarTimeZone());
+            }
+        }
+
+        $convDate = new \DateTime('now', new \DateTimeZone(self::DEFAULT_TIMEZONE));
+        $convDate->setDate((int) $date[2], (int) $date[3], (int) $date[4]);
+        $convDate->setTime((int) $date[5], (int) $date[6], (int) $date[7]);
+
+        $convDate->setTimezone($timeZone);
+        $timestamp  = $convDate->getTimestamp();
+        $timestamp += $convDate->getOffset();
 
         return $timestamp;
     }
@@ -528,6 +518,8 @@ class ICal
      */
     public function iCalDateWithTimeZone($event, $key)
     {
+        $offset = 0;
+
         if (!isset($event[$key . '_array']) || !isset($event[$key])) {
             return false;
         }
@@ -554,7 +546,6 @@ class ICal
         }
 
         if (substr($date, -1) === 'Z') {
-            $date = substr($date, 0, -1); // Remove 'Z'
             $tz = new \DateTimeZone(self::DEFAULT_TIMEZONE);
             $offset = timezone_offset_get($tz, $dateTime);
         } else {
@@ -562,13 +553,13 @@ class ICal
             $offset = timezone_offset_get($tz, $dateTime);
         }
 
-        if ($offset >= 0) {
-            $offset = '+' . $offset;
+        if ($offset < 0) {
+            $dateTime->sub(new \DateInterval('PT' . ($offset * -1) . 'S'));
+        } else {
+            $dateTime->add(new \DateInterval('PT' . $offset . 'S'));
         }
 
-        $time = strtotime($date . " $offset seconds");
-
-        return date('Ymd\THis', $time);
+        return $dateTime->format('Ymd\THis');
     }
 
     /**
