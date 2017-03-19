@@ -39,11 +39,11 @@ $ curl -s https://getcomposer.org/installer | php
 
 | Name               | Description                                 | Configurable       |
 |--------------------|---------------------------------------------|:------------------:|
+| `RECURRENCE_EVENT` | Used to isolate generated recurrence events |         :x:        |
 | `UNIX_MIN_YEAR`    | Minimum UNIX year to use                    |         :x:        |
 | `TIME_FORMAT`      | Default time format to use                  | :white_check_mark: |
 | `DATE_TIME_FORMAT` | Default datetime format to use              | :white_check_mark: |
 | `DEFAULT_TIMEZONE` | Default timezone to use                     | :white_check_mark: |
-| `RECURRENCE_EVENT` | Used to isolate generated recurrence events |         :x:        |
 
 #### Variables
 
@@ -73,7 +73,7 @@ $ curl -s https://getcomposer.org/installer | php
 | `eventsFromInterval`          | `$interval`                                | Returns a sorted array of the events following a given string, or false if no events exist in the range.                      |
 | `freeBusyEvents`              | -                                          | Returns an array of arrays with all free/busy events. Every event is an associative array and each property is an element it. |
 | `hasEvents`                   | -                                          | Returns a boolean value whether the current calendar has events or not                                                        |
-| `iCalDateToUnixTimestamp`     | `$icalDate`, `$useTimeZone`                | Return Unix timestamp from iCal date time format                                                                              |
+| `iCalDateToUnixTimestamp`     | `$icalDate`                                | Return Unix timestamp from iCal date time format                                                                              |
 | `iCalDateWithTimeZone`        | `$event`, `$key`                           | Return a date adapted to the calendar timezone depending on the event TZID                                                    |
 | `isValidTimeZoneId`           | `$timezone`                                | Check if a timezone is valid                                                                                                  |
 | `numberOfDays`                | `$days`, `$start`, `$end`                  | Get the number of days between a start and end date                                                                           |

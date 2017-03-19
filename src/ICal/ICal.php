@@ -16,11 +16,11 @@ use ICal\EventObject;
 
 class ICal
 {
+    const RECURRENCE_EVENT = 'Generated recurrence event';
     const UNIX_MIN_YEAR    = 1970;
     const TIME_FORMAT      = 'His';
     const DATE_TIME_FORMAT = 'Ymd\THis';
     const DEFAULT_TIMEZONE = 'UTC';
-    const RECURRENCE_EVENT = 'Generated recurrence event';
 
     /**
      * Track the number of todos in the current iCal feed
