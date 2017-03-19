@@ -541,7 +541,7 @@ class ICal
             $dateTime  = \DateTime::createFromFormat('U', $timestamp);
             $date      = $dateTime->format(self::DATE_TIME_FORMAT);
         } else {
-            $dateTime = new \DateTime($date);
+            $dateTime = new \DateTime($date, new \DateTimeZone(self::DEFAULT_TIMEZONE));
         }
 
         if (isset($dateArray[0]['TZID']) && preg_match('/[a-z]*\/[a-z_]*/i', $dateArray[0]['TZID'])) {
