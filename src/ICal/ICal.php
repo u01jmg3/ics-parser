@@ -147,11 +147,11 @@ class ICal
     /**
      * Creates the iCal Object
      *
-     * @param  mixed $filename  The path to the iCal-file or an array of lines from an iCal file
-     * @param  mixed $weekStart The default first day of the week (SU or MO, etc.)
+     * @param  mixed $filename The path to the iCal-file or an array of lines from an iCal file
+     * @param  array $settings Default settings to apply
      * @return void or false if no filename is provided
      */
-    public function __construct($filename = false, $weekStart = false)
+    public function __construct($filename = false, array $settings = array())
     {
         if (!$filename) {
             return false;
@@ -163,8 +163,8 @@ class ICal
             $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         }
 
-        if ($weekStart) {
-            $this->defaultWeekStart = $weekStart;
+        foreach ($settings as $setting => $value) {
+            $this->{$setting} = $value;
         }
 
         $this->initLines($lines);
