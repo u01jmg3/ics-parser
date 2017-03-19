@@ -1291,12 +1291,17 @@ class ICal
         }
 
         foreach ($events as $key => $anEvent) {
-            $events[$key]['DTSTART_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTSTART');
+            if ($this->useTimeZoneWithRRules && isset($anEvent['RRULE_array'][2]) && $anEvent['RRULE_array'][2] === self::RECURRENCE_EVENT) {
+                $events[$key]['DTSTART_tz'] = $anEvent['DTSTART'];
+                $events[$key]['DTEND_tz']   = $anEvent['DTEND'];
+            } else {
+                $events[$key]['DTSTART_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTSTART');
 
-            if ($this->iCalDateWithTimeZone($anEvent, 'DTEND')) {
-                $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTEND');
-            } else if ($this->iCalDateWithTimeZone($anEvent, 'DURATION')) {
-                $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DURATION');
+                if ($this->iCalDateWithTimeZone($anEvent, 'DTEND')) {
+                    $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTEND');
+                } else if ($this->iCalDateWithTimeZone($anEvent, 'DURATION')) {
+                    $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DURATION');
+                }
             }
         }
 
