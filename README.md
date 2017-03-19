@@ -35,14 +35,15 @@ $ curl -s https://getcomposer.org/installer | php
 
 ### `ICal` API
 
-#### Configurable Constants
+#### Constants
 
-| Name               | Description                    |
-|--------------------|--------------------------------|
-| `UNIX_MIN_YEAR`    | Minimum UNIX year to use       |
-| `TIME_FORMAT`      | Default time format to use     |
-| `DATE_TIME_FORMAT` | Default datetime format to use |
-| `DEFAULT_TIMEZONE` | Default timezone to use        |
+| Name               | Description                                 | Configurable       |
+|--------------------|---------------------------------------------|:------------------:|
+| `UNIX_MIN_YEAR`    | Minimum UNIX year to use                    |         :x:        |
+| `TIME_FORMAT`      | Default time format to use                  | :white_check_mark: |
+| `DATE_TIME_FORMAT` | Default datetime format to use              | :white_check_mark: |
+| `DEFAULT_TIMEZONE` | Default timezone to use                     | :white_check_mark: |
+| `RECURRENCE_EVENT` | Used to isolate generated recurrence events |         :x:        |
 
 #### Variables
 
