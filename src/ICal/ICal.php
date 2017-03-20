@@ -450,9 +450,9 @@ class ICal
     /**
      * Return Unix timestamp from iCal date time format
      *
-     * @param  string  $icalDate    A Date in the format YYYYMMDD[T]HHMMSS[Z] or
-     *                              YYYYMMDD[T]HHMMSS or
-     *                              TZID=Timezone:YYYYMMDD[T]HHMMSS
+     * @param  string $icalDate A Date in the format YYYYMMDD[T]HHMMSS[Z] or
+     *                          YYYYMMDD[T]HHMMSS or
+     *                          TZID=Timezone:YYYYMMDD[T]HHMMSS
      * @return integer
      */
     public function iCalDateToUnixTimestamp($icalDate)
