@@ -83,7 +83,7 @@ $ curl -s https://getcomposer.org/installer | php
 | `processRecurrences`          | -                                          | Processes recurrence rules                                                                                                    |
 | `sortEventsWithOrder`         | `$events`, `$sortOrder = SORT_ASC`         | Sort events based on a given sort order                                                                                       |
 
---
+---
 
 ### `EventObject` API
 
