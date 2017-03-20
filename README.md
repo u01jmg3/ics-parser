@@ -10,24 +10,21 @@
 ## Installation
 
 ### Requirements
-  - PHP 5 ≥ 5.3.0
+ - PHP 5 ≥ 5.3.0
 
-### [Composer](http://getcomposer.org)
+### Setup
 
-```bash
-$ curl -s https://getcomposer.org/installer | php
-```
+ - Install [Composer](http://getcomposer.org)
+   - Add the following requirement to `composer.json`
+     - :warning: **Note the owner is `johngrogg` and not `u01jmg3`**
 
-- `composer.json`
-  - :warning: **Packagist owner is `johngrogg` and not `u01jmg3`**
-
-```yaml
-{
-    "require": {
-        "johngrogg/ics-parser": "dev-master"
-    }
-}
-```
+   ```yaml
+   {
+       "require": {
+           "johngrogg/ics-parser": "dev-master"
+       }
+   }
+   ```
 
 ---
 
@@ -96,14 +93,14 @@ $ curl -s https://getcomposer.org/installer | php
 ---
 
 ## Credits
-  - [Jonathan Goode](https://github.com/u01jmg3) (programming, bug fixing, enhancement, coding standard)
-  - [John Grogg](john.grogg@gmail.com) (programming, addition of event recurrence handling)
-  - Frank Gregor (programming, feedback, testing)
-  - [Martin Thoma](info@martin-thoma.de) (programming, bug fixing, project management, initial concept)
+ - [Jonathan Goode](https://github.com/u01jmg3) (programming, bug fixing, enhancement, coding standard)
+ - [John Grogg](john.grogg@gmail.com) (programming, addition of event recurrence handling)
+ - Frank Gregor (programming, feedback, testing)
+ - [Martin Thoma](info@martin-thoma.de) (programming, bug fixing, project management, initial concept)
 
 ---
 
 ## Tools for Testing
 
-- [https://jakubroztocil.github.io/rrule/](https://jakubroztocil.github.io/rrule/)
-- [http://www.unixtimestamp.com/](http://www.unixtimestamp.com/)
+ - [https://jakubroztocil.github.io/rrule/](https://jakubroztocil.github.io/rrule/)
+ - [http://www.unixtimestamp.com/](http://www.unixtimestamp.com/)
