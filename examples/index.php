@@ -3,7 +3,7 @@ require_once '../vendor/autoload.php';
 
 use ICal\ICal;
 
-$ical = new ICal('MyCal.ics', array(
+$ical = new ICal('iCal.ics', array(
     'defaultSpan'           => 2,
     'defaultWeekStart'      => 'MO',
     'useTimeZoneWithRRules' => false,
