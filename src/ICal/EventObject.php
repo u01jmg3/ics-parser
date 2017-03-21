@@ -1,30 +1,125 @@
 <?php
 /**
- * @category    Parser
- * @package     ics-parser
+ * @category Parser
+ * @package  ics-parser
  */
 
 namespace ICal;
 
 class EventObject
 {
+    /**
+     * http://www.kanzaki.com/docs/ical/summary.html
+     *
+     * @var $summary
+     */
     public $summary;
+
+    /**
+     * http://www.kanzaki.com/docs/ical/dtstart.html
+     *
+     * @var $dtstart
+     */
     public $dtstart;
+
+    /**
+     * http://www.kanzaki.com/docs/ical/dtend.html
+     *
+     * @var $dtend
+     */
     public $dtend;
+
+    /**
+     * http://www.kanzaki.com/docs/ical/duration.html
+     *
+     * @var $duration
+     */
     public $duration;
+
+    /**
+     * http://www.kanzaki.com/docs/ical/dtstamp.html
+     *
+     * @var $dtstamp
+     */
     public $dtstamp;
+
+    /**
+     * http://www.kanzaki.com/docs/ical/uid.html
+     *
+     * @var $uid
+     */
     public $uid;
+
+    /**
+     * http://www.kanzaki.com/docs/ical/created.html
+     *
+     * @var $created
+     */
     public $created;
+
+    /**
+     * http://www.kanzaki.com/docs/ical/lastModified.html
+     *
+     * @var $lastmodified
+     */
     public $lastmodified;
+
+    /**
+     * http://www.kanzaki.com/docs/ical/description.html
+     *
+     * @var $description
+     */
     public $description;
+
+    /**
+     * http://www.kanzaki.com/docs/ical/location.html
+     *
+     * @var $location
+     */
     public $location;
+
+    /**
+     * http://www.kanzaki.com/docs/ical/sequence.html
+     *
+     * @var $sequence
+     */
     public $sequence;
+
+    /**
+     * http://www.kanzaki.com/docs/ical/status.html
+     *
+     * @var $status
+     */
     public $status;
+
+    /**
+     * http://www.kanzaki.com/docs/ical/transp.html
+     *
+     * @var $transp
+     */
     public $transp;
+
+    /**
+     * http://www.kanzaki.com/docs/ical/organizer.html
+     *
+     * @var $organizer
+     */
     public $organizer;
+
+    /**
+     * http://www.kanzaki.com/docs/ical/attendee.html
+     *
+     * @var $attendee
+     */
     public $attendee;
 
-    public function __construct($data = array())
+    /**
+     * Creates the Event Object
+     *
+     * @param  array $data
+     * @return void
+     */
+    public function __construct(array $data = array())
     {
         if (!empty($data)) {
             foreach ($data as $key => $value) {
@@ -32,7 +127,7 @@ class EventObject
                 $this->{$variable} = $value;
 
                 if (is_array($value)) {
-                     $this->{$variable} = $value;
+                    $this->{$variable} = $value;
                 } else {
                     $this->{$variable} = stripslashes(trim(str_replace('\n', "\n", $value)));
                 }

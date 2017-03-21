@@ -60,7 +60,7 @@
 |-------------------------------|--------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
 | `initLines`                   | `$lines`                                   | Initialises lines from file                                                                                                   |
 | `initString`                  | `$contents`                                | Initialises lines from a string                                                                                               |
-| `initURL`                     | `$url`                                     | Initialises lines from a URL                                                                                                  |
+| `initUrl`                     | `$url`                                     | Initialises lines from a URL                                                                                                  |
 | `calendarDescription`         | -                                          | Returns the calendar description                                                                                              |
 | `calendarName`                | -                                          | Returns the calendar name                                                                                                     |
 | `calendarTimeZone`            | -                                          | Returns the calendar timezone                                                                                                 |
