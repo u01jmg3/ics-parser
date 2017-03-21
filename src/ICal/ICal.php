@@ -183,7 +183,7 @@ class ICal
     {
         $contents = file_get_contents($url);
 
-        $lines = explode("\n", $contents);
+        $lines = explode(PHP_EOL, $contents);
 
         return $this->initLines($lines);
     }
@@ -196,7 +196,7 @@ class ICal
      */
     public function initString($contents)
     {
-        $lines = explode("\n", $contents);
+        $lines = explode(PHP_EOL, $contents);
 
         return $this->initLines($lines);
     }
@@ -414,7 +414,7 @@ class ICal
                 $formatted = array();
                 foreach ($properties as $property) {
                     // Match semicolon separator outside of quoted substrings
-                    preg_match_all('~[^\r\n";]+(?:"[^"\\\]*(?:\\\.[^"\\\]*)*"[^\r\n";]*)*~', $property, $attributes);
+                    preg_match_all('~[^' . PHP_EOL . '";]+(?:"[^"\\\]*(?:\\\.[^"\\\]*)*"[^' . PHP_EOL . '";]*)*~', $property, $attributes);
                     // Remove multi-dimensional array and use the first key
                     $attributes = (sizeof($attributes) == 0) ? array($property) : reset($attributes);
 
@@ -422,7 +422,7 @@ class ICal
                         foreach ($attributes as $attribute) {
                             // Match equals sign separator outside of quoted substrings
                             preg_match_all(
-                                '~[^\r\n"=]+(?:"[^"\\\]*(?:\\\.[^"\\\]*)*"[^\r\n"=]*)*~',
+                                '~[^' . PHP_EOL . '"=]+(?:"[^"\\\]*(?:\\\.[^"\\\]*)*"[^' . PHP_EOL . '"=]*)*~',
                                 $attribute,
                                 $values
                             );
