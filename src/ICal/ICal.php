@@ -44,13 +44,6 @@ class ICal
     public $freebusyCount = 0;
 
     /**
-     * The parsed calendar
-     *
-     * @var array
-     */
-    public $cal;
-
-    /**
      * The value in years to use for indefinite, recurring events
      *
      * @var integer
@@ -72,11 +65,18 @@ class ICal
     public $useTimeZoneWithRRules = false;
 
     /**
+     * The parsed calendar
+     *
+     * @var array
+     */
+    protected $cal;
+
+    /**
      * Variable to track the previous keyword
      *
      * @var string
      */
-    private $lastKeyword;
+    protected $lastKeyword;
 
     /**
      * Event recurrence instances that have been altered
