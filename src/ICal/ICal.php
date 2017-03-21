@@ -516,11 +516,12 @@ class ICal
     /**
      * Return a date adapted to the calendar timezone depending on the event TZID
      *
-     * @param  array  $event An event
-     * @param  string $key   An event parameter (DTSTART or DTEND)
+     * @param  array  $event         An event
+     * @param  string $key           An event parameter (DTSTART or DTEND)
+     * @param  string $forceTimeZone Whether to force a timezone even if Zulu time is specified
      * @return string Ymd\THis date
      */
-    public function iCalDateWithTimeZone($event, $key)
+    public function iCalDateWithTimeZone($event, $key, $forceTimeZone = false)
     {
         $offset = 0;
 
@@ -551,7 +552,7 @@ class ICal
             $timeZone = self::DEFAULT_TIMEZONE;
         }
 
-        if (substr($date, -1) === 'Z') {
+        if (!$forceTimeZone && substr($date, -1) === 'Z') {
             $tz     = new \DateTimeZone(self::DEFAULT_TIMEZONE);
             $offset = timezone_offset_get($tz, $dateTime);
         } else {
@@ -1292,12 +1293,13 @@ class ICal
                 $events[$key]['DTSTART_tz'] = $anEvent['DTSTART'];
                 $events[$key]['DTEND_tz']   = $anEvent['DTEND'];
             } else {
-                $events[$key]['DTSTART_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTSTART');
+                $forceTimeZone = true;
+                $events[$key]['DTSTART_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTSTART', $forceTimeZone);
 
-                if ($this->iCalDateWithTimeZone($anEvent, 'DTEND')) {
-                    $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTEND');
-                } else if ($this->iCalDateWithTimeZone($anEvent, 'DURATION')) {
-                    $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DURATION');
+                if ($this->iCalDateWithTimeZone($anEvent, 'DTEND', $forceTimeZone)) {
+                    $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTEND', $forceTimeZone);
+                } else if ($this->iCalDateWithTimeZone($anEvent, 'DURATION', $forceTimeZone)) {
+                    $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DURATION', $forceTimeZone);
                 }
             }
         }

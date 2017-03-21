@@ -72,7 +72,7 @@
 | `freeBusyEvents`              | -                                          | Returns an array of arrays with all free/busy events. Every event is an associative array and each property is an element it. |
 | `hasEvents`                   | -                                          | Returns a boolean value whether the current calendar has events or not                                                        |
 | `iCalDateToUnixTimestamp`     | `$icalDate`                                | Return Unix timestamp from iCal date time format                                                                              |
-| `iCalDateWithTimeZone`        | `$event`, `$key`                           | Return a date adapted to the calendar timezone depending on the event TZID                                                    |
+| `iCalDateWithTimeZone`        | `$event`, `$key`, `$forceTimeZone`         | Return a date adapted to the calendar timezone depending on the event TZID                                                    |
 | `isValidTimeZoneId`           | `$timezone`                                | Check if a timezone is valid                                                                                                  |
 | `numberOfDays`                | `$days`, `$start`, `$end`                  | Get the number of days between a start and end date                                                                           |
 | `parseDuration`               | `$date`, `$duration`                       | Parse a duration and apply it to a date                                                                                       |
