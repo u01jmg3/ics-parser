@@ -23,13 +23,6 @@ class ICal
     const UNIX_MIN_YEAR    = 1970;
 
     /**
-     * Track the number of todos in the current iCal feed
-     *
-     * @var integer
-     */
-    public $todoCount = 0;
-
-    /**
      * Track the number of events in the current iCal feed
      *
      * @var integer
@@ -37,11 +30,18 @@ class ICal
     public $eventCount = 0;
 
     /**
-     * Track the freebusy count in the current iCal feed
+     * Track the free/busy count in the current iCal feed
      *
      * @var integer
      */
     public $freebusyCount = 0;
+
+    /**
+     * Track the number of todos in the current iCal feed
+     *
+     * @var integer
+     */
+    public $todoCount = 0;
 
     /**
      * The value in years to use for indefinite, recurring events

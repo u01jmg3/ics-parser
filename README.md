@@ -46,9 +46,9 @@
 
 | Name                     | Description                                                        | Configurable       |
 |--------------------------|--------------------------------------------------------------------|:------------------:|
-| `$todoCount`             | Track the number of todos in the current iCal feed                 |         :x:        |
 | `$eventCount`            | Track the number of events in the current iCal feed                |         :x:        |
 | `$freebusyCount`         | Track the freebusy count in the current iCal feed                  |         :x:        |
+| `$todoCount`             | Track the number of todos in the current iCal feed                 |         :x:        |
 | `$cal`                   | The parsed calendar                                                |         :x:        |
 | `$defaultSpan`           | The value in years to use for indefinite, recurring events         | :white_check_mark: |
 | `$defaultWeekStart`      | The two letter representation of the first day of the week         | :white_check_mark: |

@@ -27,12 +27,12 @@ $ical = new ICal('iCal.ics', array(
             The number of events
         </li>
         <li class="list-group-item">
-            <span class="badge"><?php echo $ical->todoCount ?></span>
-            The number of todos
-        </li>
-        <li class="list-group-item">
             <span class="badge"><?php echo $ical->freebusyCount ?></span>
             The number of free/busy time slots
+        </li>
+        <li class="list-group-item">
+            <span class="badge"><?php echo $ical->todoCount ?></span>
+            The number of todos
         </li>
     </ul>
 
