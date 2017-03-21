@@ -34,13 +34,13 @@
 
 #### Constants
 
-| Name               | Description                                 | Configurable       |
-|--------------------|---------------------------------------------|:------------------:|
-| `RECURRENCE_EVENT` | Used to isolate generated recurrence events |         :x:        |
-| `UNIX_MIN_YEAR`    | Minimum UNIX year to use                    |         :x:        |
-| `TIME_FORMAT`      | Default time format to use                  | :white_check_mark: |
-| `DATE_TIME_FORMAT` | Default datetime format to use              | :white_check_mark: |
-| `DEFAULT_TIMEZONE` | Default timezone to use                     | :white_check_mark: |
+| Name               | Description                                 |
+|--------------------|---------------------------------------------|
+| `DATE_TIME_FORMAT` | Default datetime format to use              |
+| `DEFAULT_TIMEZONE` | Default timezone to use                     |
+| `RECURRENCE_EVENT` | Used to isolate generated recurrence events |
+| `TIME_FORMAT`      | Default time format to use                  |
+| `UNIX_MIN_YEAR`    | Minimum UNIX year to use                    |
 
 #### Variables
 
