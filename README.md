@@ -73,7 +73,7 @@
 | `hasEvents`                   | -                                          | Returns a boolean value whether the current calendar has events or not                                                        |
 | `iCalDateToUnixTimestamp`     | `$icalDate`                                | Return Unix timestamp from iCal date time format                                                                              |
 | `iCalDateWithTimeZone`        | `$event`, `$key`, `$forceTimeZone`         | Return a date adapted to the calendar timezone depending on the event TZID                                                    |
-| `isValidTimeZoneId`           | `$timezone`                                | Check if a timezone is valid                                                                                                  |
+| `isValidTimeZoneId`           | `$timeZone`                                | Check if a timezone is valid                                                                                                  |
 | `numberOfDays`                | `$days`, `$start`, `$end`                  | Get the number of days between a start and end date                                                                           |
 | `parseDuration`               | `$date`, `$duration`                       | Parse a duration and apply it to a date                                                                                       |
 | `processDateConversions`      | -                                          | Add fields `DTSTART_tz` and `DTEND_tz` to each event                                                                          |

@@ -1358,19 +1358,19 @@ class ICal
         $defaultTimeZone = date_default_timezone_get();
 
         if (isset($this->cal['VCALENDAR']['X-WR-TIMEZONE'])) {
-            $timezone = $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
+            $timeZone = $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
         } else if (isset($this->cal['VTIMEZONE']['TZID'])) {
-            $timezone = $this->cal['VTIMEZONE']['TZID'];
+            $timeZone = $this->cal['VTIMEZONE']['TZID'];
         } else {
             return $defaultTimeZone;
         }
 
         // Use default timezone if defined is invalid
-        if (!$this->isValidTimeZoneId($timezone)) {
+        if (!$this->isValidTimeZoneId($timeZone)) {
             return $defaultTimeZone;
         }
 
-        return $timezone;
+        return $timeZone;
     }
 
     /**
@@ -1524,13 +1524,13 @@ class ICal
     /**
      * Check if a timezone is valid
      *
-     * @param  string $timezone A timezone
+     * @param  string $timeZone A timezone
      * @return boolean
      */
-    protected function isValidTimeZoneId($timezone)
+    protected function isValidTimeZoneId($timeZone)
     {
         $valid = array();
-        $tza = timezone_abbreviations_list();
+        $tza   = timezone_abbreviations_list();
 
         foreach ($tza as $zone) {
             foreach ($zone as $item) {
@@ -1540,7 +1540,7 @@ class ICal
 
         unset($valid['']);
 
-        return (isset($valid[$timezone]));
+        return (isset($valid[$timeZone]));
     }
 
     /**
