@@ -211,6 +211,8 @@ class ICal
             $component = '';
             foreach ($lines as $line) {
                 $line = rtrim($line); // Trim trailing whitespace
+                $line = $this->removeInvalidChars($line);
+                $line = $this->cleanData($line);
                 $add  = $this->keyValueFromString($line);
 
                 if ($add === false) {
@@ -1612,5 +1614,46 @@ class ICal
         $dayOrdinals = array_combine(array_keys($dayOrdinals), array_reverse(array_values($dayOrdinals)));
 
         return $dayOrdinals[$dayNumber * -1];
+    }
+
+    /**
+     * Remove non-utf8 characters from a string
+     *
+     * @param  string $data
+     * @return string
+     */
+    protected function removeInvalidChars($data){
+        $characters = str_split($data);
+        $output = '';
+
+        foreach ($characters as $character) {
+            $ascii_value = ord($character);
+
+            if ($ascii_value > 31 && $ascii_value < 127) {
+                $output .= $character;
+            }
+        }
+
+        return $output;
+    }
+
+    /**
+     * Replace curly quotes and other special characters
+     * with their standard equivalents.
+     *
+     * @param  string $data
+     * @return string
+     */
+    protected function cleanData($data){
+        $replacementChars = array("'", "'", '"', '"', '-', '--', '...', ' ');
+
+        // Replace UTF-8 characters
+        $cleanedData = str_replace(array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\xa6", "\xc2\xa0"), $replacementChars, $data);
+
+        // Replace Windows-1252 equivalents
+        // Replacement of horizontal ellipsis - chr(133) - as it interferes with 'A with circle' char
+        $cleanedData = str_replace(array(chr(145), chr(146), chr(147), chr(148), chr(150), chr(151), chr(133), chr(194)), $replacementChars, $cleanedData);
+
+        return $cleanedData;
     }
 }
