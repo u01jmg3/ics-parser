@@ -543,13 +543,14 @@ class ICal
 
         if (isset($dateArray[0]['TZID']) && preg_match('/[a-z]*\/[a-z_]*/i', $dateArray[0]['TZID'])) {
             $timeZone = $dateArray[0]['TZID'];
-        } else {
-            $timeZone = $this->calendarTimeZone();
+
+            if ($this->isValidTimeZoneId($timeZone)) {
+                return $dateTime->format(self::DATE_TIME_FORMAT);
+            }
         }
 
-        // Check if the defined timezone is valid
-        if (!isset($timeZone) || !in_array($timeZone, timezone_identifiers_list())) {
-            $timeZone = self::DEFAULT_TIMEZONE;
+        if (!isset($timeZone)) {
+            $timeZone = $this->calendarTimeZone();
         }
 
         if (!$forceTimeZone && substr($date, -1) === 'Z') {
