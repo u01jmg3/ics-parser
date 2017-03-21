@@ -3,7 +3,7 @@
  * This PHP class will read an iCal file (*.ics), parse it and return an
  * array with its content.
  *
- * PHP Version ≥ 5.3.0
+ * PHP ≥ 5.3.0
  *
  * @author  Jonathan Goode <https://github.com/u01jmg3>, John Grogg <john.grogg@gmail.com>, Martin Thoma <info@martin-thoma.de>
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
@@ -540,6 +540,8 @@ class ICal
 
         if (isset($dateArray[0]['TZID']) && preg_match('/[a-z]*\/[a-z_]*/i', $dateArray[0]['TZID'])) {
             $timeZone = $dateArray[0]['TZID'];
+        } else {
+            $timeZone = $this->calendarTimeZone();
         }
 
         // Check if the defined timezone is valid
@@ -548,10 +550,10 @@ class ICal
         }
 
         if (substr($date, -1) === 'Z') {
-            $tz = new \DateTimeZone(self::DEFAULT_TIMEZONE);
+            $tz     = new \DateTimeZone(self::DEFAULT_TIMEZONE);
             $offset = timezone_offset_get($tz, $dateTime);
         } else {
-            $tz = new \DateTimeZone($timeZone);
+            $tz     = new \DateTimeZone($timeZone);
             $offset = timezone_offset_get($tz, $dateTime);
         }
 
