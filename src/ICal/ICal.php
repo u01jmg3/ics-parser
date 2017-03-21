@@ -1629,9 +1629,9 @@ class ICal
         $output = '';
 
         foreach ($characters as $character) {
-            $ascii_value = ord($character);
+            $asciiValue = ord($character);
 
-            if ($ascii_value > 31 && $ascii_value < 127) {
+            if ($asciiValue > 31 && $asciiValue < 127) {
                 $output .= $character;
             }
         }
