@@ -1523,7 +1523,7 @@ class ICal
      * @param  string $timezone A timezone
      * @return boolean
      */
-    function isValidTimeZoneId($timezone){
+    protected function isValidTimeZoneId($timezone){
         $valid = array();
         $tza = timezone_abbreviations_list();
 
@@ -1545,7 +1545,7 @@ class ICal
      * @param  \DateInterval $timezone A duration to parse
      * @return integer Unix timestamp
      */
-    function parseDuration($date, $duration){
+    protected function parseDuration($date, $duration){
         $timestamp = date_create($date);
         $timestamp->modify($duration->y . ' year');
         $timestamp->modify($duration->m . ' month');
@@ -1566,7 +1566,7 @@ class ICal
      * @param  $end
      * @return integer
      */
-    function numberOfDays($days, $start, $end){
+    protected function numberOfDays($days, $start, $end){
         $w       = array(date('w', $start), date('w', $end));
         $oneWeek = 604800; // 7 * 24 * 60 * 60
         $x       = floor(($end - $start) / $oneWeek);
@@ -1590,7 +1590,7 @@ class ICal
      * @param  $timestamp
      * @return string
      */
-    function convertDayOrdinalToPositive($dayNumber, $weekday, $timestamp){
+    protected function convertDayOrdinalToPositive($dayNumber, $weekday, $timestamp){
         $dayNumber = empty($dayNumber) ? 1 : $dayNumber; // Returns 0 when no number defined in BYDAY
 
         $dayOrdinals = $this->dayOrdinals;
