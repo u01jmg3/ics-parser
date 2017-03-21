@@ -1353,19 +1353,19 @@ class ICal
      */
     public function calendarTimeZone()
     {
-        $defaultTimezone = date_default_timezone_get();
+        $defaultTimeZone = date_default_timezone_get();
 
         if (isset($this->cal['VCALENDAR']['X-WR-TIMEZONE'])) {
             $timezone = $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
         } else if (isset($this->cal['VTIMEZONE']['TZID'])) {
             $timezone = $this->cal['VTIMEZONE']['TZID'];
         } else {
-            return $defaultTimezone;
+            return $defaultTimeZone;
         }
 
         // Use default timezone if defined is invalid
         if (!$this->isValidTimeZoneId($timezone)) {
-            return $defaultTimezone;
+            return $defaultTimeZone;
         }
 
         return $timezone;
