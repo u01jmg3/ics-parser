@@ -384,19 +384,47 @@ class ICal
     }
 
     /**
-     * Get a key-value pair of a string.
+     * Get the key-value pair from an iCal string.
      *
-     * @param  string $text which is like "VCALENDAR:Begin" or "LOCATION:"
+     * @param  string $text
      * @return array
      */
     protected function keyValueFromString($text)
     {
-        // Match colon separator outside of quoted substrings
-        // Fallback to nearest semicolon outside of quoted substrings, if colon cannot be found
-        // Do not try and match within the value paired with the keyword
-        preg_match('/(.*?)(?::(?=(?:[^"]*"[^"]*")*[^"]*$)|;(?=[^:]*$))([\w\W]*)/', htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8'), $matches);
+        $text = htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8');
 
-        if (count($matches) == 0) {
+        $colon = strpos($text, ':');
+        $quote = strpos($text, '"');
+        if ($colon === false) {
+            $matches = array();
+        } else if ($quote === false || $colon < $quote) {
+            list($before, $after) = explode(':', $text, 2);
+            $matches              = array($text, $before, $after);
+        } else {
+            list($before, $text) = explode('"', $text, 2);
+            $text                = '"' . $text;
+            $matches             = str_getcsv($text, ':');
+            $combinedValue       = '';
+
+            foreach ($matches as $key => $match) {
+                if ($key === 0) {
+                    if (!empty($before)) {
+                        $matches[$key] = $before . '"' . $matches[$key] . '"';
+                    }
+                } else {
+                    if ($key > 1) {
+                        $combinedValue .= ':';
+                    }
+
+                    $combinedValue .= $matches[$key];
+                }
+            }
+            $matches    = array_slice($matches, 0, 2);
+            $matches[1] = $combinedValue;
+            array_unshift($matches, $before . $text);
+        }
+
+        if (count($matches) === 0) {
             return false;
         }
 
