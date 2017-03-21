@@ -1569,7 +1569,11 @@ class ICal
 
         unset($valid['']);
 
-        return (isset($valid[$timeZone]));
+        if (isset($valid[$timeZone]) || in_array($timeZone, timezone_identifiers_list(\DateTimeZone::ALL_WITH_BC))) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
