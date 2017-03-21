@@ -566,7 +566,7 @@ class ICal
             $dateTime->add(new \DateInterval('PT' . $offset . 'S'));
         }
 
-        return $dateTime->format('Ymd\THis');
+        return $dateTime->format(self::DATE_TIME_FORMAT);
     }
 
     /**
