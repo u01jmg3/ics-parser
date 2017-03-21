@@ -165,7 +165,9 @@ class ICal
         }
 
         foreach ($settings as $setting => $value) {
-            $this->{$setting} = $value;
+            if (in_array($setting, array('defaultSpan', 'defaultWeekStart', 'useTimeZoneWithRRules'))) {
+                $this->{$setting} = $value;
+            }
         }
 
         $this->initLines($lines);
