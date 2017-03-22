@@ -174,6 +174,19 @@ class ICal
     }
 
     /**
+     * Initialises lines from a string
+     *
+     * @param  string $string The contents of the iCal file to initialise
+     * @return ICal
+     */
+    public function initString($string)
+    {
+        $lines = explode(PHP_EOL, $string);
+
+        return $this->initLines($lines);
+    }
+
+    /**
      * Initialises lines from a URL
      *
      * @param  string $url The url of the iCal file to download and initialise
@@ -182,32 +195,18 @@ class ICal
     public function initUrl($url)
     {
         $contents = file_get_contents($url);
-
-        $lines = explode(PHP_EOL, $contents);
-
-        return $this->initLines($lines);
-    }
-
-    /**
-     * Initialises lines from a string
-     *
-     * @param  string $contents The contents of the ical file to initialise
-     * @return ICal
-     */
-    public function initString($contents)
-    {
-        $lines = explode(PHP_EOL, $contents);
+        $lines    = explode(PHP_EOL, $contents);
 
         return $this->initLines($lines);
     }
 
     /**
-     * Initialises lines from file
+     * Initialises lines from a file
      *
      * @param  array $lines The lines to initialise
      * @return void
      */
-    public function initLines(array $lines)
+    protected function initLines(array $lines)
     {
         if (stristr($lines[0], 'BEGIN:VCALENDAR') !== false) {
             $component = '';
@@ -223,7 +222,7 @@ class ICal
                 }
 
                 $keyword = $add[0];
-                $values  = $add[1]; // Could be an array containing multiple values
+                $values  = $add[1]; // May be an array containing multiple values
 
                 if (!is_array($values)) {
                     if (!empty($values)) {
@@ -605,7 +604,7 @@ class ICal
      *
      * @return mixed
      */
-    public function processEvents()
+    protected function processEvents()
     {
         $events = (isset($this->cal['VEVENT'])) ? $this->cal['VEVENT'] : array();
 
@@ -643,7 +642,7 @@ class ICal
      *
      * @return mixed
      */
-    public function processRecurrences()
+    protected function processRecurrences()
     {
         $events = (isset($this->cal['VEVENT'])) ? $this->cal['VEVENT'] : array();
 
@@ -1303,13 +1302,13 @@ class ICal
     /**
      * Processes date conversions using the timezone
      *
-     * Add fields DTSTART_tz and DTEND_tz to each event
+     * Add fields DTSTART_tz and DTEND_tz to each Event
      * These fields contain dates adapted to the calendar
      * timezone depending on the event TZID
      *
      * @return mixed
      */
-    public function processDateConversions()
+    protected function processDateConversions()
     {
         $events = (isset($this->cal['VEVENT'])) ? $this->cal['VEVENT'] : array();
 
