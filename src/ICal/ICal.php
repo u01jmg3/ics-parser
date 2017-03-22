@@ -3,7 +3,7 @@
  * This PHP class will read an iCal file (*.ics), parse it and return an
  * array with its content.
  *
- * PHP ≥ 5.3.0
+ * PHP 5 (≥ 5.3.0)
  *
  * @author  Jonathan Goode <https://github.com/u01jmg3>, John Grogg <john.grogg@gmail.com>, Martin Thoma <info@martin-thoma.de>
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
