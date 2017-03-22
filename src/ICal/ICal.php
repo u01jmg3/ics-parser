@@ -174,6 +174,18 @@ class ICal
     }
 
     /**
+     * Unfold an iCal string in preparation for parsing
+     * https://icalendar.org/iCalendar-RFC-5545/3-1-content-lines.html
+     *
+     * @param  string $string The contents of the iCal string to unfold
+     * @return string
+     */
+    protected function unfold($string)
+    {
+        return str_replace(array("\r\n ", "\r\n\t"), '', $string);
+    }
+
+    /**
      * Initialises lines from a string
      *
      * @param  string $string The contents of the iCal file to initialise
@@ -181,7 +193,8 @@ class ICal
      */
     public function initString($string)
     {
-        $lines = explode(PHP_EOL, $string);
+        $string = $this->unfold($string);
+        $lines  = explode(PHP_EOL, $string);
 
         return $this->initLines($lines);
     }
@@ -195,6 +208,7 @@ class ICal
     public function initUrl($url)
     {
         $contents = file_get_contents($url);
+        $contents = $this->unfold($contents);
         $lines    = explode(PHP_EOL, $contents);
 
         return $this->initLines($lines);

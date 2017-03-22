@@ -70,6 +70,7 @@
 | `processEvents`               | -                                          | `protected` | Performs some admin tasks on all events as taken straight from the ics file.                                                  |
 | `processRecurrences`          | -                                          | `protected` | Processes recurrence rules                                                                                                    |
 | `removeInvalidChars`          | `$data`                                    | `protected` | Remove non-utf8 characters from a string                                                                                      |
+| `unfold`                      | `$string`                                  | `protected` | Unfold an iCal string in preparation for parsing                                                                              |
 | `calendarDescription`         | -                                          | `public`    | Returns the calendar description                                                                                              |
 | `calendarName`                | -                                          | `public`    | Returns the calendar name                                                                                                     |
 | `calendarTimeZone`            | -                                          | `public`    | Returns the calendar timezone                                                                                                 |
