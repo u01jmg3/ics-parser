@@ -226,7 +226,7 @@ class ICal
             $component = '';
             foreach ($lines as $line) {
                 $line = rtrim($line); // Trim trailing whitespace
-                $line = $this->removeInvalidChars($line);
+                $line = $this->removeUnprintableChars($line);
                 $line = $this->cleanData($line);
                 $add  = $this->keyValueFromString($line);
 
@@ -1673,25 +1673,14 @@ class ICal
     }
 
     /**
-     * Remove non-utf8 characters from a string
+     * Remove unprintable ASCII and UTF-8 characters
      *
      * @param  string $data
      * @return string
      */
-    protected function removeInvalidChars($data)
+    protected function removeUnprintableChars($data)
     {
-        $characters = str_split($data);
-        $output = '';
-
-        foreach ($characters as $character) {
-            $asciiValue = ord($character);
-
-            if ($asciiValue > 31 && $asciiValue < 127) {
-                $output .= $character;
-            }
-        }
-
-        return $output;
+        return preg_replace('/[\x00-\x1F\x7F\xA0]/u', '', $data);
     }
 
     /**

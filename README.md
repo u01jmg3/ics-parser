@@ -47,7 +47,7 @@
 | Name                     | Description                                                        | Configurable       |
 |--------------------------|--------------------------------------------------------------------|:------------------:|
 | `$eventCount`            | Track the number of events in the current iCal feed                |         :x:        |
-| `$freebusyCount`         | Track the freebusy count in the current iCal feed                  |         :x:        |
+| `$freebusyCount`         | Track the free/busy count in the current iCal feed                 |         :x:        |
 | `$todoCount`             | Track the number of todos in the current iCal feed                 |         :x:        |
 | `$cal`                   | The parsed calendar                                                |         :x:        |
 | `$defaultSpan`           | The value in years to use for indefinite, recurring events         | :white_check_mark: |
@@ -69,7 +69,7 @@
 | `processDateConversions`      | -                                          | `protected` | Add fields `DTSTART_tz` and `DTEND_tz` to each Event                                                                          |
 | `processEvents`               | -                                          | `protected` | Performs some admin tasks on all events as taken straight from the ics file.                                                  |
 | `processRecurrences`          | -                                          | `protected` | Processes recurrence rules                                                                                                    |
-| `removeInvalidChars`          | `$data`                                    | `protected` | Remove non-utf8 characters from a string                                                                                      |
+| `removeUnprintableChars`      | `$data`                                    | `protected` | Remove unprintable ASCII and UTF-8 characters                                                                                 |
 | `unfold`                      | `$string`                                  | `protected` | Unfold an iCal string in preparation for parsing                                                                              |
 | `calendarDescription`         | -                                          | `public`    | Returns the calendar description                                                                                              |
 | `calendarName`                | -                                          | `public`    | Returns the calendar name                                                                                                     |
