@@ -6,6 +6,7 @@ use ICal\ICal;
 $ical = new ICal('iCal.ics', array(
     'defaultSpan'           => 2,
     'defaultWeekStart'      => 'MO',
+    'skipRecurrence'        => false,
     'useTimeZoneWithRRules' => false,
 ));
 ?>

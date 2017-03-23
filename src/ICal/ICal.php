@@ -58,6 +58,13 @@ class ICal
     public $defaultWeekStart = 'MO';
 
     /**
+     * Toggle whether to skip the parsing recurrence rules
+     *
+     * @var boolean
+     */
+    public $skipRecurrence = false;
+
+    /**
      * Toggle whether to use time zone info when parsing recurrence rules
      *
      * @var boolean
@@ -165,7 +172,7 @@ class ICal
         }
 
         foreach ($settings as $setting => $value) {
-            if (in_array($setting, array('defaultSpan', 'defaultWeekStart', 'useTimeZoneWithRRules'))) {
+            if (in_array($setting, array('defaultSpan', 'defaultWeekStart', 'skipRecurrence', 'useTimeZoneWithRRules'))) {
                 $this->{$setting} = $value;
             }
         }
@@ -303,7 +310,11 @@ class ICal
             }
 
             $this->processEvents();
-            $this->processRecurrences();
+
+            if (!$this->skipRecurrence) {
+                $this->processRecurrences();
+            }
+
             $this->processDateConversions();
         }
     }

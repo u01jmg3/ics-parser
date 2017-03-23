@@ -51,6 +51,7 @@
 | `$todoCount`             | Track the number of todos in the current iCal feed                 |         :x:        | N/A           |
 | `$defaultSpan`           | The value in years to use for indefinite, recurring events         | :white_check_mark: | `2`           |
 | `$defaultWeekStart`      | The two letter representation of the first day of the week         | :white_check_mark: | `MO`          |
+| `$skipRecurrence`        | Toggle whether to skip the parsing recurrence rules                | :white_check_mark: | `false`       |
 | `$useTimeZoneWithRRules` | Toggle whether to use time zone info when parsing recurrence rules | :white_check_mark: | `false`       |
 
 #### Functions
