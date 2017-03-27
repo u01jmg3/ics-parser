@@ -157,7 +157,7 @@ class ICal
      *
      * @param  mixed $filename The path to the iCal-file or an array of lines from an iCal file
      * @param  array $settings Default settings to apply
-     * @return void or false if no filename is provided
+     * @return mixed
      */
     public function __construct($filename = false, array $settings = array())
     {
@@ -894,7 +894,7 @@ class ICal
                         }
 
                         // Get timestamp of first day of start week
-                        $weekRecurringTimestamp = ($initialStart->format('w') == 0)
+                        $weekRecurringTimestamp = (strcasecmp($initialStart->format('l'), $this->weekdays[$wkst]) === 0)
                             ? $startTimestamp
                             : strtotime("last {$days[$wkst]} " . $initialStart->format('H:i:s'), $startTimestamp);
 
