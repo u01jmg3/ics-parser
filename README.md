@@ -81,6 +81,7 @@
 | `hasEvents`                   | -                                          | `public`    | Returns a boolean value whether the current calendar has events or not                                                        |
 | `iCalDateToUnixTimestamp`     | `$icalDate`                                | `public`    | Return Unix timestamp from iCal date time format                                                                              |
 | `iCalDateWithTimeZone`        | `$event`, `$key`, `$forceTimeZone`         | `public`    | Return a date adapted to the calendar timezone depending on the event TZID                                                    |
+| `parseExdates`                | `$event`                                   | `public`    | Parse a list of excluded dates to be applied to an Event                                                                      |
 | `sortEventsWithOrder`         | `$events`, `$sortOrder = SORT_ASC`         | `public`    | Sort events based on a given sort order                                                                                       |
 
 ---
