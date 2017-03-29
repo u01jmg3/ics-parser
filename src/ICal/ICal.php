@@ -536,6 +536,10 @@ class ICal
         $pattern .= '(Z?)/';               // 8: UTC flag
         preg_match($pattern, $icalDate, $date);
 
+        if (empty($date)) {
+            return $icalDate;
+        }
+
         if (isset($date[1])) {
             $eventTimeZone = rtrim($date[1], ':');
         }
