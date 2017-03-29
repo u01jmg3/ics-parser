@@ -549,7 +549,7 @@ class ICal
         if ($date[8] !== 'Z') {
             if (isset($eventTimeZone) && $this->isValidTimeZoneId($eventTimeZone)) {
                 $timeZone = new \DateTimeZone($eventTimeZone);
-            } else if ($this->isValidTimeZoneId($eventTimeZone)) {
+            } else {
                 $timeZone = new \DateTimeZone($this->calendarTimeZone());
             }
         }
@@ -596,7 +596,7 @@ class ICal
         if (isset($dateArray[0]['TZID']) && preg_match('/[a-z]*\/[a-z_]*/i', $dateArray[0]['TZID'])) {
             $timeZone = $dateArray[0]['TZID'];
 
-            if ($this->isValidTimeZoneId($timeZone)) {
+            if (!$this->isValidTimeZoneId($timeZone)) {
                 return $dateTime->format(self::DATE_TIME_FORMAT);
             }
         }
