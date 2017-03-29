@@ -547,21 +547,16 @@ class ICal
             return date_timestamp_get($date);
         }
 
-        // Unix timestamps after 03:14:07 UTC 2038-01-19 might cause an overflow
-        // if 32 bit integers are used.
-        $timeZone = new \DateTimeZone(self::DEFAULT_TIMEZONE);
-        if ($date[8] !== 'Z') {
-            if (isset($eventTimeZone) && $this->isValidTimeZoneId($eventTimeZone)) {
-                $timeZone = new \DateTimeZone($eventTimeZone);
-            } else {
-                $timeZone = new \DateTimeZone($this->calendarTimeZone());
-            }
-        }
-
         $convDate = new \DateTime('now', new \DateTimeZone(self::DEFAULT_TIMEZONE));
         $convDate->setDate((int) $date[2], (int) $date[3], (int) $date[4]);
         $convDate->setTime((int) $date[5], (int) $date[6], (int) $date[7]);
 
+        // Unix timestamps after 03:14:07 UTC 2038-01-19 might cause an overflow
+        // if 32 bit integers are used.
+        $timeZone = new \DateTimeZone(self::DEFAULT_TIMEZONE);
+        if ($date[8] !== 'Z' && isset($eventTimeZone) && $this->isValidTimeZoneId($eventTimeZone)) {
+            $timeZone = new \DateTimeZone($eventTimeZone);
+        }
         $convDate->setTimezone($timeZone);
         $timestamp  = $convDate->getTimestamp();
         $timestamp += $convDate->getOffset();
