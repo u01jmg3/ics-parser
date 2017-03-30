@@ -1703,10 +1703,22 @@ class ICal
      */
     protected function cleanData($data)
     {
-        $replacementChars = array("'", "'", '"', '"', '-', '--', '...', ' ');
-
+        $replacementChars = array(
+            "\xe2\x80\x98" => "'",   // ‘
+            "\xe2\x80\x99" => "'",   // ’
+            "\xe2\x80\x9a" => "'",   // ‚
+            "\xe2\x80\x9b" => "'",   // ‛
+            "\xe2\x80\x9c" => '"',   // “
+            "\xe2\x80\x9d" => '"',   // ”
+            "\xe2\x80\x9e" => '"',   // „
+            "\xe2\x80\x9f" => '"',   // ‟
+            "\xe2\x80\x93" => '-',   // –
+            "\xe2\x80\x94" => '--',  // —
+            "\xe2\x80\xa6" => '...', // …
+            "\xc2\xa0"     => ' ',
+        );
         // Replace UTF-8 characters
-        $cleanedData = str_replace(array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\xa6", "\xc2\xa0"), $replacementChars, $data);
+        $cleanedData = strtr($data, $replacementChars);
 
         // Replace Windows-1252 equivalents
         // Replacement of horizontal ellipsis - chr(133) - as it interferes with 'A with circle' char
