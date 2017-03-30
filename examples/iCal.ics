@@ -153,7 +153,10 @@ LAST-MODIFIED:20161121T113027Z
 LOCATION:
 SEQUENCE:1
 STATUS:CONFIRMED
-SUMMARY:Long event covering the range from example
+SUMMARY:Long event covering the range from example with special chars:
+  ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÕÖÒÓÔØÙÚÛÜÝÞß
+  àáâãäåæçèéêėëìíîïðñòóôõöøùúûüūýþÿž
+  ‘ ’ ‚ ‛ “ ” „ ‟ – — …
 TRANSP:OPAQUE
 END:VEVENT
 BEGIN:VEVENT
