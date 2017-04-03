@@ -155,7 +155,7 @@ class ICal
     /**
      * Creates the iCal Object
      *
-     * @param  mixed $filename The path to the iCal-file or an array of lines from an iCal file
+     * @param  mixed $filename The path to the iCal file or an array of lines from an iCal file
      * @param  array $settings Default settings to apply
      * @return mixed
      */
@@ -164,6 +164,11 @@ class ICal
         if (!$filename) {
             return false;
         }
+
+        // If PHP is not properly recognising the line endings when reading files either
+        // on or created by a Macintosh computer, enabling the `auto_detect_line_endings`
+        // run-time configuration option may help resolve the problem.
+        ini_set('auto_detect_line_endings', '1');
 
         if (is_array($filename)) {
             $lines = $filename;
