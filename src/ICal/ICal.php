@@ -1347,6 +1347,13 @@ class ICal
         }
 
         foreach ($events as $key => $anEvent) {
+            if (!$this->isValidDate($anEvent['DTSTART'])) {
+                unset($events[$key]);
+                $this->eventCount--;
+
+                continue;
+            }
+
             if ($this->useTimeZoneWithRRules && isset($anEvent['RRULE_array'][2]) && $anEvent['RRULE_array'][2] === self::RECURRENCE_EVENT) {
                 $events[$key]['DTSTART_tz'] = $anEvent['DTSTART'];
                 $events[$key]['DTEND_tz']   = $anEvent['DTEND'];
@@ -1802,5 +1809,26 @@ class ICal
         }
 
         return $output;
+    }
+
+    /**
+     * Check if a date string is a valid date
+     *
+     * @param  string $value
+     * @return boolean
+     */
+    public function isValidDate($value)
+    {
+        if (!$value) {
+            return false;
+        }
+
+        try {
+            new \DateTime($value);
+
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }
