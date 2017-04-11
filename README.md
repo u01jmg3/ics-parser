@@ -28,7 +28,7 @@
 
 ### How to instantiate the Parser
 
-- Using the example script as a guide, [use this code](https://github.com/u01jmg3/ics-parser/blob/master/examples/index.php#L1-L12)
+- Using the example script as a guide, [refer to this code](https://github.com/u01jmg3/ics-parser/blob/master/examples/index.php#L1-L12)
 
 ---
 

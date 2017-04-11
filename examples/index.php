@@ -4,10 +4,10 @@ require_once '../vendor/autoload.php';
 use ICal\ICal;
 
 $ical = new ICal('ICal.ics', array(
-    'defaultSpan'           => 2,
-    'defaultWeekStart'      => 'MO',
-    'skipRecurrence'        => false,
-    'useTimeZoneWithRRules' => false,
+    'defaultSpan'           => 2,     // Default value
+    'defaultWeekStart'      => 'MO',  // Default value
+    'skipRecurrence'        => false, // Default value
+    'useTimeZoneWithRRules' => false, // Default value
 ));
 ?>
 <!DOCTYPE html>
