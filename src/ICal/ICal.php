@@ -285,24 +285,22 @@ class ICal
                             $component = 'VFREEBUSY';
                         break;
 
-                        // All other special strings
-                        case 'BEGIN:VCALENDAR':
                         case 'BEGIN:DAYLIGHT':
-                            // http://www.kanzaki.com/docs/ical/vtimezone.html
-                        case 'BEGIN:VTIMEZONE':
                         case 'BEGIN:STANDARD':
                         case 'BEGIN:VALARM':
+                        case 'BEGIN:VCALENDAR':
+                        case 'BEGIN:VTIMEZONE':
                             $component = $value;
                         break;
 
+                        case 'END:DAYLIGHT':
+                        case 'END:STANDARD':
                         case 'END:VALARM':
-                        case 'END:VTODO': // End special text - goto VCALENDAR key
+                        case 'END:VCALENDAR':
                         case 'END:VEVENT':
                         case 'END:VFREEBUSY':
-                        case 'END:VCALENDAR':
-                        case 'END:DAYLIGHT':
                         case 'END:VTIMEZONE':
-                        case 'END:STANDARD':
+                        case 'END:VTODO':
                             $component = 'VCALENDAR';
                         break;
 
