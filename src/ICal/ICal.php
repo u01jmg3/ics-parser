@@ -534,11 +534,9 @@ class ICal
 
         // Unix timestamps after 03:14:07 UTC 2038-01-19 might cause an overflow
         // if 32 bit integers are used.
-        $timeZone = new \DateTimeZone(self::DEFAULT_TIMEZONE);
         if ($date[8] !== 'Z' && isset($eventTimeZone) && $this->isValidTimeZoneId($eventTimeZone)) {
-            $timeZone = new \DateTimeZone($eventTimeZone);
+            $convDate->setTimezone(new \DateTimeZone($eventTimeZone));
         }
-        $convDate->setTimezone($timeZone);
         $timestamp  = $convDate->getTimestamp();
         $timestamp += $convDate->getOffset();
 
@@ -573,16 +571,15 @@ class ICal
             $dateTime = new \DateTime($date, new \DateTimeZone(self::DEFAULT_TIMEZONE));
         }
 
+        $timeZone = $this->calendarTimeZone();
         if (isset($dateArray[0]['TZID']) && preg_match('/[a-z]*\/[a-z_]*/i', $dateArray[0]['TZID'])) {
-            $timeZone = $dateArray[0]['TZID'];
+            $tzid = $dateArray[0]['TZID'];
 
-            if (!$this->isValidTimeZoneId($timeZone)) {
+            // TimeZone attached to the date is valid
+            // and has been applied so return
+            if ($this->isValidTimeZoneId($tzid)) {
                 return $dateTime->format(self::DATE_TIME_FORMAT);
             }
-        }
-
-        if (!isset($timeZone)) {
-            $timeZone = $this->calendarTimeZone();
         }
 
         if (!$forceTimeZone && substr($date, -1) === 'Z') {
