@@ -124,15 +124,25 @@ class EventObject
         if (!empty($data)) {
             foreach ($data as $key => $value) {
                 $variable = lcfirst(str_replace(' ', '', ucwords(str_replace('-', ' ', strtolower($key)))));
-                $this->{$variable} = $value;
-
-                if (is_array($value)) {
-                    $this->{$variable} = $value;
-                } else {
-                    $this->{$variable} = stripslashes(trim(str_replace('\n', "\n", $value)));
-                }
+                $this->{$variable} = self::prepareData($value);
             }
         }
+    }
+
+    /**
+     * Prepares the data for output
+     *
+     * @param  mixed $value
+     * @return mixed
+     */
+    protected function prepareData($value) {
+        if (is_string($value)) {
+            return stripslashes(trim(str_replace('\n', "\n", $value)));
+        } else if (is_array($value)) {
+            return array_map('self::prepareData', $value);
+        }
+
+        return $value;
     }
 
     /**

@@ -96,9 +96,10 @@
 
 #### Functions
 
-| Function    | Parameter(s)              | Description                                                        |
-|-------------|---------------------------|--------------------------------------------------------------------|
-| `printData` | `$html = '<p>%s: %s</p>'` | Return Event data excluding anything blank within an HTML template |
+| Function      | Parameter(s)              | Description                                                        |
+|---------------|---------------------------|--------------------------------------------------------------------|
+| `prepareDate` | `$value`                  | Prepares the data for output                                       |
+| `printData`   | `$html = '<p>%s: %s</p>'` | Return Event data excluding anything blank within an HTML template |
 
 ---
 
