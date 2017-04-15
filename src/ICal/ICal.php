@@ -12,7 +12,7 @@
 
 namespace ICal;
 
-use ICal\EventObject;
+use ICal\Event;
 
 class ICal
 {
@@ -153,7 +153,7 @@ class ICal
     );
 
     /**
-     * Creates the iCal Object
+     * Creates the ICal object
      *
      * @param  mixed $filename The path to the iCal file or an array of lines from an iCal file
      * @param  array $settings Default settings to apply
@@ -1371,10 +1371,10 @@ class ICal
     }
 
     /**
-     * Returns an array of EventObjects. Every event is a class
+     * Returns an array of Events. Every event is a class
      * with the event details being properties within it.
      *
-     * @return array of EventObjects
+     * @return array of Events
      */
     public function events()
     {
@@ -1384,7 +1384,7 @@ class ICal
 
         if (!empty($array)) {
             foreach ($array as $event) {
-                $events[] = new EventObject($event);
+                $events[] = new Event($event);
             }
         }
 
@@ -1478,7 +1478,7 @@ class ICal
      *
      * @param  string $rangeStart Start date of the search range.
      * @param  string $rangeEnd   End date of the search range.
-     * @return array of EventObjects
+     * @return array of Events
      */
     public function eventsFromRange($rangeStart = false, $rangeEnd = false)
     {
@@ -1549,7 +1549,7 @@ class ICal
      * or false if no events exist in the range.
      *
      * @param  string $interval
-     * @return array of EventObjects
+     * @return array of Events
      */
     public function eventsFromInterval($interval)
     {
@@ -1565,9 +1565,9 @@ class ICal
     /**
      * Sort events based on a given sort order
      *
-     * @param  array   $events    An array of EventObjects
+     * @param  array   $events    An array of Events
      * @param  integer $sortOrder Either SORT_ASC, SORT_DESC, SORT_REGULAR, SORT_NUMERIC, SORT_STRING
-     * @return sorted array of EventObjects
+     * @return sorted array of Events
      */
     public function sortEventsWithOrder(array $events, $sortOrder = SORT_ASC)
     {

@@ -79,7 +79,7 @@
 | `calendarDescription`         | -                                               | `public`    | Returns the calendar description                                                                                              |
 | `calendarName`                | -                                               | `public`    | Returns the calendar name                                                                                                     |
 | `calendarTimeZone`            | -                                               | `public`    | Returns the calendar timezone                                                                                                 |
-| `events`                      | -                                               | `public`    | Returns an array of EventObjects. Every event is a class with the event details being properties within it.                   |
+| `events`                      | -                                               | `public`    | Returns an array of Events. Every event is a class with the event details being properties within it.                         |
 | `eventsFromInterval`          | `$interval`                                     | `public`    | Returns a sorted array of the events following a given string, or false if no events exist in the range.                      |
 | `eventsFromRange`             | `$rangeStart = false`, `$rangeEnd = false`      | `public`    | Returns a sorted array of the events in a given range, or an empty array if no events exist in the range.                     |
 | `freeBusyEvents`              | -                                               | `public`    | Returns an array of arrays with all free/busy events. Every event is an associative array and each property is an element it. |
@@ -92,7 +92,7 @@
 
 ---
 
-### `EventObject` API
+### `Event` API
 
 #### Functions
 

@@ -6,7 +6,7 @@
 
 namespace ICal;
 
-class EventObject
+class Event
 {
     /**
      * http://www.kanzaki.com/docs/ical/summary.html
@@ -114,7 +114,7 @@ class EventObject
     public $attendee;
 
     /**
-     * Creates the Event Object
+     * Creates the Event object
      *
      * @param  array $data
      * @return void
