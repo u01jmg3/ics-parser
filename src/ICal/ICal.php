@@ -195,7 +195,7 @@ class ICal
     protected function unfold(array $lines)
     {
         $string = implode(PHP_EOL, $lines);
-        $string = str_replace(array("\n ", "\r\n ", "\r\n\t"), '', $string);
+        $string = preg_replace('/\r?\n[ \t]/', '', $string);
         $lines  = explode(PHP_EOL, $string);
 
         return $lines;
