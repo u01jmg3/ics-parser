@@ -4,6 +4,7 @@
 >   - Best to upload the iCal file directly to this issue
 
 - PHP Version: `5.#.#`
+- PHP date.timezone: `[Country]/[City]`
 
 ### Description of the Issue:
 
