@@ -2,6 +2,7 @@
 require_once '../vendor/autoload.php';
 
 use ICal\ICal;
+date_default_timezone_set(ICal::DEFAULT_TIMEZONE);
 
 $ical = new ICal('ICal.ics', array(
     'defaultSpan'           => 2,     // Default value
@@ -38,9 +39,18 @@ $ical = new ICal('ICal.ics', array(
     </ul>
 
     <?php
-        $events = $ical->eventsFromInterval('1 week');
-        if ($events) echo '<h4>Events in the next 7 days:</h4>';
-        $count = 1;
+        $showExample = array(
+            'interval' => true,
+            'range'    => true,
+            'all'      => true,
+        );
+    ?>
+
+    <?php
+        if ($showExample['interval']) {
+            $events = $ical->eventsFromInterval('1 week');
+            if ($events) echo '<h4>Events in the next 7 days:</h4>';
+            $count = 1;
     ?>
     <div class="row">
     <?php
@@ -62,11 +72,13 @@ $ical = new ICal('ICal.ics', array(
     endforeach
     ?>
     </div>
+    <?php } ?>
 
     <?php
-        $events = $ical->eventsFromRange('2017-03-01 12:00:00', '2017-04-31 17:00:00');
-        if ($events) echo '<h4>Events March through April:</h4>';
-        $count = 1;
+        if ($showExample['range']) {
+            $events = $ical->eventsFromRange('2017-03-01 12:00:00', '2017-04-31 17:00:00');
+            if ($events) echo '<h4>Events March through April:</h4>';
+            $count = 1;
     ?>
     <div class="row">
     <?php
@@ -88,10 +100,12 @@ $ical = new ICal('ICal.ics', array(
     endforeach
     ?>
     </div>
+    <?php } ?>
 
     <?php
-        $events = $ical->sortEventsWithOrder($ical->events());
-        if ($events) echo '<h4>All Events:</h4>';
+        if ($showExample['all']) {
+            $events = $ical->sortEventsWithOrder($ical->events());
+            if ($events) echo '<h4>All Events:</h4>';
     ?>
     <div class="row">
     <?php
@@ -114,6 +128,7 @@ $ical = new ICal('ICal.ics', array(
     endforeach
     ?>
     </div>
+    <?php } ?>
 </div>
 </body>
 </html>
