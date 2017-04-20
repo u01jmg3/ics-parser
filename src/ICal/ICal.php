@@ -497,10 +497,10 @@ class ICal
         /**
          * iCal times may be in 3 formats, ref http://www.kanzaki.com/docs/ical/dateTime.html
          * UTC:      Has a trailing 'Z'
-         * Floating: No timezone reference specified, no trailing 'Z', use local time
-         * TZID:     Set timezone as specified
-         * Use DateTime class objects to get around limitations with mktime and gmmktime. Must have a local timezone set
-         * to process floating times.
+         * Floating: No time zone reference specified, no trailing 'Z', use local time
+         * TZID:     Set time zone as specified
+         * Use DateTime class objects to get around limitations with `mktime` and `gmmktime`.
+         * Must have a local time zone set to process floating times.
          */
         $pattern  = '/\AT?Z?I?D?=?(.*):?'; // 1: TimeZone
         $pattern .= '([0-9]{4})';          // 2: YYYY
@@ -544,11 +544,11 @@ class ICal
     }
 
     /**
-     * Return a date adapted to the calendar timezone depending on the event TZID
+     * Return a date adapted to the calendar time zone depending on the event TZID
      *
      * @param  array  $event         An event
      * @param  string $key           An event parameter (DTSTART or DTEND)
-     * @param  string $forceTimeZone Whether to force a timezone even if Zulu time is specified
+     * @param  string $forceTimeZone Whether to force a time zone even if Zulu time is specified
      * @return string Ymd\THis date
      */
     public function iCalDateWithTimeZone(array $event, $key, $forceTimeZone = false)
@@ -778,7 +778,7 @@ class ICal
                         while ($recurringTimestamp <= $until) {
                             $dayRecurringTimestamp = $recurringTimestamp;
 
-                            // Adjust timezone from initial event
+                            // Adjust time zone from initial event
                             $dayRecurringOffset = 0;
                             if ($this->useTimeZoneWithRRules) {
                                 $recurringTimeZone = \DateTime::createFromFormat('U', $dayRecurringTimestamp);
@@ -870,7 +870,7 @@ class ICal
                         while ($weekRecurringTimestamp <= $until) {
                             $dayRecurringTimestamp = $weekRecurringTimestamp;
 
-                            // Adjust timezone from initial event
+                            // Adjust time zone from initial event
                             $dayRecurringOffset = 0;
                             if ($this->useTimeZoneWithRRules) {
                                 $dayRecurringTimeZone = \DateTime::createFromFormat('U', $dayRecurringTimestamp);
@@ -881,7 +881,6 @@ class ICal
 
                             foreach ($weekdays as $day) {
                                 // Check if day should be added
-
                                 if (in_array($day, $byDays) && $dayRecurringTimestamp > $startTimestamp
                                     && $dayRecurringTimestamp <= $until
                                 ) {
@@ -978,7 +977,7 @@ class ICal
                                         );
                                     }
 
-                                    // Adjust timezone from initial event
+                                    // Adjust time zone from initial event
                                     $monthRecurringOffset = 0;
                                     if ($this->useTimeZoneWithRRules) {
                                         $recurringTimeZone = \DateTime::createFromFormat('U', $monthRecurringTimestamp);
@@ -1042,7 +1041,7 @@ class ICal
                             while ($recurringTimestamp <= $until) {
                                 $monthRecurringTimestamp = $recurringTimestamp;
 
-                                // Adjust timezone from initial event
+                                // Adjust time zone from initial event
                                 $monthRecurringOffset = 0;
                                 if ($this->useTimeZoneWithRRules) {
                                     $recurringTimeZone = \DateTime::createFromFormat('U', $monthRecurringTimestamp);
@@ -1145,7 +1144,7 @@ class ICal
                             while ($recurringTimestamp <= $until) {
                                 $yearRecurringTimestamp = $recurringTimestamp;
 
-                                // Adjust timezone from initial event
+                                // Adjust time zone from initial event
                                 $yearRecurringOffset = 0;
                                 if ($this->useTimeZoneWithRRules) {
                                     $recurringTimeZone = \DateTime::createFromFormat('U', $yearRecurringTimestamp);
@@ -1231,7 +1230,7 @@ class ICal
                             while ($recurringTimestamp <= $until) {
                                 $yearRecurringTimestamp = $recurringTimestamp;
 
-                                // Adjust timezone from initial event
+                                // Adjust time zone from initial event
                                 $yearRecurringOffset = 0;
                                 if ($this->useTimeZoneWithRRules) {
                                     $recurringTimeZone = \DateTime::createFromFormat('U', $yearRecurringTimestamp);
@@ -1313,11 +1312,11 @@ class ICal
     }
 
     /**
-     * Processes date conversions using the timezone
+     * Processes date conversions using the time zone
      *
      * Add fields DTSTART_tz and DTEND_tz to each Event
      * These fields contain dates adapted to the calendar
-     * timezone depending on the event TZID
+     * time zone depending on the event TZID.
      *
      * @return mixed
      */
@@ -1397,9 +1396,9 @@ class ICal
     }
 
     /**
-     * Returns the calendar timezone
+     * Returns the calendar time zone
      *
-     * @return calendar timezone
+     * @return calendar time zone
      */
     public function calendarTimeZone()
     {
@@ -1413,7 +1412,7 @@ class ICal
             return $defaultTimeZone;
         }
 
-        // Use default timezone if defined is invalid
+        // Use default time zone if defined is invalid
         if (!$this->isValidTimeZoneId($timeZone)) {
             return $defaultTimeZone;
         }
@@ -1570,9 +1569,9 @@ class ICal
     }
 
     /**
-     * Check if a timezone is valid
+     * Check if a time zone is valid
      *
-     * @param  string $timeZone A timezone
+     * @param  string $timeZone
      * @return boolean
      */
     protected function isValidTimeZoneId($timeZone)

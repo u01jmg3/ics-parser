@@ -41,7 +41,7 @@
 | Name               | Description                                 |
 |--------------------|---------------------------------------------|
 | `DATE_TIME_FORMAT` | Default datetime format to use              |
-| `DEFAULT_TIMEZONE` | Default timezone to use                     |
+| `DEFAULT_TIMEZONE` | Default time zone to use                    |
 | `RECURRENCE_EVENT` | Used to isolate generated recurrence events |
 | `TIME_FORMAT`      | Default time format to use                  |
 | `UNIX_MIN_YEAR`    | Minimum UNIX year to use                    |
@@ -68,7 +68,7 @@
 | `initUrl`                     | `$url`                                          | `protected` | Initialises lines from a URL                                                                                                  |
 | `cleanData`                   | `$data`                                         | `protected` | Replace curly quotes and other special characters with their standard equivalents                                             |
 | `convertDayOrdinalToPositive` | `$dayNumber`, `$weekday`, `$timestamp`          | `protected` | Convert a negative day ordinal to its equivalent positive form                                                                |
-| `isValidTimeZoneId`           | `$timeZone`                                     | `protected` | Check if a timezone is valid                                                                                                  |
+| `isValidTimeZoneId`           | `$timeZone`                                     | `protected` | Check if a time zone is valid                                                                                                 |
 | `mb_str_replace`              | `$search`, `$replace`, `$subject`, `$count = 0` | `protected` | Replace all occurrences of the search string with the replacement string. Multibyte safe.                                     |
 | `numberOfDays`                | `$days`, `$start`, `$end`                       | `protected` | Get the number of days between a start and end date                                                                           |
 | `parseDuration`               | `$date`, `$duration`                            | `protected` | Parse a duration and apply it to a date                                                                                       |
@@ -79,14 +79,14 @@
 | `unfold`                      | `$lines`                                        | `protected` | Unfold an iCal file in preparation for parsing                                                                                |
 | `calendarDescription`         | -                                               | `public`    | Returns the calendar description                                                                                              |
 | `calendarName`                | -                                               | `public`    | Returns the calendar name                                                                                                     |
-| `calendarTimeZone`            | -                                               | `public`    | Returns the calendar timezone                                                                                                 |
+| `calendarTimeZone`            | -                                               | `public`    | Returns the calendar time zone                                                                                                |
 | `events`                      | -                                               | `public`    | Returns an array of Events. Every event is a class with the event details being properties within it.                         |
 | `eventsFromInterval`          | `$interval`                                     | `public`    | Returns a sorted array of the events following a given string, or false if no events exist in the range.                      |
 | `eventsFromRange`             | `$rangeStart = false`, `$rangeEnd = false`      | `public`    | Returns a sorted array of the events in a given range, or an empty array if no events exist in the range.                     |
 | `freeBusyEvents`              | -                                               | `public`    | Returns an array of arrays with all free/busy events. Every event is an associative array and each property is an element it. |
 | `hasEvents`                   | -                                               | `public`    | Returns a boolean value whether the current calendar has events or not                                                        |
 | `iCalDateToUnixTimestamp`     | `$icalDate`                                     | `public`    | Return Unix timestamp from iCal date time format                                                                              |
-| `iCalDateWithTimeZone`        | `$event`, `$key`, `$forceTimeZone`              | `public`    | Return a date adapted to the calendar timezone depending on the event TZID                                                    |
+| `iCalDateWithTimeZone`        | `$event`, `$key`, `$forceTimeZone`              | `public`    | Return a date adapted to the calendar time zone depending on the event TZID                                                   |
 | `isValidDate`                 | `$value`                                        | `public`    | Check if a date string is a valid date                                                                                        |
 | `parseExdates`                | `$event`                                        | `public`    | Parse a list of excluded dates to be applied to an Event                                                                      |
 | `sortEventsWithOrder`         | `$events`, `$sortOrder = SORT_ASC`              | `public`    | Sort events based on a given sort order                                                                                       |
