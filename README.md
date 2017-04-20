@@ -41,7 +41,6 @@
 | Name               | Description                                 |
 |--------------------|---------------------------------------------|
 | `DATE_TIME_FORMAT` | Default datetime format to use              |
-| `DEFAULT_TIMEZONE` | Default time zone to use                    |
 | `RECURRENCE_EVENT` | Used to isolate generated recurrence events |
 | `TIME_FORMAT`      | Default time format to use                  |
 | `UNIX_MIN_YEAR`    | Minimum UNIX year to use                    |
@@ -51,6 +50,7 @@
 | Name                     | Description                                                        | Configurable       | Default Value |
 |--------------------------|--------------------------------------------------------------------|:------------------:|---------------|
 | `$cal`                   | The parsed calendar                                                |         :x:        | N/A           |
+| `$defaultTimeZone`       | Track the default time zone                                        |         :x:        | N/A           |
 | `$eventCount`            | Track the number of events in the current iCal feed                |         :x:        | N/A           |
 | `$freebusyCount`         | Track the free/busy count in the current iCal feed                 |         :x:        | N/A           |
 | `$todoCount`             | Track the number of todos in the current iCal feed                 |         :x:        | N/A           |

@@ -2,7 +2,7 @@
 require_once '../vendor/autoload.php';
 
 use ICal\ICal;
-date_default_timezone_set(ICal::DEFAULT_TIMEZONE);
+date_default_timezone_set('UTC');
 
 $ical = new ICal('ICal.ics', array(
     'defaultSpan'           => 2,     // Default value
