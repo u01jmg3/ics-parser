@@ -76,7 +76,7 @@ class ICal
      *
      * @var array
      */
-    protected $cal;
+    public $cal;
 
     /**
      * Variable to track the previous keyword

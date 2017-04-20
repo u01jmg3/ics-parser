@@ -50,6 +50,7 @@
 
 | Name                     | Description                                                        | Configurable       | Default Value |
 |--------------------------|--------------------------------------------------------------------|:------------------:|---------------|
+| `$cal`                   | The parsed calendar                                                |         :x:        | N/A           |
 | `$eventCount`            | Track the number of events in the current iCal feed                |         :x:        | N/A           |
 | `$freebusyCount`         | Track the free/busy count in the current iCal feed                 |         :x:        | N/A           |
 | `$todoCount`             | Track the number of todos in the current iCal feed                 |         :x:        | N/A           |
