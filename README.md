@@ -11,24 +11,26 @@
 
 ### Requirements
  - PHP 5 (≥ 5.3.0)
+ - Valid ICS (`.ics`, `.ical`, `.ifb`) file
 
 ### Setup
 
  - Install [Composer](http://getcomposer.org)
    - Add the following requirement to `composer.json`
      - :warning: **Note the owner is `johngrogg` and not `u01jmg3`**
+   - If you want to try out newer features then require [`dev-master`](https://getcomposer.org/doc/articles/aliases.md#branch-alias)
 
    ```yaml
    {
        "require": {
-           "johngrogg/ics-parser": "dev-master"
+           "johngrogg/ics-parser": "^2"
        }
    }
    ```
 
 ### How to instantiate the Parser
 
-- Using the example script as a guide, [refer to this code](https://github.com/u01jmg3/ics-parser/blob/master/examples/index.php#L1-L12)
+- Using the example script as a guide, [refer to this code](https://github.com/u01jmg3/ics-parser/blob/master/examples/index.php#L1-L13)
 
 ---
 
