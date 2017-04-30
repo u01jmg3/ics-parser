@@ -6,6 +6,7 @@ date_default_timezone_set('UTC');
 
 $ical = new ICal('ICal.ics', array(
     'defaultSpan'           => 2,     // Default value
+    'defaultTimeZone'       => 'UTC',
     'defaultWeekStart'      => 'MO',  // Default value
     'skipRecurrence'        => false, // Default value
     'useTimeZoneWithRRules' => false, // Default value

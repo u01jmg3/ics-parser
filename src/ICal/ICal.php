@@ -50,6 +50,13 @@ class ICal
     public $defaultSpan = 2;
 
     /**
+     * Customise the default time zone used by the parser
+     *
+     * @var string
+     */
+    public $defaultTimeZone;
+
+    /**
      * The two letter representation of the first day of the week
      *
      * @var string
@@ -90,13 +97,6 @@ class ICal
      * @var string
      */
     protected $lastKeyword;
-
-    /**
-     * Variable to track the default time zone
-     *
-     * @var string
-     */
-    protected $defaultTimeZone;
 
     /**
      * Event recurrence instances that have been altered
@@ -172,6 +172,7 @@ class ICal
      */
     private static $configurableOptions = array(
         'defaultSpan',
+        'defaultTimeZone',
         'defaultWeekStart',
         'skipRecurrence',
         'useTimeZoneWithRRules',
@@ -181,27 +182,12 @@ class ICal
      * Creates the ICal object
      *
      * @param  mixed $filename The path to the iCal file or an array of lines from an iCal file
-     * @return mixed
      * @param  array $options  Default options to be used by the parser
+     * @return void
      */
     public function __construct($filename = false, array $options = array())
     {
-        if (!$filename) {
-            return false;
-        }
-
-        // If PHP is not properly recognising the line endings when reading files either
-        // on or created by a Macintosh computer, enabling the `auto_detect_line_endings`
-        // run-time configuration option may help resolve the problem.
         ini_set('auto_detect_line_endings', '1');
-
-        $this->defaultTimeZone = date_default_timezone_get();
-
-        if (is_array($filename)) {
-            $lines = $filename;
-        } else {
-            $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        }
 
         foreach ($options as $option => $value) {
             if (in_array($option, self::$configurableOptions)) {
@@ -209,7 +195,20 @@ class ICal
             }
         }
 
-        $this->initLines($lines);
+        // Fallback to use the system default time zone
+        if (!isset($this->defaultTimeZone) || !$this->isValidTimeZoneId($this->defaultTimeZone)) {
+            $this->defaultTimeZone = date_default_timezone_get();
+        }
+
+        if (file_exists($filename)) {
+            if (is_array($filename)) {
+                $lines = $filename;
+            } else {
+                $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            }
+
+            $this->initLines($lines);
+        }
     }
 
     /**

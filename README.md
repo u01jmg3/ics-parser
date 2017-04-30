@@ -30,7 +30,7 @@
 
 ### How to instantiate the Parser
 
-- Using the example script as a guide, [refer to this code](https://github.com/u01jmg3/ics-parser/blob/master/examples/index.php#L1-L13)
+- Using the example script as a guide, [refer to this code](https://github.com/u01jmg3/ics-parser/blob/master/examples/index.php#L1-L14)
 
 ---
 
@@ -49,17 +49,17 @@
 
 #### Variables
 
-| Name                     | Description                                                        | Configurable       | Default Value |
-|--------------------------|--------------------------------------------------------------------|:------------------:|---------------|
-| `$cal`                   | The parsed calendar                                                |         :x:        | N/A           |
-| `$defaultTimeZone`       | Track the default time zone                                        |         :x:        | N/A           |
-| `$eventCount`            | Track the number of events in the current iCal feed                |         :x:        | N/A           |
-| `$freeBusyCount`         | Track the free/busy count in the current iCal feed                 |         :x:        | N/A           |
-| `$todoCount`             | Track the number of todos in the current iCal feed                 |         :x:        | N/A           |
-| `$defaultSpan`           | The value in years to use for indefinite, recurring events         | :white_check_mark: | `2`           |
-| `$defaultWeekStart`      | The two letter representation of the first day of the week         | :white_check_mark: | `MO`          |
-| `$skipRecurrence`        | Toggle whether to skip the parsing recurrence rules                | :white_check_mark: | `false`       |
-| `$useTimeZoneWithRRules` | Toggle whether to use time zone info when parsing recurrence rules | :white_check_mark: | `false`       |
+| Name                     | Description                                                        | Configurable       | Default Value  |
+|--------------------------|--------------------------------------------------------------------|:------------------:|----------------|
+| `$cal`                   | The parsed calendar                                                |         :x:        | N/A            |
+| `$eventCount`            | Track the number of events in the current iCal feed                |         :x:        | N/A            |
+| `$freeBusyCount`         | Track the free/busy count in the current iCal feed                 |         :x:        | N/A            |
+| `$todoCount`             | Track the number of todos in the current iCal feed                 |         :x:        | N/A            |
+| `$defaultSpan`           | The value in years to use for indefinite, recurring events         | :white_check_mark: | `2`            |
+| `$defaultTimeZone`       | Customise the default time zone used by the parser                 | :white_check_mark: | System default |
+| `$defaultWeekStart`      | The two letter representation of the first day of the week         | :white_check_mark: | `MO`           |
+| `$skipRecurrence`        | Toggle whether to skip the parsing recurrence rules                | :white_check_mark: | `false`        |
+| `$useTimeZoneWithRRules` | Toggle whether to use time zone info when parsing recurrence rules | :white_check_mark: | `false`        |
 
 #### Functions
 
