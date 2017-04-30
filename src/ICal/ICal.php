@@ -277,7 +277,9 @@ class ICal
                     switch ($line) {
                         // http://www.kanzaki.com/docs/ical/vtodo.html
                         case 'BEGIN:VTODO':
-                            $this->todoCount++;
+                            if (!is_array($value)) {
+                                $this->todoCount++;
+                            }
                             $component = 'VTODO';
                         break;
 
@@ -291,7 +293,9 @@ class ICal
 
                         // http://www.kanzaki.com/docs/ical/vfreebusy.html
                         case 'BEGIN:VFREEBUSY':
-                            $this->freeBusyIndex++;
+                            if (!is_array($value)) {
+                                $this->freeBusyIndex++;
+                            }
                             $component = 'VFREEBUSY';
                         break;
 
