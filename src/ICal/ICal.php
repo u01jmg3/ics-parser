@@ -159,13 +159,25 @@ class ICal
     );
 
     /**
+     * Define which variables can be configured
+     *
+     * @var array
+     */
+    private static $configurableOptions = array(
+        'defaultSpan',
+        'defaultWeekStart',
+        'skipRecurrence',
+        'useTimeZoneWithRRules',
+    );
+
+    /**
      * Creates the ICal object
      *
      * @param  mixed $filename The path to the iCal file or an array of lines from an iCal file
-     * @param  array $settings Default settings to apply
      * @return mixed
+     * @param  array $options  Default options to be used by the parser
      */
-    public function __construct($filename = false, array $settings = array())
+    public function __construct($filename = false, array $options = array())
     {
         if (!$filename) {
             return false;
@@ -184,9 +196,9 @@ class ICal
             $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         }
 
-        foreach ($settings as $setting => $value) {
-            if (in_array($setting, array('defaultSpan', 'defaultWeekStart', 'skipRecurrence', 'useTimeZoneWithRRules'))) {
-                $this->{$setting} = $value;
+        foreach ($options as $option => $value) {
+            if (in_array($option, self::$configurableOptions)) {
+                $this->{$option} = $value;
             }
         }
 
@@ -194,46 +206,29 @@ class ICal
     }
 
     /**
-     * Unfold an iCal file in preparation for parsing
-     * https://icalendar.org/iCalendar-RFC-5545/3-1-content-lines.html
-     *
-     * @param  array $lines The contents of the iCal string to unfold
-     * @return string
-     */
-    protected function unfold(array $lines)
-    {
-        $string = implode(PHP_EOL, $lines);
-        $string = preg_replace('/' . PHP_EOL . '[ \t]/', '', $string);
-        $lines  = explode(PHP_EOL, $string);
-
-        return $lines;
-    }
-
-    /**
      * Initialises lines from a string
      *
      * @param  string $string The contents of the iCal file to initialise
-     * @return ICal
+     * @return void
      */
     public function initString($string)
     {
         $lines = explode(PHP_EOL, $string);
 
-        return $this->initLines($lines);
+        $this->initLines($lines);
     }
 
     /**
      * Initialises lines from a URL
      *
      * @param  string $url The url of the iCal file to download and initialise
-     * @return ICal
+     * @return void
      */
     public function initUrl($url)
     {
         $contents = file_get_contents($url);
-        $lines    = explode(PHP_EOL, $contents);
 
-        return $this->initLines($lines);
+        $this->initString($contents);
     }
 
     /**
@@ -327,6 +322,22 @@ class ICal
 
             $this->processDateConversions();
         }
+    }
+
+    /**
+     * Unfold an iCal file in preparation for parsing
+     * https://icalendar.org/iCalendar-RFC-5545/3-1-content-lines.html
+     *
+     * @param  array $lines The contents of the iCal string to unfold
+     * @return string
+     */
+    protected function unfold(array $lines)
+    {
+        $string = implode(PHP_EOL, $lines);
+        $string = preg_replace('/' . PHP_EOL . '[ \t]/', '', $string);
+        $lines  = explode(PHP_EOL, $string);
+
+        return $lines;
     }
 
     /**
