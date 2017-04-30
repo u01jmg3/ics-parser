@@ -33,7 +33,7 @@ class ICal
      *
      * @var integer
      */
-    public $freebusyCount = 0;
+    public $freeBusyCount = 0;
 
     /**
      * Track the number of todos in the current iCal feed
@@ -76,6 +76,13 @@ class ICal
      * @var array
      */
     public $cal;
+
+    /**
+     * Track the VFREEBUSY component
+     *
+     * @var integer
+     */
+    protected $freeBusyIndex = 0;
 
     /**
      * Variable to track the previous keyword
@@ -284,7 +291,7 @@ class ICal
 
                         // http://www.kanzaki.com/docs/ical/vfreebusy.html
                         case 'BEGIN:VFREEBUSY':
-                            $this->freebusyCount++;
+                            $this->freeBusyIndex++;
                             $component = 'VFREEBUSY';
                         break;
 
@@ -396,7 +403,21 @@ class ICal
             break;
 
             case 'VFREEBUSY':
-                $this->cal[$component][$this->freebusyCount - 1][$keyword] = $value;
+                if ($keyword === 'FREEBUSY') {
+                    if (is_array($value)) {
+                        $this->cal[$component][$this->freeBusyIndex - 1][$keyword][][] = $value;
+                    } else {
+                        $this->freeBusyCount++;
+
+                        end($this->cal[$component][$this->freeBusyIndex - 1][$keyword]);
+                        $key = key($this->cal[$component][$this->freeBusyIndex - 1][$keyword]);
+
+                        $value = explode('/', $value);
+                        $this->cal[$component][$this->freeBusyIndex - 1][$keyword][$key][] = $value;
+                    }
+                } else {
+                    $this->cal[$component][$this->freeBusyIndex - 1][$keyword][] = $value;
+                }
             break;
 
             default:

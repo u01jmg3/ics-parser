@@ -29,7 +29,7 @@ $ical = new ICal('ICal.ics', array(
             The number of events
         </li>
         <li class="list-group-item">
-            <span class="badge"><?php echo $ical->freebusyCount ?></span>
+            <span class="badge"><?php echo $ical->freeBusyCount ?></span>
             The number of free/busy time slots
         </li>
         <li class="list-group-item">
