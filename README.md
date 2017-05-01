@@ -40,12 +40,13 @@
 
 #### Constants
 
-| Name               | Description                                 |
-|--------------------|---------------------------------------------|
-| `DATE_TIME_FORMAT` | Default datetime format to use              |
-| `RECURRENCE_EVENT` | Used to isolate generated recurrence events |
-| `TIME_FORMAT`      | Default time format to use                  |
-| `UNIX_MIN_YEAR`    | Minimum UNIX year to use                    |
+| Name                | Description                                 |
+|---------------------|---------------------------------------------|
+| `DATE_TIME_FORMAT`  | Default datetime format to use              |
+| `RECURRENCE_EVENT`  | Used to isolate generated recurrence events |
+| `SECONDS_IN_A_WEEK` | Integer of the number of seconds in a week  |
+| `TIME_FORMAT`       | Default time format to use                  |
+| `UNIX_MIN_YEAR`     | Minimum UNIX year to use                    |
 
 #### Variables
 

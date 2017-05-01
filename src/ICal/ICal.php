@@ -16,10 +16,11 @@ use ICal\Event;
 
 class ICal
 {
-    const DATE_TIME_FORMAT = 'Ymd\THis';
-    const RECURRENCE_EVENT = 'Generated recurrence event';
-    const TIME_FORMAT      = 'His';
-    const UNIX_MIN_YEAR    = 1970;
+    const DATE_TIME_FORMAT  = 'Ymd\THis';
+    const RECURRENCE_EVENT  = 'Generated recurrence event';
+    const SECONDS_IN_A_WEEK = 604800;
+    const TIME_FORMAT       = 'His';
+    const UNIX_MIN_YEAR     = 1970;
 
     /**
      * Track the number of events in the current iCal feed
@@ -131,6 +132,18 @@ class ICal
         'TH' => 'thursday',
         'FR' => 'friday',
         'SA' => 'saturday',
+    );
+
+    /**
+     * An associative array containing week conversion data
+     * (UK = SU, Europe = MO)
+     *
+     * @var array
+     */
+    protected $weeks = array(
+        'SA' => array('SA', 'SU', 'MO', 'TU', 'WE', 'TH', 'FR'),
+        'SU' => array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'),
+        'MO' => array('MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'),
     );
 
     /**
@@ -492,7 +505,7 @@ class ICal
                     // Match semicolon separator outside of quoted substrings
                     preg_match_all('~[^' . PHP_EOL . '";]+(?:"[^"\\\]*(?:\\\.[^"\\\]*)*"[^' . PHP_EOL . '";]*)*~', $property, $attributes);
                     // Remove multi-dimensional array and use the first key
-                    $attributes = (sizeof($attributes) == 0) ? array($property) : reset($attributes);
+                    $attributes = (sizeof($attributes) === 0) ? array($property) : reset($attributes);
 
                     if (is_array($attributes)) {
                         foreach ($attributes as $attribute) {
@@ -503,7 +516,7 @@ class ICal
                                 $values
                             );
                             // Remove multi-dimensional array and use the first key
-                            $value = (sizeof($values) == 0) ? null : reset($values);
+                            $value = (sizeof($values) === 0) ? null : reset($values);
 
                             if (is_array($value) && isset($value[1])) {
                                 // Remove double quotes from beginning and end only
@@ -878,15 +891,8 @@ class ICal
                         // Create offset
                         $offset = "+{$interval} week";
 
-                        // Use RRULE['WKST'] setting or a default week start (UK = SU, Europe = MO)
-                        $weeks = array(
-                            'SA' => array('SA', 'SU', 'MO', 'TU', 'WE', 'TH', 'FR'),
-                            'SU' => array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'),
-                            'MO' => array('MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'),
-                        );
-
                         $wkst  = (isset($rrules['WKST']) && in_array($rrules['WKST'], array('SA', 'SU', 'MO'))) ? $rrules['WKST'] : $this->defaultWeekStart;
-                        $aWeek = $weeks[$wkst];
+                        $aWeek = $this->weeks[$wkst];
                         $days  = array('SA' => 'Saturday', 'SU' => 'Sunday', 'MO' => 'Monday');
 
                         // Build list of days of week to add events
@@ -1158,7 +1164,7 @@ class ICal
                                         }
                                     }
 
-                                    $eventStartTimestamp += 7 * 86400;
+                                    $eventStartTimestamp += self::SECONDS_IN_A_WEEK;
                                 } while ($eventStartTimestamp <= $lastDayTimestamp);
 
                                 // Move forwards
@@ -1254,7 +1260,7 @@ class ICal
                                             }
                                         }
 
-                                        $eventStartTimestamp += 7 * 86400;
+                                        $eventStartTimestamp += self::SECONDS_IN_A_WEEK;
                                     } while ($eventStartTimestamp <= $lastDayTimestamp);
                                 }
 
@@ -1664,7 +1670,7 @@ class ICal
     protected function numberOfDays($days, $start, $end)
     {
         $w       = array(date('w', $start), date('w', $end));
-        $oneWeek = 604800; // 7 * 24 * 60 * 60
+        $oneWeek = self::SECONDS_IN_A_WEEK;
         $x       = floor(($end - $start) / $oneWeek);
         $sum     = 0;
 
@@ -1702,7 +1708,7 @@ class ICal
         $end       = strtotime('last day of '  . $timestamp->format('F Y H:i:s'));
 
         // Used with pow(2, X) so pow(2, 4) is THURSDAY
-        $weekdays = array('SU' => 0, 'MO' => 1, 'TU' => 2, 'WE' => 3, 'TH' => 4, 'FR' => 5, 'SA' => 6);
+        $weekdays = array_flip(array_keys($this->weekdays));
 
         $numberOfDays = $this->numberOfDays(pow(2, $weekdays[$weekday]), $start, $end);
 

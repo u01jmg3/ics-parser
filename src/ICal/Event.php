@@ -174,8 +174,7 @@ class Event
             'ATTENDEE(S)'   => $this->attendee,
         );
 
-        $data   = array_map('trim', $data); // Trim all values
-        $data   = array_filter($data);      // Remove any blank values
+        $data   = array_filter($data); // Remove any blank values
         $output = '';
 
         foreach ($data as $key => $value) {
