@@ -2,7 +2,6 @@
 require_once '../vendor/autoload.php';
 
 use ICal\ICal;
-date_default_timezone_set('UTC');
 
 $ical = new ICal('ICal.ics', array(
     'defaultSpan'           => 2,     // Default value
@@ -19,9 +18,9 @@ $ical = new ICal('ICal.ics', array(
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <title>PHP ICS Parser example</title>
-    <style>.caption { overflow-x: auto }</style>
+    <style>body { background-color: #eee } .caption { overflow-x: auto }</style>
 </head>
-<body style="background-color: #eee">
+<body>
 <div class="container-fluid">
     <h3>PHP ICS Parser example</h3>
     <ul class="list-group">
