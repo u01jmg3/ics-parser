@@ -1,7 +1,7 @@
 <?php
 /**
- * This PHP class will read an iCal file (*.ics), parse it and return an
- * array with its content.
+ * This PHP class will read an ICS (`.ics`, `.ical`, `.ifb`) file, parse it and return an
+ * array of its contents.
  *
  * PHP 5 (≥ 5.3.0)
  *
@@ -181,7 +181,7 @@ class ICal
     /**
      * Creates the ICal object
      *
-     * @param  mixed $filename The path to the iCal file or an array of lines from an iCal file
+     * @param  mixed $filename The path to the ICS file or an array of lines from an ICS file
      * @param  array $options  Default options to be used by the parser
      * @return void
      */
@@ -214,7 +214,7 @@ class ICal
     /**
      * Initialises lines from a string
      *
-     * @param  string $string The contents of the iCal file to initialise
+     * @param  string $string The contents of the ICS file to initialise
      * @return void
      */
     public function initString($string)
@@ -227,7 +227,7 @@ class ICal
     /**
      * Initialises lines from a URL
      *
-     * @param  string $url The url of the iCal file to download and initialise
+     * @param  string $url The url of the ICS file to download and initialise
      * @return void
      */
     public function initUrl($url)
@@ -335,7 +335,7 @@ class ICal
     }
 
     /**
-     * Unfold an iCal file in preparation for parsing
+     * Unfold an ICS file in preparation for parsing
      * https://icalendar.org/iCalendar-RFC-5545/3-1-content-lines.html
      *
      * @param  array $lines The contents of the iCal string to unfold
@@ -351,7 +351,7 @@ class ICal
     }
 
     /**
-     * Add to $this->ical array one value and key.
+     * Add to `$this->ical` array one value and key.
      *
      * @param  string         $component This could be VTODO, VEVENT, VCALENDAR, ...
      * @param  string|boolean $keyword   The keyword, for example DTSTART
@@ -538,14 +538,14 @@ class ICal
     public function iCalDateToUnixTimestamp($icalDate)
     {
         /**
-         * iCal times may be in 3 formats, ref http://www.kanzaki.com/docs/ical/dateTime.html
+         * iCal times may be in 3 formats, (http://www.kanzaki.com/docs/ical/dateTime.html)
          * UTC:      Has a trailing 'Z'
          * Floating: No time zone reference specified, no trailing 'Z', use local time
          * TZID:     Set time zone as specified
          * Use DateTime class objects to get around limitations with `mktime` and `gmmktime`.
          * Must have a local time zone set to process floating times.
          */
-        $pattern  = '/\AT?Z?I?D?=?(.*):?'; // 1: TimeZone
+        $pattern  = '/\AT?Z?I?D?=?(.*):?'; // 1: Time zone
         $pattern .= '([0-9]{4})';          // 2: YYYY
         $pattern .= '([0-9]{2})';          // 3: MM
         $pattern .= '([0-9]{2})';          // 4: DD
@@ -618,7 +618,7 @@ class ICal
         if (isset($dateArray[0]['TZID']) && preg_match('/[a-z]*\/[a-z_]*/i', $dateArray[0]['TZID'])) {
             $tzid = $dateArray[0]['TZID'];
 
-            // TimeZone attached to the date is valid
+            // Time zone attached to the date is valid
             // and has been applied so return
             if ($this->isValidTimeZoneId($tzid)) {
                 return $dateTime->format(self::DATE_TIME_FORMAT);
@@ -735,16 +735,12 @@ class ICal
                 }
                 $eventTimestampOffset = $endTimestamp - $startTimestamp;
                 // Get Interval
-                $interval = (isset($rrules['INTERVAL']) && $rrules['INTERVAL'] !== '')
-                    ? $rrules['INTERVAL']
-                    : 1;
+                $interval = (isset($rrules['INTERVAL']) && $rrules['INTERVAL'] !== '') ? $rrules['INTERVAL'] : 1;
 
                 $dayNumber = null;
                 $weekday   = null;
 
-                if (in_array($frequency, array('MONTHLY', 'YEARLY'))
-                    && isset($rrules['BYDAY']) && $rrules['BYDAY'] !== ''
-                ) {
+                if (in_array($frequency, array('MONTHLY', 'YEARLY')) && isset($rrules['BYDAY']) && $rrules['BYDAY'] !== '') {
                     // Deal with BYDAY
                     $byDay     = $rrules['BYDAY'];
                     $dayNumber = intval($byDay);
@@ -764,7 +760,7 @@ class ICal
                 $untilDefault->modify($this->defaultSpan . ' year');
                 $untilDefault->setTime(23, 59, 59); // End of the day
 
-                // Compute exdates
+                // Compute EXDATEs
                 $exdates = $this->parseExdates($anEvent);
 
                 if (isset($rrules['UNTIL'])) {
@@ -782,6 +778,7 @@ class ICal
                     if ($interval >= 2) {
                         $count += ($count > 0) ? ($count * $interval) : 0;
                     }
+
                     $countNb = 1;
                     $offset = "+{$count} " . $this->frequencyConversion[$frequency];
                     $until = strtotime($offset, $startTimestamp);
@@ -797,12 +794,10 @@ class ICal
                             $dtstart->modify($offset);
                         }
 
-                        /**
-                         * Jumping X months forwards doesn't mean
-                         * the end date will fall on the same day defined in BYDAY
-                         * Use the largest of these to ensure we are going far enough
-                         * in the future to capture our final end day
-                         */
+                        // Jumping X months forwards doesn't mean
+                        // the end date will fall on the same day defined in BYDAY
+                        // Use the largest of these to ensure we are going far enough
+                        // in the future to capture our final end day
                         $until = max($until, $dtstart->format('U'));
                     }
 
@@ -1401,7 +1396,7 @@ class ICal
      * Returns an array of Events. Every event is a class
      * with the event details being properties within it.
      *
-     * @return array of Events
+     * @return array
      */
     public function events()
     {
@@ -1431,7 +1426,7 @@ class ICal
     /**
      * Returns the calendar description
      *
-     * @return calendar description
+     * @return string
      */
     public function calendarDescription()
     {
@@ -1441,7 +1436,7 @@ class ICal
     /**
      * Returns the calendar time zone
      *
-     * @return calendar time zone
+     * @return string
      */
     public function calendarTimeZone()
     {
@@ -1470,6 +1465,7 @@ class ICal
     public function freeBusyEvents()
     {
         $array = $this->cal;
+
         return isset($array['VFREEBUSY']) ? $array['VFREEBUSY'] : '';
     }
 
@@ -1493,7 +1489,7 @@ class ICal
      * If a start date is not specified or of a valid format, then the start
      * of the range will default to the current time and date of the server.
      *
-     * If an end date is not specified or of a valid format, the the end of
+     * If an end date is not specified or of a valid format, then the end of
      * the range will default to the current time and date of the server,
      * plus 20 years.
      *
@@ -1503,7 +1499,7 @@ class ICal
      *
      * @param  string $rangeStart Start date of the search range.
      * @param  string $rangeEnd   End date of the search range.
-     * @return array of Events
+     * @return array
      */
     public function eventsFromRange($rangeStart = false, $rangeEnd = false)
     {
@@ -1566,6 +1562,7 @@ class ICal
         if (empty($extendedEvents)) {
             return array();
         }
+
         return $extendedEvents;
     }
 
@@ -1574,7 +1571,7 @@ class ICal
      * or false if no events exist in the range.
      *
      * @param  string $interval
-     * @return array of Events
+     * @return array
      */
     public function eventsFromInterval($interval)
     {
@@ -1592,16 +1589,16 @@ class ICal
      *
      * @param  array   $events    An array of Events
      * @param  integer $sortOrder Either SORT_ASC, SORT_DESC, SORT_REGULAR, SORT_NUMERIC, SORT_STRING
-     * @return sorted array of Events
+     * @return array
      */
     public function sortEventsWithOrder(array $events, $sortOrder = SORT_ASC)
     {
         $extendedEvents = array();
-        $timestamp = array();
+        $timestamp      = array();
 
         foreach ($events as $key => $anEvent) {
             $extendedEvents[] = $anEvent;
-            $timestamp[$key] = $anEvent->dtstart_array[2];
+            $timestamp[$key]  = $anEvent->dtstart_array[2];
         }
 
         array_multisort($timestamp, $sortOrder, $extendedEvents);
@@ -1640,7 +1637,7 @@ class ICal
      *
      * @param  string $date     A date to add a duration to
      * @param  string $duration A duration to parse
-     * @return integer Unix timestamp
+     * @return integer
      */
     protected function parseDuration($date, $duration)
     {
@@ -1701,8 +1698,8 @@ class ICal
         }
 
         $timestamp = (is_object($timestamp)) ? $timestamp : \DateTime::createFromFormat('U', $timestamp);
-        $start = strtotime('first day of ' . $timestamp->format('F Y H:i:s'));
-        $end   = strtotime('last day of ' . $timestamp->format('F Y H:i:s'));
+        $start     = strtotime('first day of ' . $timestamp->format('F Y H:i:s'));
+        $end       = strtotime('last day of '  . $timestamp->format('F Y H:i:s'));
 
         // Used with pow(2, X) so pow(2, 4) is THURSDAY
         $weekdays = array('SU' => 0, 'MO' => 1, 'TU' => 2, 'WE' => 3, 'TH' => 4, 'FR' => 5, 'SA' => 6);
@@ -1712,7 +1709,7 @@ class ICal
         // Create subset
         $dayOrdinals = array_slice($dayOrdinals, 0, $numberOfDays, true);
 
-        //Reverse only the values
+        // Reverse only the values
         $dayOrdinals = array_combine(array_keys($dayOrdinals), array_reverse(array_values($dayOrdinals)));
 
         return $dayOrdinals[$dayNumber * -1];

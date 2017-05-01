@@ -149,7 +149,7 @@ class Event
      * Return Event data excluding anything blank
      * within an HTML template
      *
-     * @param string $html HTML template to use
+     * @param  string $html HTML template to use
      * @return string
      */
     public function printData($html = '<p>%s: %s</p>')
