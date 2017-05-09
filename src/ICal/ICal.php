@@ -213,14 +213,16 @@ class ICal
             $this->defaultTimeZone = date_default_timezone_get();
         }
 
-        if (file_exists($filename)) {
-            if (is_array($filename)) {
-                $lines = $filename;
-            } else {
+        if($filename !== false){
+            if(is_array($filename)){
+                foreach($filename as $file){
+                    $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                    $this->initLines($lines);
+                }
+            }else if(file_exists($filename)){
                 $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                $this->initLines($lines);
             }
-
-            $this->initLines($lines);
         }
     }
 
