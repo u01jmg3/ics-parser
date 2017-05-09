@@ -66,6 +66,7 @@
 
 | Function                      | Parameter(s)                                    | Visibility  | Description                                                                                                                   |
 |-------------------------------|-------------------------------------------------|-------------|-------------------------------------------------------------------------------------------------------------------------------|
+| `__construct`                 | `$files = false`, `$options = array()`          | `public`    | Creates the ICal object                                                                                                       |
 | `initLines`                   | `$lines`                                        | `protected` | Initialises lines from a file                                                                                                 |
 | `initString`                  | `$string`                                       | `protected` | Initialises lines from a string                                                                                               |
 | `initUrl`                     | `$url`                                          | `protected` | Initialises lines from a URL                                                                                                  |
@@ -102,6 +103,7 @@
 
 | Function      | Parameter(s)              | Description                                                        |
 |---------------|---------------------------|--------------------------------------------------------------------|
+| `__construct` | `$data = array()`         | Creates the Event object                                           |
 | `prepareDate` | `$value`                  | Prepares the data for output                                       |
 | `printData`   | `$html = '<p>%s: %s</p>'` | Return Event data excluding anything blank within an HTML template |
 

@@ -194,11 +194,11 @@ class ICal
     /**
      * Creates the ICal object
      *
-     * @param  mixed $filename The path to the ICS file or an array of lines from an ICS file
-     * @param  array $options  Default options to be used by the parser
+     * @param  mixed $files   The path to each ICS file to parse
+     * @param  array $options Default options to be used by the parser
      * @return void
      */
-    public function __construct($filename = false, array $options = array())
+    public function __construct($files = false, array $options = array())
     {
         ini_set('auto_detect_line_endings', '1');
 
@@ -213,14 +213,11 @@ class ICal
             $this->defaultTimeZone = date_default_timezone_get();
         }
 
-        if($filename !== false){
-            if(is_array($filename)){
-                foreach($filename as $file){
-                    $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-                    $this->initLines($lines);
-                }
-            }else if(file_exists($filename)){
-                $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if ($files !== false) {
+            $files = is_array($files) ? $files : array($files);
+
+            foreach ($files as $file) {
+                $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
                 $this->initLines($lines);
             }
         }
@@ -802,6 +799,11 @@ class ICal
                         && isset($rrules['BYDAY']) && $rrules['BYDAY'] !== ''
                     ) {
                         $dtstart = date_create($anEvent['DTSTART']);
+
+                        if (!$dtstart) {
+                            continue;
+                        }
+
                         for ($i = 1; $i <= $count; $i++) {
                             $dtstartClone = clone $dtstart;
                             $dtstartClone->modify('next ' . $this->frequencyConversion[$frequency]);
