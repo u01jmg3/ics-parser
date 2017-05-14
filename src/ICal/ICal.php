@@ -1168,6 +1168,12 @@ class ICal
                                         }
                                     }
 
+                                    if ($dayNumber > 1) {
+                                        // BYSETPOS is defined so skip
+                                        // looping through each week
+                                        $lastDayTimestamp = $eventStartTimestamp;
+                                    }
+
                                     $eventStartTimestamp += self::SECONDS_IN_A_WEEK;
                                 } while ($eventStartTimestamp <= $lastDayTimestamp);
 
