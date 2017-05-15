@@ -217,7 +217,12 @@ class ICal
             $files = is_array($files) ? $files : array($files);
 
             foreach ($files as $file) {
-                $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                if (file_exists($file)) {
+                    $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                } else {
+                    $lines = is_array($file) ? $file : array($file);
+                }
+
                 $this->initLines($lines);
             }
         }
