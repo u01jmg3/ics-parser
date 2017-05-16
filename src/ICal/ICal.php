@@ -1173,7 +1173,7 @@ class ICal
                                         }
                                     }
 
-                                    if ($dayNumber > 1) {
+                                    if (isset($rrules['BYSETPOS'])) {
                                         // BYSETPOS is defined so skip
                                         // looping through each week
                                         $lastDayTimestamp = $eventStartTimestamp;
