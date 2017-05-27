@@ -1104,15 +1104,15 @@ class ICal
                                 }
 
                                 $eventStartDesc = "{$this->convertDayOrdinalToPositive($dayNumber, $weekday, $monthRecurringTimestamp)} {$this->weekdays[$weekday]} of "
-                                    . gmdate('F Y H:i:s', $monthRecurringTimestamp);
+                                    . date('F Y H:i:s', $monthRecurringTimestamp);
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
                                 if (intval($rrules['BYDAY']) === 0) {
                                     $lastDayDesc = "last {$this->weekdays[$weekday]} of "
-                                        . gmdate('F Y H:i:s', $monthRecurringTimestamp);
+                                        . date('F Y H:i:s', $monthRecurringTimestamp);
                                 } else {
                                     $lastDayDesc = "{$this->convertDayOrdinalToPositive($dayNumber, $weekday, $monthRecurringTimestamp)} {$this->weekdays[$weekday]} of "
-                                        . gmdate('F Y H:i:s', $monthRecurringTimestamp);
+                                        . date('F Y H:i:s', $monthRecurringTimestamp);
                                 }
                                 $lastDayTimestamp = strtotime($lastDayDesc);
 
