@@ -15,6 +15,7 @@ namespace ICal;
 class ICal
 {
     const DATE_TIME_FORMAT  = 'Ymd\THis';
+    const FILE_FLAGS        = FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES;
     const RECURRENCE_EVENT  = 'Generated recurrence event';
     const SECONDS_IN_A_WEEK = 604800;
     const TIME_FORMAT       = 'His';
@@ -81,7 +82,7 @@ class ICal
      *
      * @var array
      */
-    public $cal;
+    public $cal = array();
 
     /**
      * Track the VFREEBUSY component
@@ -192,7 +193,8 @@ class ICal
     /**
      * Creates the ICal object
      *
-     * @param  mixed $files   The path to each ICS file to parse
+     * @param  mixed $files   The path or URL to each ICS file to parse
+     *                        or iCal content provided as an array
      * @param  array $options Default options to be used by the parser
      * @return void
      */
@@ -215,8 +217,8 @@ class ICal
             $files = is_array($files) ? $files : array($files);
 
             foreach ($files as $file) {
-                if (file_exists($file)) {
-                    $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                if (file_exists($file) || filter_var($file, FILTER_VALIDATE_URL)) {
+                    $lines = file($file, self::FILE_FLAGS);
                 } else {
                     $lines = is_array($file) ? $file : array($file);
                 }
@@ -234,9 +236,34 @@ class ICal
      */
     public function initString($string)
     {
-        $lines = explode(PHP_EOL, $string);
+        if (empty($this->cal)) {
+            $lines = explode(PHP_EOL, $string);
 
-        $this->initLines($lines);
+            $this->initLines($lines);
+        } else {
+            trigger_error('ICal::initString: Calendar already initialised in constructor', E_USER_NOTICE);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Initialises lines from a file
+     *
+     * @param  string $file The file path or URL of the ICS to use
+     * @return ICal
+     */
+    public function initFile($file)
+    {
+        if (empty($this->cal)) {
+            if (!$lines = file($file, self::FILE_FLAGS)) {
+                trigger_error("ICal::initFile: Invalid file path or URL passed ({$file})", E_USER_ERROR);
+            }
+
+            $this->initLines($lines);
+        } else {
+            trigger_error('ICal::initFile: Calendar already initialised in constructor', E_USER_NOTICE);
+        }
 
         return $this;
     }
@@ -244,20 +271,19 @@ class ICal
     /**
      * Initialises lines from a URL
      *
-     * @param  string $url The url of the ICS file to download and initialise
+     * @param  string $url The url of the ICS file to download and initialise from
      * @return ICal
      */
     public function initUrl($url)
     {
-        $contents = file_get_contents($url);
-
-        $this->initString($contents);
+        $this->initFile($url);
 
         return $this;
     }
 
     /**
-     * Initialises lines from a file
+     * Initialises the parser using an array
+     * containing each line of iCal content
      *
      * @param  array $lines The lines to initialise
      * @return void

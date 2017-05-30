@@ -10,6 +10,8 @@ $ical = new ICal(array('ICal.ics'), array(
     'skipRecurrence'        => false, // Default value
     'useTimeZoneWithRRules' => false, // Default value
 ));
+// $ical->initFile('ICal.ics');
+// $ical->initUrl('https://raw.githubusercontent.com/u01jmg3/ics-parser/master/examples/ICal.ics');
 ?>
 <!DOCTYPE html>
 <html lang="en">

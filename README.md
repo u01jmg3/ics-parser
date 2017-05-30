@@ -43,6 +43,7 @@
 | Name                | Description                                 |
 |---------------------|---------------------------------------------|
 | `DATE_TIME_FORMAT`  | Default datetime format to use              |
+| `FILE_FLAGS`        | Optional file parameter flags to use        |
 | `RECURRENCE_EVENT`  | Used to isolate generated recurrence events |
 | `SECONDS_IN_A_WEEK` | Integer of the number of seconds in a week  |
 | `TIME_FORMAT`       | Default time format to use                  |
@@ -67,7 +68,8 @@
 | Function                      | Parameter(s)                                    | Visibility  | Description                                                                                                                   |
 |-------------------------------|-------------------------------------------------|-------------|-------------------------------------------------------------------------------------------------------------------------------|
 | `__construct`                 | `$files = false`, `$options = array()`          | `public`    | Creates the ICal object                                                                                                       |
-| `initLines`                   | `$lines`                                        | `protected` | Initialises lines from a file                                                                                                 |
+| `initFile`                    | `$file`                                         | `protected` | Initialises lines from a file                                                                                                 |
+| `initLines`                   | `$lines`                                        | `protected` | Initialises the parser using an array containing each line of iCal content                                                    |
 | `initString`                  | `$string`                                       | `protected` | Initialises lines from a string                                                                                               |
 | `initUrl`                     | `$url`                                          | `protected` | Initialises lines from a URL                                                                                                  |
 | `cleanData`                   | `$data`                                         | `protected` | Replace curly quotes and other special characters with their standard equivalents                                             |
