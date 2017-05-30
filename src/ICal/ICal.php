@@ -219,6 +219,10 @@ class ICal
             foreach ($files as $file) {
                 if (file_exists($file) || filter_var($file, FILTER_VALIDATE_URL)) {
                     $lines = file($file, self::FILE_FLAGS);
+
+                    if ($lines === false) {
+                        throw new \ErrorException("The file path or URL '{$file}' does not exist.");
+                    }
                 } else {
                     $lines = is_array($file) ? $file : array($file);
                 }
@@ -257,7 +261,7 @@ class ICal
     {
         if (empty($this->cal)) {
             if (!$lines = file($file, self::FILE_FLAGS)) {
-                trigger_error("ICal::initFile: Invalid file path or URL passed ({$file})", E_USER_ERROR);
+                throw new \ErrorException("The file path or URL '{$file}' does not exist.");
             }
 
             $this->initLines($lines);

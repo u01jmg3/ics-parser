@@ -3,15 +3,19 @@ require_once '../vendor/autoload.php';
 
 use ICal\ICal;
 
-$ical = new ICal(array('ICal.ics'), array(
-    'defaultSpan'           => 2,     // Default value
-    'defaultTimeZone'       => 'UTC',
-    'defaultWeekStart'      => 'MO',  // Default value
-    'skipRecurrence'        => false, // Default value
-    'useTimeZoneWithRRules' => false, // Default value
-));
-// $ical->initFile('ICal.ics');
-// $ical->initUrl('https://raw.githubusercontent.com/u01jmg3/ics-parser/master/examples/ICal.ics');
+try {
+    $ical = new ICal('ICal.ics', array(
+        'defaultSpan'           => 2,     // Default value
+        'defaultTimeZone'       => 'UTC',
+        'defaultWeekStart'      => 'MO',  // Default value
+        'skipRecurrence'        => false, // Default value
+        'useTimeZoneWithRRules' => false, // Default value
+    ));
+    // $ical->initFile('ICal.ics');
+    // $ical->initUrl('https://raw.githubusercontent.com/u01jmg3/ics-parser/master/examples/ICal.ics');
+} catch (\ErrorException $e) {
+    die($e);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
