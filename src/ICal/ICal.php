@@ -217,12 +217,8 @@ class ICal
             $files = is_array($files) ? $files : array($files);
 
             foreach ($files as $file) {
-                if (file_exists($file) || filter_var($file, FILTER_VALIDATE_URL)) {
-                    $lines = file($file, self::FILE_FLAGS);
-
-                    if ($lines === false) {
-                        throw new \ErrorException("The file path or URL '{$file}' does not exist.");
-                    }
+                if ($this->isFileOrUrl($file)) {
+                    $lines = $this->fileOrUrl($file);
                 } else {
                     $lines = is_array($file) ? $file : array($file);
                 }
@@ -260,9 +256,7 @@ class ICal
     public function initFile($file)
     {
         if (empty($this->cal)) {
-            if (!$lines = file($file, self::FILE_FLAGS)) {
-                throw new \ErrorException("The file path or URL '{$file}' does not exist.");
-            }
+            $lines = $this->fileOrUrl($file);
 
             $this->initLines($lines);
         } else {
@@ -1907,5 +1901,32 @@ class ICal
         } catch (\Exception $e) {
             return false;
         }
+    }
+
+    /**
+     * Check if filename exists as a file or URL
+     *
+     * @param  string $filename
+     * @return boolean
+     */
+    protected function isFileOrUrl($filename)
+    {
+        return (file_exists($filename) || filter_var($filename, FILTER_VALIDATE_URL)) ?: false;
+    }
+
+    /**
+     * Reads an entire file or URL into an array
+     *
+     * @param  string $filename
+     * @return array
+     * @throws Exception
+     */
+    protected function fileOrUrl($filename)
+    {
+        if (!$lines = file($filename, self::FILE_FLAGS)) {
+            throw new \Exception("The file path or URL '{$filename}' does not exist.");
+        }
+
+        return $lines;
     }
 }

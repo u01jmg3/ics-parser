@@ -13,7 +13,7 @@ try {
     ));
     // $ical->initFile('ICal.ics');
     // $ical->initUrl('https://raw.githubusercontent.com/u01jmg3/ics-parser/master/examples/ICal.ics');
-} catch (\ErrorException $e) {
+} catch (\Exception $e) {
     die($e);
 }
 ?>
