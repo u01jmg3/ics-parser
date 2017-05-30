@@ -230,26 +230,30 @@ class ICal
      * Initialises lines from a string
      *
      * @param  string $string The contents of the ICS file to initialise
-     * @return void
+     * @return ICal
      */
     public function initString($string)
     {
         $lines = explode(PHP_EOL, $string);
 
         $this->initLines($lines);
+
+        return $this;
     }
 
     /**
      * Initialises lines from a URL
      *
      * @param  string $url The url of the ICS file to download and initialise
-     * @return void
+     * @return ICal
      */
     public function initUrl($url)
     {
         $contents = file_get_contents($url);
 
         $this->initString($contents);
+
+        return $this;
     }
 
     /**
