@@ -15,7 +15,6 @@ namespace ICal;
 class ICal
 {
     const DATE_TIME_FORMAT  = 'Ymd\THis';
-    const FILE_FLAGS        = FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES;
     const RECURRENCE_EVENT  = 'Generated recurrence event';
     const SECONDS_IN_A_WEEK = 604800;
     const TIME_FORMAT       = 'His';
@@ -1929,7 +1928,7 @@ class ICal
      */
     protected function fileOrUrl($filename)
     {
-        if (!$lines = file($filename, self::FILE_FLAGS)) {
+        if (!$lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)) {
             throw new \Exception("The file path or URL '{$filename}' does not exist.");
         }
 

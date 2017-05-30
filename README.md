@@ -30,7 +30,7 @@
 
 ### How to instantiate the Parser
 
-- Using the example script as a guide, [refer to this code](https://github.com/u01jmg3/ics-parser/blob/master/examples/index.php#L1-L13)
+- Using the example script as a guide, [refer to this code](https://github.com/u01jmg3/ics-parser/blob/master/examples/index.php#L1-L19)
 
 ---
 
@@ -43,7 +43,6 @@
 | Name                | Description                                 |
 |---------------------|---------------------------------------------|
 | `DATE_TIME_FORMAT`  | Default datetime format to use              |
-| `FILE_FLAGS`        | Optional file parameter flags to use        |
 | `RECURRENCE_EVENT`  | Used to isolate generated recurrence events |
 | `SECONDS_IN_A_WEEK` | Integer of the number of seconds in a week  |
 | `TIME_FORMAT`       | Default time format to use                  |
