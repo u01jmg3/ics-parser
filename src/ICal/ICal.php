@@ -394,7 +394,7 @@ class ICal
     }
 
     /**
-     * Add to `$this->ical` array one value and key.
+     * Add to `$this->ical` array one value and key
      *
      * @param  string         $component This could be VTODO, VEVENT, VCALENDAR, ...
      * @param  string|boolean $keyword   The keyword, for example DTSTART
@@ -475,7 +475,7 @@ class ICal
     }
 
     /**
-     * Get the key-value pair from an iCal string.
+     * Get the key-value pair from an iCal string
      *
      * @param  string $text
      * @return array
@@ -634,7 +634,8 @@ class ICal
     }
 
     /**
-     * Return a date adapted to the calendar time zone depending on the event TZID
+     * Return a date adapted to the calendar
+     * time zone depending on the event TZID
      *
      * @param  array  $event         An event
      * @param  string $key           An event parameter (DTSTART or DTEND)
@@ -1444,8 +1445,9 @@ class ICal
     }
 
     /**
-     * Returns an array of Events. Every event is a class
-     * with the event details being properties within it.
+     * Returns an array of Events.
+     * Every event is a class with the event
+     * details being properties within it.
      *
      * @return array
      */
@@ -1508,8 +1510,9 @@ class ICal
     }
 
     /**
-     * Returns an array of arrays with all free/busy events. Every event is
-     * an associative array and each property is an element it.
+     * Returns an array of arrays with all free/busy events.
+     * Every event is an associative array and each property
+     * is an element it.
      *
      * @return array
      */
@@ -1521,7 +1524,8 @@ class ICal
     }
 
     /**
-     * Returns a boolean value whether the current calendar has events or not
+     * Returns a boolean value whether the
+     * current calendar has events or not
      *
      * @return boolean
      */
@@ -1551,6 +1555,7 @@ class ICal
      * @param  string $rangeStart Start date of the search range.
      * @param  string $rangeEnd   End date of the search range.
      * @return array
+     * @throws Exception
      */
     public function eventsFromRange($rangeStart = false, $rangeEnd = false)
     {
@@ -1812,7 +1817,7 @@ class ICal
 
     /**
      * Replace curly quotes and other special characters
-     * with their standard equivalents.
+     * with their standard equivalents
      *
      * @param  string $data
      * @return string
@@ -1887,6 +1892,7 @@ class ICal
      *
      * @param  string $value
      * @return boolean
+     * @throws Exception
      */
     public function isValidDate($value)
     {
