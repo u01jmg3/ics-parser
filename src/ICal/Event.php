@@ -8,6 +8,8 @@ namespace ICal;
 
 class Event
 {
+    const TIMEZONE_TEMPLATE = 'TZID=%s:';
+
     /**
      * http://www.kanzaki.com/docs/ical/summary.html
      *
@@ -114,18 +116,30 @@ class Event
     public $attendee;
 
     /**
+     * The ICal instance
+     *
+     * @var ICal
+     */
+    public $ical;
+
+    /**
      * Creates the Event object
      *
+     * @param  ICal  $ical
      * @param  array $data
      * @return void
      */
-    public function __construct(array $data = array())
+    public function __construct($ical, array $data = array())
     {
+        $this->ical = $ical;
+
         if (!empty($data)) {
             foreach ($data as $key => $value) {
                 $variable = self::snakeCase($key);
                 $this->{$variable} = self::prepareData($value);
             }
+
+            $this->updateEventTimeZoneString();
         }
     }
 
@@ -199,5 +213,30 @@ class Event
         $input = str_replace($separator, $glue, $input);
 
         return strtolower($input);
+    }
+
+    /**
+     * Extend `{DTSTART|DTEND|RECURRENCE-ID}_array` to include
+     * `TZID=Timezone:YYYYMMDD[T]HHMMSS` of each event
+     *
+     * @return void
+     */
+    protected function updateEventTimeZoneString()
+    {
+        $eventTimeZoneStringIndex = 3;
+        $calendarTimeZone = $this->ical->calendarTimeZone(true);
+
+        $dtStartTimeZone = (isset($this->dtstart_array[0]['TZID'])) ? $this->dtstart_array[0]['TZID'] : $calendarTimeZone;
+        $this->dtstart_array[$eventTimeZoneStringIndex] = ((is_null($dtStartTimeZone)) ? '' : sprintf(self::TIMEZONE_TEMPLATE, $dtStartTimeZone)) . $this->dtstart_array[1];
+
+        if (isset($this->dtend_array)) {
+            $dtEndTimeZone = (isset($this->dtend_array[0]['TZID'])) ? $this->dtend_array[0]['TZID'] : $calendarTimeZone;
+            $this->dtend_array[$eventTimeZoneStringIndex] = ((is_null($dtEndTimeZone)) ? '' : sprintf(self::TIMEZONE_TEMPLATE, $dtEndTimeZone)) . $this->dtend_array[1];
+        }
+
+        if (isset($this->recurrence_id_array)) {
+            $recurrenceIdTimeZone = (isset($this->recurrence_id_array[0]['TZID'])) ? $this->recurrence_id_array[0]['TZID'] : $calendarTimeZone;
+            $this->recurrence_id_array[$eventTimeZoneStringIndex] = ((is_null($recurrenceIdTimeZone)) ? '' : sprintf(self::TIMEZONE_TEMPLATE, $recurrenceIdTimeZone)) . $this->recurrence_id_array[1];
+        }
     }
 }
