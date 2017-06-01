@@ -72,7 +72,7 @@ try {
                 </div>
             </div>
         </div>
-        <?php if ($count > 1 && $count % 3 === 0) { echo '<div class="clearfix visible-md-block"></div>'; } ?>
+        <?php if ($count > 1 && $count % 3 === 0) { echo '</div><div class="row">'; } ?>
         <?php $count++; ?>
     <?php
     endforeach
@@ -100,7 +100,7 @@ try {
                 </div>
             </div>
         </div>
-        <?php if ($count > 1 && $count % 3 === 0) { echo '<div class="clearfix visible-md-block"></div>'; } ?>
+        <?php if ($count > 1 && $count % 3 === 0) { echo '</div><div class="row">'; } ?>
         <?php $count++; ?>
     <?php
     endforeach
@@ -128,7 +128,7 @@ try {
                 </div>
             </div>
         </div>
-        <?php if ($count > 1 && $count % 3 === 0) { echo '<div class="clearfix visible-md-block"></div>'; } ?>
+        <?php if ($count > 1 && $count % 3 === 0) { echo '</div><div class="row">'; } ?>
         <?php $count++; ?>
     <?php
     endforeach
