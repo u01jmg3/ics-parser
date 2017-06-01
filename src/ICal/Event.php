@@ -123,7 +123,7 @@ class Event
     {
         if (!empty($data)) {
             foreach ($data as $key => $value) {
-                $variable = lcfirst(str_replace(' ', '', ucwords(str_replace('-', ' ', strtolower($key)))));
+                $variable = self::snakeCase($key);
                 $this->{$variable} = self::prepareData($value);
             }
         }
@@ -182,5 +182,22 @@ class Event
         }
 
         return $output;
+    }
+
+    /**
+     * Convert the given input to snake_case
+     *
+     * @param  string $input
+     * @param  string $glue
+     * @param  string $separator
+     * @return string
+     */
+    protected static function snakeCase($input, $glue = '_', $separator = '-')
+    {
+        $input = preg_split('/(?<=[a-z])(?=[A-Z])/x', $input);
+        $input = join($input, $glue);
+        $input = str_replace($separator, $glue, $input);
+
+        return strtolower($input);
     }
 }

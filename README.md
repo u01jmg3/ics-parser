@@ -104,11 +104,12 @@
 
 #### Functions
 
-| Function      | Parameter(s)              | Description                                                        |
-|---------------|---------------------------|--------------------------------------------------------------------|
-| `__construct` | `$data = array()`         | Creates the Event object                                           |
-| `prepareDate` | `$value`                  | Prepares the data for output                                       |
-| `printData`   | `$html = '<p>%s: %s</p>'` | Return Event data excluding anything blank within an HTML template |
+| Function      | Parameter(s)                                | Description                                                        |
+|---------------|---------------------------------------------|--------------------------------------------------------------------|
+| `__construct` | `$data = array()`                           | Creates the Event object                                           |
+| `prepareDate` | `$value`                                    | Prepares the data for output                                       |
+| `printData`   | `$html = '<p>%s: %s</p>'`                   | Return Event data excluding anything blank within an HTML template |
+| `snakeCase`   | `$input`, `$glue = '_'`, `$separator = '-'` | Convert the given input to snake_case                              |
 
 ---
 
