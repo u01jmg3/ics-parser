@@ -1478,7 +1478,7 @@ class ICal
 
         if (!empty($array)) {
             foreach ($array as $event) {
-                $events[] = new Event($this, $event);
+                $events[] = new Event($event);
             }
         }
 

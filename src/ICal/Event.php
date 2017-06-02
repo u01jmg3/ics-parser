@@ -6,7 +6,7 @@
 
 namespace ICal;
 
-class Event
+class Event extends ICal
 {
     const TIMEZONE_TEMPLATE = 'TZID=%s:';
 
@@ -116,23 +116,13 @@ class Event
     public $attendee;
 
     /**
-     * The ICal instance
-     *
-     * @var ICal
-     */
-    public $ical;
-
-    /**
      * Creates the Event object
      *
-     * @param  ICal  $ical
      * @param  array $data
      * @return void
      */
-    public function __construct($ical, array $data = array())
+    public function __construct(array $data = array())
     {
-        $this->ical = $ical;
-
         if (!empty($data)) {
             foreach ($data as $key => $value) {
                 $variable = self::snakeCase($key);
@@ -225,7 +215,7 @@ class Event
     protected function updateEventTimeZoneString()
     {
         $eventTimeZoneStringIndex = 3;
-        $calendarTimeZone = $this->ical->calendarTimeZone(true);
+        $calendarTimeZone = $this->calendarTimeZone(true);
 
         $dtStartTimeZone = (isset($this->dtstart_array[0]['TZID'])) ? $this->dtstart_array[0]['TZID'] : $calendarTimeZone;
         $this->dtstart_array[$eventTimeZoneStringIndex] = ((is_null($dtStartTimeZone)) ? '' : sprintf(self::TIMEZONE_TEMPLATE, $dtStartTimeZone)) . $this->dtstart_array[1];
