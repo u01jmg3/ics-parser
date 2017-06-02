@@ -62,9 +62,9 @@
 | `$skipRecurrence`        | Toggle whether to skip the parsing recurrence rules                | :white_check_mark: | `false`        |
 | `$useTimeZoneWithRRules` | Toggle whether to use time zone info when parsing recurrence rules | :white_check_mark: | `false`        |
 
-#### Functions
+#### Methods
 
-| Function                      | Parameter(s)                                               | Visibility  | Description                                                                                                                   |
+| Method                        | Parameter(s)                                               | Visibility  | Description                                                                                                                   |
 |-------------------------------|------------------------------------------------------------|-------------|-------------------------------------------------------------------------------------------------------------------------------|
 | `__construct`                 | `$files = false`, `$options = array()`                     | `public`    | Creates the ICal object                                                                                                       |
 | `initFile`                    | `$file`                                                    | `protected` | Initialises lines from a file                                                                                                 |
@@ -108,15 +108,15 @@
 |---------------------|---------------------------------------------------------------|
 | `TIMEZONE_TEMPLATE` | `sprintf` template for use with `updateEventTimeZoneString()` |
 
-#### Functions
+#### Methods
 
-| Function                    | Parameter(s)                                | Description                                                                                             |
-|-----------------------------|---------------------------------------------|---------------------------------------------------------------------------------------------------------|
-| `__construct`               | `$ical`, `$data = array()`                  | Creates the Event object                                                                                |
-| `prepareDate`               | `$value`                                    | Prepares the data for output                                                                            |
-| `printData`                 | `$html = '<p>%s: %s</p>'`                   | Return Event data excluding anything blank within an HTML template                                      |
-| `snakeCase`                 | `$input`, `$glue = '_'`, `$separator = '-'` | Convert the given input to snake_case                                                                   |
-| `updateEventTimeZoneString` |                                             | Extend `{DTSTART|DTEND|RECURRENCE-ID}_array` to include `TZID=Timezone:YYYYMMDD[T]HHMMSS` of each event |
+| Method                      | Parameter(s)                                | Visibility  | Description                                                                                             |
+|-----------------------------|---------------------------------------------|-------------|---------------------------------------------------------------------------------------------------------|
+| `__construct`               | `$data = array()`                           | `public`    | Creates the Event object                                                                                |
+| `printData`                 | `$html = '<p>%s: %s</p>'`                   | `public`    | Return Event data excluding anything blank within an HTML template                                      |
+| `prepareData`               | `$value`                                    | `protected` | Prepares the data for output                                                                            |
+| `snakeCase`                 | `$input`, `$glue = '_'`, `$separator = '-'` | `protected` | Convert the given input to snake_case                                                                   |
+| `updateEventTimeZoneString` |                                             | `protected` | Extend `{DTSTART|DTEND|RECURRENCE-ID}_array` to include `TZID=Timezone:YYYYMMDD[T]HHMMSS` of each event |
 
 ---
 
