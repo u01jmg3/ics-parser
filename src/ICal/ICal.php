@@ -572,10 +572,10 @@ class ICal
     /**
      * Return Unix timestamp from iCal date time format
      *
-     * @param  string  $icalDate A Date in the format YYYYMMDD[T]HHMMSS[Z] or
-     *                           YYYYMMDD[T]HHMMSS or
-     *                           TZID=Timezone:YYYYMMDD[T]HHMMSS
-     * @param  boolean $forceTimeZone
+     * @param  string  $icalDate      A Date in the format YYYYMMDD[T]HHMMSS[Z] or
+     *                                YYYYMMDD[T]HHMMSS or
+     *                                TZID=Timezone:YYYYMMDD[T]HHMMSS
+     * @param  boolean $forceTimeZone Whether to force the time zone; the event's or the default
      * @return integer
      */
     public function iCalDateToUnixTimestamp($icalDate, $forceTimeZone = false)
@@ -665,10 +665,12 @@ class ICal
         if (isset($dateArray[0]['TZID']) && preg_match('/[a-z]*\/[a-z_]*/i', $dateArray[0]['TZID'])) {
             $tzid = $dateArray[0]['TZID'];
 
-            // Time zone attached to the date is valid
-            // and has been applied so return
             if ($this->isValidTimeZoneId($tzid)) {
-                return $dateTime->format(self::DATE_TIME_FORMAT);
+                if ($forceTimeZone) {
+                    $timeZone = $tzid;
+                } else {
+                    return $dateTime->format(self::DATE_TIME_FORMAT);
+                }
             }
         }
 
