@@ -576,7 +576,7 @@ class ICal
      *                                YYYYMMDD[T]HHMMSS or
      *                                TZID=Timezone:YYYYMMDD[T]HHMMSS
      * @param  boolean $forceTimeZone Whether to force the time zone; the event's or the default
-     * @param  boolean $forceUtc
+     * @param  boolean $forceUtc      Whether to force the time zone as UTC
      * @return integer
      */
     public function iCalDateToUnixTimestamp($icalDate, $forceTimeZone = false, $forceUtc = false)
