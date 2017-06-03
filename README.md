@@ -40,13 +40,14 @@
 
 #### Constants
 
-| Name                | Description                                 |
-|---------------------|---------------------------------------------|
-| `DATE_TIME_FORMAT`  | Default datetime format to use              |
-| `RECURRENCE_EVENT`  | Used to isolate generated recurrence events |
-| `SECONDS_IN_A_WEEK` | Integer of the number of seconds in a week  |
-| `TIME_FORMAT`       | Default time format to use                  |
-| `UNIX_MIN_YEAR`     | Minimum Unix year to use                    |
+| Name                      | Description                                   |
+|---------------------------|-----------------------------------------------|
+| `DATE_TIME_FORMAT`        | Default date time format to use               |
+| `ICAL_DATE_TIME_TEMPLATE` | String template to generate an iCal date time |
+| `RECURRENCE_EVENT`        | Used to isolate generated recurrence events   |
+| `SECONDS_IN_A_WEEK`       | The number of seconds in a week               |
+| `TIME_FORMAT`             | Default time format to use                    |
+| `UNIX_MIN_YEAR`           | The year Unix time began                      |
 
 #### Variables
 
@@ -80,6 +81,7 @@
 | `numberOfDays`                | `$days`, `$start`, `$end`                                  | `protected` | Get the number of days between a start and end date                                                                           |
 | `parseDuration`               | `$date`, `$duration`, `$format = 'U'`                      | `protected` | Parse a duration and apply it to a date                                                                                       |
 | `processDateConversions`      | -                                                          | `protected` | Add fields `DTSTART_tz` and `DTEND_tz` to each Event                                                                          |
+| `processEventIcalDate`        | `$event`, `$index = 3`                                     | `protected` | Extend `{DTSTART|DTEND|RECURRENCE-ID}_array` to include an iCal date time for each event                                      |
 | `processEvents`               | -                                                          | `protected` | Performs some admin tasks on all events as taken straight from the ics file.                                                  |
 | `processRecurrences`          | -                                                          | `protected` | Processes recurrence rules                                                                                                    |
 | `removeUnprintableChars`      | `$data`                                                    | `protected` | Remove unprintable ASCII and UTF-8 characters                                                                                 |
@@ -101,23 +103,20 @@
 
 ---
 
-### `Event` API
+### `Event` API (extends `ICal` API)
 
 #### Constants
 
-| Name                | Description                                                   |
-|---------------------|---------------------------------------------------------------|
-| `TIMEZONE_TEMPLATE` | `sprintf` template for use with `updateEventTimeZoneString()` |
+- None
 
 #### Methods
 
-| Method                      | Parameter(s)                                | Visibility  | Description                                                                                             |
-|-----------------------------|---------------------------------------------|-------------|---------------------------------------------------------------------------------------------------------|
-| `__construct`               | `$data = array()`                           | `public`    | Creates the Event object                                                                                |
-| `printData`                 | `$html = '<p>%s: %s</p>'`                   | `public`    | Return Event data excluding anything blank within an HTML template                                      |
-| `prepareData`               | `$value`                                    | `protected` | Prepares the data for output                                                                            |
-| `snakeCase`                 | `$input`, `$glue = '_'`, `$separator = '-'` | `protected` | Convert the given input to snake_case                                                                   |
-| `updateEventTimeZoneString` |                                             | `protected` | Extend `{DTSTART|DTEND|RECURRENCE-ID}_array` to include `TZID=Timezone:YYYYMMDD[T]HHMMSS` of each event |
+| Method        | Parameter(s)                                | Visibility  | Description                                                        |
+|---------------|---------------------------------------------|-------------|--------------------------------------------------------------------|
+| `__construct` | `$data = array()`                           | `public`    | Creates the Event object                                           |
+| `printData`   | `$html = '<p>%s: %s</p>'`                   | `public`    | Return Event data excluding anything blank within an HTML template |
+| `prepareData` | `$value`                                    | `protected` | Prepares the data for output                                       |
+| `snakeCase`   | `$input`, `$glue = '_'`, `$separator = '-'` | `protected` | Convert the given input to snake_case                              |
 
 ---
 

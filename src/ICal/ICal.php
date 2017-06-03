@@ -14,11 +14,12 @@ namespace ICal;
 
 class ICal
 {
-    const DATE_TIME_FORMAT  = 'Ymd\THis';
-    const RECURRENCE_EVENT  = 'Generated recurrence event';
-    const SECONDS_IN_A_WEEK = 604800;
-    const TIME_FORMAT       = 'His';
-    const UNIX_MIN_YEAR     = 1970;
+    const DATE_TIME_FORMAT        = 'Ymd\THis';
+    const TIME_FORMAT             = 'His';
+    const SECONDS_IN_A_WEEK       = 604800;
+    const UNIX_MIN_YEAR           = 1970;
+    const ICAL_DATE_TIME_TEMPLATE = 'TZID=%s:';
+    const RECURRENCE_EVENT        = 'Generated recurrence event';
 
     /**
      * Track the number of events in the current iCal feed
@@ -910,6 +911,7 @@ class ICal
                             }
 
                             if (!$isExcluded) {
+                                $anEvent  = $this->processEventIcalDateTime($anEvent);
                                 $events[] = $anEvent;
                                 $this->eventCount++;
 
@@ -1003,6 +1005,7 @@ class ICal
                                     }
 
                                     if (!$isExcluded) {
+                                        $anEvent  = $this->processEventIcalDateTime($anEvent);
                                         $events[] = $anEvent;
                                         $this->eventCount++;
 
@@ -1111,6 +1114,7 @@ class ICal
                                     }
 
                                     if (!$isExcluded) {
+                                        $anEvent  = $this->processEventIcalDateTime($anEvent);
                                         $events[] = $anEvent;
                                         $this->eventCount++;
 
@@ -1195,6 +1199,7 @@ class ICal
                                         }
 
                                         if (!$isExcluded) {
+                                            $anEvent  = $this->processEventIcalDateTime($anEvent);
                                             $events[] = $anEvent;
                                             $this->eventCount++;
 
@@ -1300,6 +1305,7 @@ class ICal
                                             }
 
                                             if (!$isExcluded) {
+                                                $anEvent  = $this->processEventIcalDateTime($anEvent);
                                                 $events[] = $anEvent;
                                                 $this->eventCount++;
 
@@ -1383,6 +1389,7 @@ class ICal
                                         }
 
                                         if (!$isExcluded) {
+                                            $anEvent  = $this->processEventIcalDateTime($anEvent);
                                             $events[] = $anEvent;
                                             $this->eventCount++;
 
@@ -1453,6 +1460,28 @@ class ICal
         }
 
         $this->cal['VEVENT'] = $events;
+    }
+
+    /**
+     * Extend `{DTSTART|DTEND|RECURRENCE-ID}_array` to include an
+     * an iCal date time (`TZID=Timezone:YYYYMMDD[T]HHMMSS`) for each event
+     *
+     * @param  array   $event
+     * @param  integer $index
+     * @return array
+     */
+    protected function processEventIcalDateTime(array $event, $index = 3)
+    {
+        $calendarTimeZone = $this->calendarTimeZone(true);
+
+        foreach (array('DTSTART', 'DTEND', 'RECURRENCE-ID') as $type) {
+            if (isset($event["{$type}_array"])) {
+                $timeZone = (isset($event["{$type}_array"][0]['TZID'])) ? $event["{$type}_array"][0]['TZID'] : $calendarTimeZone;
+                $event["{$type}_array"][$index] = ((is_null($timeZone)) ? '' : sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone)) . $event["{$type}_array"][1];
+            }
+        }
+
+        return $event;
     }
 
     /**
