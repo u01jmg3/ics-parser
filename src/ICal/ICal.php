@@ -1165,6 +1165,11 @@ class ICal
                                     $compareCurrentMonth = date('F', $monthRecurringTimestamp);
                                     $compareEventMonth   = date('F', $eventStartTimestamp);
 
+                                    if ($compareCurrentMonth !== $compareEventMonth) {
+                                        $monthRecurringTimestamp = strtotime($offset, $monthRecurringTimestamp);
+                                        continue;
+                                    }
+
                                     if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
                                         $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . ($isAllDayEvent || ($initialStartTimeZoneName === 'Z') ? 'Z' : '');
                                         $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
