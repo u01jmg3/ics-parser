@@ -67,8 +67,7 @@ $forceTimeZone = false;
             <div class="thumbnail">
                 <div class="caption">
                     <h3><?php
-                        $unix    = $ical->iCalDateToUnixTimestamp($event->dtstart_array[3], $forceTimeZone);
-                        $dtstart = new \DateTime('@' . (int) $unix);
+                        $dtstart = $ical->iCalDateToDateTime($event->dtstart_array[3], $forceTimeZone);
                         echo $event->summary . ' (' . $dtstart->format('d-m-Y H:i') . ')';
                     ?></h3>
                     <?php echo $event->printData() ?>
@@ -96,8 +95,7 @@ $forceTimeZone = false;
             <div class="thumbnail">
                 <div class="caption">
                     <h3><?php
-                        $unix    = $ical->iCalDateToUnixTimestamp($event->dtstart_array[3], $forceTimeZone);
-                        $dtstart = new \DateTime('@' . (int) $unix);
+                        $dtstart = $ical->iCalDateToDateTime($event->dtstart_array[3], $forceTimeZone);
                         echo $event->summary . ' (' . $dtstart->format('d-m-Y H:i') . ')';
                     ?></h3>
                     <?php echo $event->printData() ?>
@@ -125,8 +123,7 @@ $forceTimeZone = false;
             <div class="thumbnail">
                 <div class="caption">
                     <h3><?php
-                        $unix    = $ical->iCalDateToUnixTimestamp($event->dtstart_array[3], $forceTimeZone);
-                        $dtstart = new \DateTime('@' . (int) $unix);
+                        $dtstart = $ical->iCalDateToDateTime($event->dtstart_array[3], $forceTimeZone);
                         echo $event->summary . ' (' . $dtstart->format('d-m-Y H:i') . ')';
                     ?></h3>
                     <?php echo $event->printData() ?>

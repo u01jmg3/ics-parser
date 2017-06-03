@@ -570,16 +570,16 @@ class ICal
     }
 
     /**
-     * Return Unix timestamp from iCal date time format
+     * Return a DateTime object from an iCal date time format
      *
      * @param  string  $icalDate      A Date in the format YYYYMMDD[T]HHMMSS[Z],
      *                                YYYYMMDD[T]HHMMSS or
      *                                TZID={Time Zone}:YYYYMMDD[T]HHMMSS
      * @param  boolean $forceTimeZone Whether to force the time zone; the event's or the default
      * @param  boolean $forceUtc      Whether to force the time zone as UTC
-     * @return integer
+     * @return DateTime
      */
-    public function iCalDateToUnixTimestamp($icalDate, $forceTimeZone = false, $forceUtc = false)
+    public function iCalDateToDateTime($icalDate, $forceTimeZone = false, $forceUtc = false)
     {
         /**
          * iCal times may be in 3 formats, (http://www.kanzaki.com/docs/ical/dateTime.html)
@@ -604,38 +604,56 @@ class ICal
         preg_match($pattern, $icalDate, $date);
 
         if (empty($date)) {
-            return $icalDate;
-        }
-
-        if (isset($date[1])) {
-            $eventTimeZone = rtrim($date[1], ':');
-        }
-
-        // Unix timestamp can't represent dates before 1970
-        if ($date[2] <= self::UNIX_MIN_YEAR) {
-            $date = new \DateTime($icalDate, new \DateTimeZone($this->defaultTimeZone));
-
-            return date_timestamp_get($date);
-        }
-
-        if ($forceTimeZone) {
-            if ($date[8] === 'Z') {
-                $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
-            } elseif (isset($eventTimeZone) && $this->isValidTimeZoneId($eventTimeZone)) {
-                $dateTime = new \DateTime('now', new \DateTimeZone($eventTimeZone));
-            } else {
-                $dateTime = new \DateTime('now', new \DateTimeZone($this->defaultTimeZone));
-            }
+            // Default to the initial
+            $dateTime = $icalDate;
         } else {
-            $dateTime = new \DateTime('now');
+            // A Unix timestamp cannot represent a date prior to 1 Jan 1970
+            $year = $date[2];
+            if ($year <= self::UNIX_MIN_YEAR) {
+                $dateTime = new \DateTime($icalDate, new \DateTimeZone($this->defaultTimeZone));
+            } else {
+                if ($forceTimeZone) {
+                    // TZID={Time Zone}:
+                    if (isset($date[1])) {
+                        $eventTimeZone = rtrim($date[1], ':');
+                    }
+
+                    if ($date[8] === 'Z') {
+                        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+                    } elseif (isset($eventTimeZone) && $this->isValidTimeZoneId($eventTimeZone)) {
+                        $dateTime = new \DateTime('now', new \DateTimeZone($eventTimeZone));
+                    } else {
+                        $dateTime = new \DateTime('now', new \DateTimeZone($this->defaultTimeZone));
+                    }
+                } else {
+                    $dateTime = new \DateTime('now');
+                }
+
+                $dateTime->setDate((int) $date[2], (int) $date[3], (int) $date[4]);
+                $dateTime->setTime((int) $date[5], (int) $date[6], (int) $date[7]);
+            }
+
+            if ($forceUtc) {
+                $dateTime->setTimezone(new \DateTimeZone('UTC'));
+            }
         }
 
-        $dateTime->setDate((int) $date[2], (int) $date[3], (int) $date[4]);
-        $dateTime->setTime((int) $date[5], (int) $date[6], (int) $date[7]);
+        return $dateTime;
+    }
 
-        if ($forceUtc) {
-            $dateTime->setTimezone(new \DateTimeZone('UTC'));
-        }
+    /**
+     * Return a Unix timestamp from an iCal date time format
+     *
+     * @param  string  $icalDate      A Date in the format YYYYMMDD[T]HHMMSS[Z],
+     *                                YYYYMMDD[T]HHMMSS or
+     *                                TZID={Time Zone}:YYYYMMDD[T]HHMMSS
+     * @param  boolean $forceTimeZone Whether to force the time zone; the event's or the default
+     * @param  boolean $forceUtc      Whether to force the time zone as UTC
+     * @return integer
+     */
+    public function iCalDateToUnixTimestamp($icalDate, $forceTimeZone = false, $forceUtc = false)
+    {
+        $dateTime = $this->iCalDateToDateTime($icalDate, $forceTimeZone, $forceUtc);
 
         return $dateTime->getTimestamp();
     }
@@ -651,8 +669,6 @@ class ICal
      */
     public function iCalDateWithTimeZone(array $event, $key, $forceTimeZone = false)
     {
-        $offset = 0;
-
         if (!isset($event[$key . '_array']) || !isset($event[$key])) {
             return false;
         }
@@ -661,39 +677,10 @@ class ICal
         $date      = $event[$key];
 
         if ($key === 'DURATION') {
-            $duration  = end($dateArray);
-            $timestamp = $this->parseDuration($event['DTSTART'], $duration);
-            $dateTime  = \DateTime::createFromFormat('U', $timestamp);
-            $date      = $dateTime->format(self::DATE_TIME_FORMAT);
+            $duration = end($dateArray);
+            $dateTime = $this->parseDuration($event['DTSTART'], $duration, null);
         } else {
-            $dateTime = new \DateTime($date, new \DateTimeZone($this->defaultTimeZone));
-        }
-
-        $timeZone = $this->calendarTimeZone();
-        if (isset($dateArray[0]['TZID']) && preg_match('/[a-z]*\/[a-z_]*/i', $dateArray[0]['TZID'])) {
-            $tzid = $dateArray[0]['TZID'];
-
-            if ($this->isValidTimeZoneId($tzid)) {
-                if ($forceTimeZone) {
-                    $timeZone = $tzid;
-                } else {
-                    return $dateTime->format(self::DATE_TIME_FORMAT);
-                }
-            }
-        }
-
-        if (!$forceTimeZone && substr($date, -1) === 'Z') {
-            $tz     = new \DateTimeZone($this->defaultTimeZone);
-            $offset = timezone_offset_get($tz, $dateTime);
-        } else {
-            $tz     = new \DateTimeZone($timeZone);
-            $offset = timezone_offset_get($tz, $dateTime);
-        }
-
-        if ($offset < 0) {
-            $dateTime->sub(new \DateInterval('PT' . ($offset * -1) . 'S'));
-        } else {
-            $dateTime->add(new \DateInterval('PT' . $offset . 'S'));
+            $dateTime = $this->iCalDateToDateTime($dateArray[3], true);
         }
 
         return $dateTime->format(self::DATE_TIME_FORMAT);
@@ -1578,7 +1565,7 @@ class ICal
      * plus 20 years.
      *
      * Note that this function makes use of Unix timestamps. This might be a
-     * problem for events on, during, or after January the 29th, 2038.
+     * problem for events on, during, or after 29 Jan 2038.
      * See http://en.wikipedia.org/wiki/Unix_time#Representing_the_number
      *
      * @param  string $rangeStart Start date of the search range.
@@ -1722,19 +1709,30 @@ class ICal
      *
      * @param  string $date     A date to add a duration to
      * @param  string $duration A duration to parse
-     * @return integer
+     * @param  string $format   The format to apply to the DateTime object
+     * @return integer|DateTime
      */
-    protected function parseDuration($date, $duration)
+    protected function parseDuration($date, $duration, $format = 'U')
     {
-        $timestamp = date_create($date);
-        $timestamp->modify($duration->y . ' year');
-        $timestamp->modify($duration->m . ' month');
-        $timestamp->modify($duration->d . ' day');
-        $timestamp->modify($duration->h . ' hour');
-        $timestamp->modify($duration->i . ' minute');
-        $timestamp->modify($duration->s . ' second');
+        $dateTime = date_create($date);
+        $dateTime->modify($duration->y . ' year');
+        $dateTime->modify($duration->m . ' month');
+        $dateTime->modify($duration->d . ' day');
+        $dateTime->modify($duration->h . ' hour');
+        $dateTime->modify($duration->i . ' minute');
+        $dateTime->modify($duration->s . ' second');
 
-        return $timestamp->format('U');
+        if (is_null($format)) {
+            $output = $dateTime;
+        } else {
+            $output = $dateTime->format($format);
+
+            if ($format === 'U') {
+                $output = intval($output);
+            }
+        }
+
+        return $output;
     }
 
     /**
