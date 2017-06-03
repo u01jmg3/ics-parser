@@ -572,9 +572,9 @@ class ICal
     /**
      * Return Unix timestamp from iCal date time format
      *
-     * @param  string  $icalDate      A Date in the format YYYYMMDD[T]HHMMSS[Z] or
+     * @param  string  $icalDate      A Date in the format YYYYMMDD[T]HHMMSS[Z],
      *                                YYYYMMDD[T]HHMMSS or
-     *                                TZID=Timezone:YYYYMMDD[T]HHMMSS
+     *                                TZID={Time Zone}:YYYYMMDD[T]HHMMSS
      * @param  boolean $forceTimeZone Whether to force the time zone; the event's or the default
      * @param  boolean $forceUtc      Whether to force the time zone as UTC
      * @return integer
@@ -583,21 +583,24 @@ class ICal
     {
         /**
          * iCal times may be in 3 formats, (http://www.kanzaki.com/docs/ical/dateTime.html)
+         *
          * UTC:      Has a trailing 'Z'
          * Floating: No time zone reference specified, no trailing 'Z', use local time
          * TZID:     Set time zone as specified
+         *
          * Use DateTime class objects to get around limitations with `mktime` and `gmmktime`.
          * Must have a local time zone set to process floating times.
          */
-        $pattern  = '/\AT?Z?I?D?=?(.*):?'; // 1: Time zone
-        $pattern .= '([0-9]{4})';          // 2: YYYY
-        $pattern .= '([0-9]{2})';          // 3: MM
-        $pattern .= '([0-9]{2})';          // 4: DD
-        $pattern .= 'T?';                  //    Time delimiter
-        $pattern .= '([0-9]{0,2})';        // 5: HH
-        $pattern .= '([0-9]{0,2})';        // 6: MM
-        $pattern .= '([0-9]{0,2})';        // 7: SS
-        $pattern .= '(Z?)/';               // 8: UTC flag
+        $pattern  = '/\AT?Z?I?D?=?(.*):?'; // [1]: Time zone
+        $pattern .= '([0-9]{4})';          // [2]: YYYY
+        $pattern .= '([0-9]{2})';          // [3]: MM
+        $pattern .= '([0-9]{2})';          // [4]: DD
+        $pattern .= 'T?';                  //      Time delimiter
+        $pattern .= '([0-9]{0,2})';        // [5]: HH
+        $pattern .= '([0-9]{0,2})';        // [6]: MM
+        $pattern .= '([0-9]{0,2})';        // [7]: SS
+        $pattern .= '(Z?)/';               // [8]: UTC flag
+
         preg_match($pattern, $icalDate, $date);
 
         if (empty($date)) {
@@ -617,24 +620,24 @@ class ICal
 
         if ($forceTimeZone) {
             if ($date[8] === 'Z') {
-                $convDate = new \DateTime('now', new \DateTimeZone('UTC'));
+                $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
             } elseif (isset($eventTimeZone) && $this->isValidTimeZoneId($eventTimeZone)) {
-                $convDate = new \DateTime('now', new \DateTimeZone($eventTimeZone));
+                $dateTime = new \DateTime('now', new \DateTimeZone($eventTimeZone));
             } else {
-                $convDate = new \DateTime('now', new \DateTimeZone($this->defaultTimeZone));
+                $dateTime = new \DateTime('now', new \DateTimeZone($this->defaultTimeZone));
             }
         } else {
-            $convDate = new \DateTime('now');
+            $dateTime = new \DateTime('now');
         }
 
-        $convDate->setDate((int) $date[2], (int) $date[3], (int) $date[4]);
-        $convDate->setTime((int) $date[5], (int) $date[6], (int) $date[7]);
+        $dateTime->setDate((int) $date[2], (int) $date[3], (int) $date[4]);
+        $dateTime->setTime((int) $date[5], (int) $date[6], (int) $date[7]);
 
         if ($forceUtc) {
-            $convDate->setTimezone(new \DateTimeZone('UTC'));
+            $dateTime->setTimezone(new \DateTimeZone('UTC'));
         }
 
-        return $convDate->getTimestamp();
+        return $dateTime->getTimestamp();
     }
 
     /**
@@ -780,7 +783,7 @@ class ICal
                 // Get frequency
                 $frequency = $rrules['FREQ'];
                 // Get Start timestamp
-                $startTimestamp = $initialStart->getTimeStamp();
+                $startTimestamp = $initialStart->getTimestamp();
                 if (isset($anEvent['DTEND'])) {
                     $endTimestamp = $initialEnd->getTimestamp();
                 } elseif (isset($anEvent['DURATION'])) {
@@ -890,8 +893,8 @@ class ICal
                             $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $dayRecurringTimestamp) . ($isAllDayEvent || ($initialStartTimeZoneName === 'Z') ? 'Z' : '');
                             $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
                             $anEvent['DTSTART_array'][2] = $dayRecurringTimestamp;
-                            $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
-                            $anEvent['DTEND_array'][2] += $eventTimestampOffset;
+                            $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
+                            $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
                             $anEvent['DTEND'] = date(
                                     self::DATE_TIME_FORMAT,
                                     $anEvent['DTEND_array'][2]
@@ -983,8 +986,8 @@ class ICal
                                     $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $dayRecurringTimestamp) . ($isAllDayEvent || ($initialStartTimeZoneName === 'Z') ? 'Z' : '');
                                     $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
                                     $anEvent['DTSTART_array'][2] = $dayRecurringTimestamp;
-                                    $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
-                                    $anEvent['DTEND_array'][2] += $eventTimestampOffset;
+                                    $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
+                                    $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
                                     $anEvent['DTEND'] = date(
                                             self::DATE_TIME_FORMAT,
                                             $anEvent['DTEND_array'][2]
@@ -1091,8 +1094,8 @@ class ICal
                                         ) . ($isAllDayEvent || ($initialStartTimeZoneName === 'Z') ? 'Z' : '');
                                     $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
                                     $anEvent['DTSTART_array'][2] = $monthRecurringTimestamp;
-                                    $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
-                                    $anEvent['DTEND_array'][2] += $eventTimestampOffset;
+                                    $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
+                                    $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
                                     $anEvent['DTEND'] = date(
                                             self::DATE_TIME_FORMAT,
                                             $anEvent['DTEND_array'][2]
@@ -1175,8 +1178,8 @@ class ICal
                                         $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . ($isAllDayEvent || ($initialStartTimeZoneName === 'Z') ? 'Z' : '');
                                         $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
                                         $anEvent['DTSTART_array'][2] = $eventStartTimestamp;
-                                        $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
-                                        $anEvent['DTEND_array'][2] += $eventTimestampOffset;
+                                        $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
+                                        $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
                                         $anEvent['DTEND'] = date(
                                                 self::DATE_TIME_FORMAT,
                                                 $anEvent['DTEND_array'][2]
@@ -1280,8 +1283,8 @@ class ICal
                                             $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . ($isAllDayEvent || ($initialStartTimeZoneName === 'Z') ? 'Z' : '');
                                             $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
                                             $anEvent['DTSTART_array'][2] = $eventStartTimestamp;
-                                            $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
-                                            $anEvent['DTEND_array'][2] += $eventTimestampOffset;
+                                            $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
+                                            $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
                                             $anEvent['DTEND'] = date(
                                                     self::DATE_TIME_FORMAT,
                                                     $anEvent['DTEND_array'][2]
@@ -1363,8 +1366,8 @@ class ICal
                                         $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . ($isAllDayEvent || ($initialStartTimeZoneName === 'Z') ? 'Z' : '');
                                         $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
                                         $anEvent['DTSTART_array'][2] = $eventStartTimestamp;
-                                        $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
-                                        $anEvent['DTEND_array'][2] += $eventTimestampOffset;
+                                        $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
+                                        $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
                                         $anEvent['DTEND'] = date(
                                                 self::DATE_TIME_FORMAT,
                                                 $anEvent['DTEND_array'][2]
@@ -1574,7 +1577,7 @@ class ICal
      * the range will default to the current time and date of the server,
      * plus 20 years.
      *
-     * Note that this function makes use of UNIX timestamps. This might be a
+     * Note that this function makes use of Unix timestamps. This might be a
      * problem for events on, during, or after January the 29th, 2038.
      * See http://en.wikipedia.org/wiki/Unix_time#Representing_the_number
      *
