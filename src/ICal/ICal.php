@@ -6,7 +6,7 @@
  * PHP 5 (≥ 5.3.0)
  *
  * @author  Jonathan Goode <https://github.com/u01jmg3>, John Grogg <john.grogg@gmail.com>, Martin Thoma <info@martin-thoma.de>
- * @license http://www.opensource.org/licenses/mit-license.php MIT License
+ * @license https://opensource.org/licenses/mit-license.php MIT License
  * @version 2.0.5
  */
 
@@ -22,21 +22,21 @@ class ICal
     const RECURRENCE_EVENT        = 'Generated recurrence event';
 
     /**
-     * Track the number of events in the current iCal feed
+     * Tracks the number of events in the current iCal feed
      *
      * @var integer
      */
     public $eventCount = 0;
 
     /**
-     * Track the free/busy count in the current iCal feed
+     * Tracks the free/busy count in the current iCal feed
      *
      * @var integer
      */
     public $freeBusyCount = 0;
 
     /**
-     * Track the number of todos in the current iCal feed
+     * Tracks the number of todos in the current iCal feed
      *
      * @var integer
      */
@@ -50,7 +50,7 @@ class ICal
     public $defaultSpan = 2;
 
     /**
-     * Customise the default time zone used by the parser
+     * Enables customisation of the default time zone
      *
      * @var string
      */
@@ -64,14 +64,14 @@ class ICal
     public $defaultWeekStart = 'MO';
 
     /**
-     * Toggle whether to skip the parsing recurrence rules
+     * Toggles whether to skip the parsing of recurrence rules
      *
      * @var boolean
      */
     public $skipRecurrence = false;
 
     /**
-     * Toggle whether to use time zone info when parsing recurrence rules
+     * Toggles whether to use time zone info when parsing recurrence rules
      *
      * @var boolean
      */
@@ -85,7 +85,7 @@ class ICal
     public $cal = array();
 
     /**
-     * Track the VFREEBUSY component
+     * Tracks the VFREEBUSY component
      *
      * @var integer
      */
@@ -313,7 +313,8 @@ class ICal
                     $values = array(); // Use blank array to ignore this line
                 }
 
-                $values = array_reverse($values); // Reverse so that our array of properties is processed first
+                // Reverse so that our array of properties is processed first
+                $values = array_reverse($values);
 
                 foreach ($values as $value) {
                     switch ($line) {
@@ -378,8 +379,8 @@ class ICal
     }
 
     /**
-     * Unfold an ICS file in preparation for parsing
-     * https://icalendar.org/iCalendar-RFC-5545/3-1-content-lines.html
+     * Unfolds an iCal file in preparation for parsing
+     * (https://icalendar.org/iCalendar-RFC-5545/3-1-content-lines.html)
      *
      * @param  array $lines The contents of the iCal string to unfold
      * @return string
@@ -394,7 +395,7 @@ class ICal
     }
 
     /**
-     * Add to `$this->ical` array one value and key
+     * Add one key and value pair to the `$this->cal` array
      *
      * @param  string         $component This could be VTODO, VEVENT, VCALENDAR, ...
      * @param  string|boolean $keyword   The keyword, for example DTSTART
@@ -475,7 +476,7 @@ class ICal
     }
 
     /**
-     * Get the key-value pair from an iCal string
+     * Gets the key value pair from an iCal string
      *
      * @param  string $text
      * @return array
@@ -571,7 +572,7 @@ class ICal
     }
 
     /**
-     * Return a DateTime object from an iCal date time format
+     * Returns a `DateTime` object from an iCal date time format
      *
      * @param  string  $icalDate      A Date in the format YYYYMMDD[T]HHMMSS[Z],
      *                                YYYYMMDD[T]HHMMSS or
@@ -643,7 +644,7 @@ class ICal
     }
 
     /**
-     * Return a Unix timestamp from an iCal date time format
+     * Returns a Unix timestamp from an iCal date time format
      *
      * @param  string  $icalDate      A Date in the format YYYYMMDD[T]HHMMSS[Z],
      *                                YYYYMMDD[T]HHMMSS or
@@ -660,8 +661,7 @@ class ICal
     }
 
     /**
-     * Return a date adapted to the calendar
-     * time zone depending on the event TZID
+     * Returns a date adapted to the calendar time zone depending on the event `TZID`
      *
      * @param  array  $event         An event
      * @param  string $key           An event parameter (DTSTART or DTEND)
@@ -688,9 +688,9 @@ class ICal
     }
 
     /**
-     * Performs some admin tasks on all events as taken straight from the ics file.
+     * Performs admin tasks on all events as read from the iCal file.
      * Adds a Unix timestamp to all `{DTSTART|DTEND|RECURRENCE-ID}_array` arrays
-     * Makes a note of modified recurrence-instances
+     * Tracks modified recurrence instances
      *
      * @return mixed
      */
@@ -1427,9 +1427,9 @@ class ICal
     /**
      * Processes date conversions using the time zone
      *
-     * Add fields DTSTART_tz and DTEND_tz to each Event
-     * These fields contain dates adapted to the calendar
-     * time zone depending on the event TZID.
+     * Add keys `DTSTART_tz` and `DTEND_tz` to each Event
+     * These keys contain dates adapted to the calendar
+     * time zone depending on the event `TZID`.
      *
      * @return mixed
      */
@@ -1468,8 +1468,9 @@ class ICal
     }
 
     /**
-     * Extend `{DTSTART|DTEND|RECURRENCE-ID}_array` to include an
-     * an iCal date time (`TZID=Timezone:YYYYMMDD[T]HHMMSS`) for each event
+     * Extends the `{DTSTART|DTEND|RECURRENCE-ID}_array`
+     * array to include an iCal date time for each event
+     * (`TZID=Timezone:YYYYMMDD[T]HHMMSS`)
      *
      * @param  array   $event
      * @param  integer $index
@@ -1586,7 +1587,7 @@ class ICal
 
     /**
      * Returns a sorted array of the events in a given range,
-     * or false if no events exist in the range.
+     * or an empty array if no events exist in the range.
      *
      * Events will be returned if the start or end date is contained within the
      * range (inclusive), or if the event starts before and end after the range.
@@ -1600,7 +1601,7 @@ class ICal
      *
      * Note that this function makes use of Unix timestamps. This might be a
      * problem for events on, during, or after 29 Jan 2038.
-     * See http://en.wikipedia.org/wiki/Unix_time#Representing_the_number
+     * See https://en.wikipedia.org/wiki/Unix_time#Representing_the_number
      *
      * @param  string $rangeStart Start date of the search range.
      * @param  string $rangeEnd   End date of the search range.
@@ -1674,7 +1675,7 @@ class ICal
 
     /**
      * Returns a sorted array of the events following a given string,
-     * or false if no events exist in the range.
+     * or `false` if no events exist in the range.
      *
      * @param  string $interval
      * @return array
@@ -1691,7 +1692,7 @@ class ICal
     }
 
     /**
-     * Sort events based on a given sort order
+     * Sorts events based on a given sort order
      *
      * @param  array   $events    An array of Events
      * @param  integer $sortOrder Either SORT_ASC, SORT_DESC, SORT_REGULAR, SORT_NUMERIC, SORT_STRING
@@ -1713,7 +1714,7 @@ class ICal
     }
 
     /**
-     * Check if a time zone is valid
+     * Checks if a time zone is valid
      *
      * @param  string $timeZone
      * @return boolean
@@ -1739,7 +1740,7 @@ class ICal
     }
 
     /**
-     * Parse a duration and apply it to a date
+     * Parses a duration and applies it to a date
      *
      * @param  string $date     A date to add a duration to
      * @param  string $duration A duration to parse
@@ -1770,8 +1771,7 @@ class ICal
     }
 
     /**
-     * Get the number of days between a
-     * start and end date
+     * Gets the number of days between a start and end date
      *
      * @param  integer $days
      * @param  integer $start
@@ -1795,7 +1795,7 @@ class ICal
     }
 
     /**
-     * Convert a negative day ordinal to
+     * Converts a negative day ordinal to
      * its equivalent positive form
      *
      * @param  integer $dayNumber
@@ -1833,7 +1833,7 @@ class ICal
     }
 
     /**
-     * Remove unprintable ASCII and UTF-8 characters
+     * Removes unprintable ASCII and UTF-8 characters
      *
      * @param  string $data
      * @return string
@@ -1844,7 +1844,8 @@ class ICal
     }
 
     /**
-     * Replace all occurrences of the search string with the replacement string. Multibyte safe.
+     * Replaces all occurrences of a search string with a given replacement string.
+     * Multibyte safe.
      *
      * @param  string|array $search  The value being searched for, otherwise known as the needle. An array may be used to designate multiple needles.
      * @param  string|array $replace The replacement value that replaces found search values. An array may be used to designate multiple replacements.
@@ -1856,7 +1857,7 @@ class ICal
     protected function mb_str_replace($search, $replace, $subject, &$count = 0)
     {
         if (!is_array($subject)) {
-            // Normalize $search and $replace so they are both arrays of the same length
+            // Normalize `$search` and `$replace` so they are both arrays of the same length
             $searches     = is_array($search)  ? array_values($search)  : array($search);
             $replacements = is_array($replace) ? array_values($replace) : array($replace);
             $replacements = array_pad($replacements, count($searches), '');
@@ -1867,7 +1868,7 @@ class ICal
                 $subject = implode($replacements[$key], $parts);
             }
         } else {
-            // Call mb_str_replace for each subject in array, recursively
+            // Call `mb_str_replace` for each subject in array, recursively
             foreach ($subject as $key => $value) {
                 $subject[$key] = $this->mb_str_replace($search, $replace, $value, $count);
             }
@@ -1877,7 +1878,7 @@ class ICal
     }
 
     /**
-     * Replace curly quotes and other special characters
+     * Replaces curly quotes and other special characters
      * with their standard equivalents
      *
      * @param  string $data
@@ -1909,7 +1910,7 @@ class ICal
     }
 
     /**
-     * Parse a list of excluded dates
+     * Parses a list of excluded dates
      * to be applied to an Event
      *
      * @param  array $event
@@ -1949,7 +1950,7 @@ class ICal
     }
 
     /**
-     * Check if a date string is a valid date
+     * Checks if a date string is a valid date
      *
      * @param  string $value
      * @return boolean
@@ -1971,7 +1972,7 @@ class ICal
     }
 
     /**
-     * Check if filename exists as a file or URL
+     * Checks if a filename exists as a file or URL
      *
      * @param  string $filename
      * @return boolean

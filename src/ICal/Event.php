@@ -1,8 +1,4 @@
 <?php
-/**
- * @category Parser
- * @package  ics-parser
- */
 
 namespace ICal;
 
@@ -147,7 +143,7 @@ class Event extends ICal
     }
 
     /**
-     * Return Event data excluding anything blank
+     * Returns Event data excluding anything blank
      * within an HTML template
      *
      * @param  string $html HTML template to use
@@ -186,7 +182,7 @@ class Event extends ICal
     }
 
     /**
-     * Convert the given input to snake_case
+     * Converts the given input to snake_case
      *
      * @param  string $input
      * @param  string $glue
