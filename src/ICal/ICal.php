@@ -16,6 +16,7 @@ class ICal
 {
     const DATE_TIME_FORMAT        = 'Ymd\THis';
     const ICAL_DATE_TIME_TEMPLATE = 'TZID=%s:';
+    const DATE_TIME_FORMAT_PRETTY = 'F Y H:i:s';
     const RECURRENCE_EVENT        = 'Generated recurrence event';
     const SECONDS_IN_A_WEEK       = 604800;
     const TIME_FORMAT             = 'His';
@@ -667,7 +668,7 @@ class ICal
      * @param  array  $event  An event
      * @param  string $key    An event property (`DTSTART` or `DTEND`)
      * @param  string $format The date format to apply
-     * @return string
+     * @return string|boolean
      */
     public function iCalDateWithTimeZone(array $event, $key, $format = self::DATE_TIME_FORMAT)
     {
@@ -708,7 +709,7 @@ class ICal
      * Adds a Unix timestamp to all `{DTSTART|DTEND|RECURRENCE-ID}_array` arrays
      * Tracks modified recurrence instances
      *
-     * @return mixed
+     * @return boolean|void
      */
     protected function processEvents()
     {
@@ -723,7 +724,7 @@ class ICal
                 if (isset($anEvent[$type])) {
                     $date = $anEvent[$type . '_array'][1];
                     if (isset($anEvent[$type . '_array'][0]['TZID'])) {
-                        $date = 'TZID=' . $anEvent[$type . '_array'][0]['TZID'] . ':' . $date;
+                        $date = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent[$type . '_array'][0]['TZID']) . $date;
                     }
                     $anEvent[$type . '_array'][2] = $this->iCalDateToUnixTimestamp($date);
                     $anEvent[$type . '_array'][3] = $date;
@@ -748,7 +749,7 @@ class ICal
     /**
      * Processes recurrence rules
      *
-     * @return mixed
+     * @return boolean|void
      */
     protected function processRecurrences()
     {
@@ -908,7 +909,7 @@ class ICal
                             // Exclusions
                             $searchDate = $anEvent['DTSTART'];
                             if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                $searchDate = 'TZID=' . $anEvent['DTSTART_array'][0]['TZID'] . ':' . $searchDate;
+                                $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
                             }
                             $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $dayRecurringOffset) {
                                 $a = $this->iCalDateToUnixTimestamp($searchDate);
@@ -1002,7 +1003,7 @@ class ICal
                                     // Exclusions
                                     $searchDate = $anEvent['DTSTART'];
                                     if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                        $searchDate = 'TZID=' . $anEvent['DTSTART_array'][0]['TZID'] . ':' . $searchDate;
+                                        $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
                                     }
                                     $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $dayRecurringOffset) {
                                         $a = $this->iCalDateToUnixTimestamp($searchDate);
@@ -1111,7 +1112,7 @@ class ICal
                                     // Exclusions
                                     $searchDate = $anEvent['DTSTART'];
                                     if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                        $searchDate = 'TZID=' . $anEvent['DTSTART_array'][0]['TZID'] . ':' . $searchDate;
+                                        $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
                                     }
                                     $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $monthRecurringOffset) {
                                         $a = $this->iCalDateToUnixTimestamp($searchDate);
@@ -1162,15 +1163,15 @@ class ICal
                                 }
 
                                 $eventStartDesc = "{$this->convertDayOrdinalToPositive($dayNumber, $weekday, $monthRecurringTimestamp)} {$this->weekdays[$weekday]} of "
-                                    . date('F Y H:i:s', $monthRecurringTimestamp);
+                                    . date(self::DATE_TIME_FORMAT_PRETTY, $monthRecurringTimestamp);
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
                                 if (intval($rrules['BYDAY']) === 0) {
                                     $lastDayDesc = "last {$this->weekdays[$weekday]} of "
-                                        . date('F Y H:i:s', $monthRecurringTimestamp);
+                                        . date(self::DATE_TIME_FORMAT_PRETTY, $monthRecurringTimestamp);
                                 } else {
                                     $lastDayDesc = "{$this->convertDayOrdinalToPositive($dayNumber, $weekday, $monthRecurringTimestamp)} {$this->weekdays[$weekday]} of "
-                                        . date('F Y H:i:s', $monthRecurringTimestamp);
+                                        . date(self::DATE_TIME_FORMAT_PRETTY, $monthRecurringTimestamp);
                                 }
                                 $lastDayTimestamp = strtotime($lastDayDesc);
 
@@ -1201,7 +1202,7 @@ class ICal
                                         // Exclusions
                                         $searchDate = $anEvent['DTSTART'];
                                         if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                            $searchDate = 'TZID=' . $anEvent['DTSTART_array'][0]['TZID'] . ':' . $searchDate;
+                                            $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
                                         }
                                         $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $monthRecurringOffset) {
                                             $a = $this->iCalDateToUnixTimestamp($searchDate);
@@ -1307,7 +1308,7 @@ class ICal
                                             // Exclusions
                                             $searchDate = $anEvent['DTSTART'];
                                             if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                                $searchDate = 'TZID=' . $anEvent['DTSTART_array'][0]['TZID'] . ':' . $searchDate;
+                                                $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
                                             }
                                             $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $yearRecurringOffset) {
                                                 $a = $this->iCalDateToUnixTimestamp($searchDate);
@@ -1370,7 +1371,7 @@ class ICal
                                         array_push($eventStartDescs, "$day {$this->monthNames[$bymonth]} " . gmdate('Y H:i:s', $yearRecurringTimestamp));
                                     }
                                 } else {
-                                    array_push($eventStartDescs, $day . gmdate('F Y H:i:s', $yearRecurringTimestamp));
+                                    array_push($eventStartDescs, $day . gmdate(self::DATE_TIME_FORMAT_PRETTY, $yearRecurringTimestamp));
                                 }
 
                                 foreach ($eventStartDescs as $eventStartDesc) {
@@ -1391,7 +1392,7 @@ class ICal
                                         // Exclusions
                                         $searchDate = $anEvent['DTSTART'];
                                         if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                            $searchDate = 'TZID=' . $anEvent['DTSTART_array'][0]['TZID'] . ':' . $searchDate;
+                                            $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
                                         }
                                         $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $yearRecurringOffset) {
                                             $a = $this->iCalDateToUnixTimestamp($searchDate);
@@ -1447,7 +1448,7 @@ class ICal
      * These keys contain dates adapted to the calendar
      * time zone depending on the event `TZID`.
      *
-     * @return mixed
+     * @return boolean|void
      */
     protected function processDateConversions()
     {
@@ -1550,7 +1551,7 @@ class ICal
     /**
      * Returns the calendar time zone
      *
-     * @return boolean $ignoreUtc
+     * @param  boolean $ignoreUtc
      * @return string
      */
     public function calendarTimeZone($ignoreUtc = false)
@@ -1568,7 +1569,7 @@ class ICal
             $timeZone = $this->defaultTimeZone;
         }
 
-        if ($ignoreUtc && $timeZone === 'UTC') {
+        if ($ignoreUtc && strtoupper($timeZone) === 'UTC') {
             return null;
         }
 
@@ -1597,7 +1598,7 @@ class ICal
      */
     public function hasEvents()
     {
-        return (count($this->events()) > 0) ? true : false;
+        return (count($this->events()) > 0) ?: false;
     }
 
     /**
@@ -1830,8 +1831,8 @@ class ICal
         }
 
         $timestamp = (is_object($timestamp)) ? $timestamp : \DateTime::createFromFormat(self::UNIX_FORMAT, $timestamp);
-        $start     = strtotime('first day of ' . $timestamp->format('F Y H:i:s'));
-        $end       = strtotime('last day of '  . $timestamp->format('F Y H:i:s'));
+        $start     = strtotime('first day of ' . $timestamp->format(self::DATE_TIME_FORMAT_PRETTY));
+        $end       = strtotime('last day of '  . $timestamp->format(self::DATE_TIME_FORMAT_PRETTY));
 
         // Used with pow(2, X) so pow(2, 4) is THURSDAY
         $weekdays = array_flip(array_keys($this->weekdays));
@@ -1950,7 +1951,7 @@ class ICal
                 if ($key === 'TZID') {
                     $currentTimeZone = $subArray[$key];
                 } else {
-                    $icalDate = 'TZID=' . $currentTimeZone . ':' . $subArray[$key];
+                    $icalDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $currentTimeZone) . $subArray[$key];
                     $output[] = $this->iCalDateToUnixTimestamp($icalDate);
 
                     if ($key === $finalKey) {

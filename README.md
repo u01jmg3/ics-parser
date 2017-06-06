@@ -49,6 +49,7 @@ var_dump($ical->events());
 - Also included are special `{property}_array` arrays which further resolve the contents of a key/value pair.
 
 ```php
+// Dump a parsed event's start date
 var_dump($event->dtstart_array);
 
 // array (size=4)
@@ -70,6 +71,7 @@ var_dump($event->dtstart_array);
 
 | Name                      | Description                                   |
 |---------------------------|-----------------------------------------------|
+| `DATE_TIME_FORMAT_PRETTY` | Default pretty date time format to use        |
 | `DATE_TIME_FORMAT`        | Default date time format to use               |
 | `ICAL_DATE_TIME_TEMPLATE` | String template to generate an iCal date time |
 | `RECURRENCE_EVENT`        | Used to isolate generated recurrence events   |
@@ -136,12 +138,22 @@ var_dump($event->dtstart_array);
 
 ### `Event` API (extends `ICal` API)
 
+#### Constants
+
+| Name            | Description                                         |
+|-----------------|-----------------------------------------------------|
+| `HTML_TEMPLATE` | String template to use when pretty printing content |
+
+#### Variables
+
+- None
+
 #### Methods
 
 | Method        | Parameter(s)                                | Visibility  | Description                                                         |
 |---------------|---------------------------------------------|-------------|---------------------------------------------------------------------|
 | `__construct` | `$data = array()`                           | `public`    | Creates the Event object                                            |
-| `printData`   | `$html = '<p>%s: %s</p>'`                   | `public`    | Returns Event data excluding anything blank within an HTML template |
+| `printData`   | `$html = HTML_TEMPLATE`                     | `public`    | Returns Event data excluding anything blank within an HTML template |
 | `prepareData` | `$value`                                    | `protected` | Prepares the data for output                                        |
 | `snakeCase`   | `$input`, `$glue = '_'`, `$separator = '-'` | `protected` | Converts the given input to snake_case                              |
 

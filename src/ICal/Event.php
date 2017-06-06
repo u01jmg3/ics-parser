@@ -4,6 +4,8 @@ namespace ICal;
 
 class Event extends ICal
 {
+    const HTML_TEMPLATE = '<p>%s: %s</p>';
+
     /**
      * http://www.kanzaki.com/docs/ical/summary.html
      *
@@ -149,7 +151,7 @@ class Event extends ICal
      * @param  string $html HTML template to use
      * @return string
      */
-    public function printData($html = '<p>%s: %s</p>')
+    public function printData($html = self::HTML_TEMPLATE)
     {
         $data = array(
             'SUMMARY'       => $this->summary,
