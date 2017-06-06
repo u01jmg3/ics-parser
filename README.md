@@ -15,10 +15,10 @@
 
 ### Setup
 
- - Install [Composer](http://getcomposer.org)
+ - Install [Composer](https://getcomposer.org/)
    - Add the following requirement to `composer.json`
-     - :warning: **Note the owner is `johngrogg` and not `u01jmg3`**
-   - If you want to try out newer features then require [`dev-master`](https://getcomposer.org/doc/articles/aliases.md#branch-alias)
+     - :warning: **Note with Composer the owner is `johngrogg` and not `u01jmg3`**
+   - To access new features require [`dev-master`](https://getcomposer.org/doc/articles/aliases.md#branch-alias)
 
    ```yaml
    {
@@ -30,7 +30,35 @@
 
 ### How to instantiate the Parser
 
-- Using the example script as a guide, [refer to this code](https://github.com/u01jmg3/ics-parser/blob/master/examples/index.php#L1-L19)
+- Using the example script as a guide, [refer to this code](https://github.com/u01jmg3/ics-parser/blob/master/examples/index.php#L1-L21)
+
+#### What will the parser return?
+
+- Each key/value pair from the iCal file will be parsed creating an associate array for both the calendar and every event it contains.
+- Also injected will be content under `dtstart_tz` and `dtend_tz` for accessing start and end dates with time zone data applied.
+- Where possible [`DateTime`](https://secure.php.net/manual/en/class.datetime.php) objects are used and returned.
+
+```php
+// Dump the whole calendar
+var_dump($ical->cal);
+
+// Dump every event
+var_dump($ical->events());
+```
+
+- Also included are special `{property}_array` arrays which further resolve the contents of a key/value pair.
+
+```php
+var_dump($event->dtstart_array);
+
+// array (size=4)
+//   0 =>
+//     array (size=1)
+//       'TZID' => string 'America/Detroit' (length=15)
+//   1 => string '20160409T090000' (length=15)
+//   2 => int 1460192400
+//   3 => string 'TZID=America/Detroit:20160409T090000' (length=36)
+```
 
 ---
 
@@ -40,76 +68,82 @@
 
 #### Constants
 
-| Name                | Description                                 |
-|---------------------|---------------------------------------------|
-| `DATE_TIME_FORMAT`  | Default datetime format to use              |
-| `RECURRENCE_EVENT`  | Used to isolate generated recurrence events |
-| `SECONDS_IN_A_WEEK` | Integer of the number of seconds in a week  |
-| `TIME_FORMAT`       | Default time format to use                  |
-| `UNIX_MIN_YEAR`     | Minimum Unix year to use                    |
+| Name                      | Description                                   |
+|---------------------------|-----------------------------------------------|
+| `DATE_TIME_FORMAT`        | Default date time format to use               |
+| `ICAL_DATE_TIME_TEMPLATE` | String template to generate an iCal date time |
+| `RECURRENCE_EVENT`        | Used to isolate generated recurrence events   |
+| `SECONDS_IN_A_WEEK`       | The number of seconds in a week               |
+| `TIME_FORMAT`             | Default time format to use                    |
+| `UNIX_FORMAT`             | Unix timestamp date format                    |
+| `UNIX_MIN_YEAR`           | The year Unix time began                      |
 
 #### Variables
 
-| Name                     | Description                                                        | Configurable       | Default Value  |
-|--------------------------|--------------------------------------------------------------------|:------------------:|----------------|
-| `$cal`                   | The parsed calendar                                                |         :x:        | N/A            |
-| `$eventCount`            | Track the number of events in the current iCal feed                |         :x:        | N/A            |
-| `$freeBusyCount`         | Track the free/busy count in the current iCal feed                 |         :x:        | N/A            |
-| `$todoCount`             | Track the number of todos in the current iCal feed                 |         :x:        | N/A            |
-| `$defaultSpan`           | The value in years to use for indefinite, recurring events         | :white_check_mark: | `2`            |
-| `$defaultTimeZone`       | Customise the default time zone used by the parser                 | :white_check_mark: | System default |
-| `$defaultWeekStart`      | The two letter representation of the first day of the week         | :white_check_mark: | `MO`           |
-| `$skipRecurrence`        | Toggle whether to skip the parsing recurrence rules                | :white_check_mark: | `false`        |
-| `$useTimeZoneWithRRules` | Toggle whether to use time zone info when parsing recurrence rules | :white_check_mark: | `false`        |
+| Name                     | Description                                                         | Configurable       | Default Value  |
+|--------------------------|---------------------------------------------------------------------|:------------------:|----------------|
+| `$cal`                   | The parsed calendar                                                 |         :x:        | N/A            |
+| `$eventCount`            | Tracks the number of events in the current iCal feed                |         :x:        | N/A            |
+| `$freeBusyCount`         | Tracks the free/busy count in the current iCal feed                 |         :x:        | N/A            |
+| `$todoCount`             | Tracks the number of todos in the current iCal feed                 |         :x:        | N/A            |
+| `$defaultSpan`           | The value in years to use for indefinite, recurring events          | :white_check_mark: | `2`            |
+| `$defaultTimeZone`       | Enables customisation of the default time zone                      | :white_check_mark: | System default |
+| `$defaultWeekStart`      | The two letter representation of the first day of the week          | :white_check_mark: | `MO`           |
+| `$skipRecurrence`        | Toggles whether to skip the parsing of recurrence rules             | :white_check_mark: | `false`        |
+| `$useTimeZoneWithRRules` | Toggles whether to use time zone info when parsing recurrence rules | :white_check_mark: | `false`        |
 
 #### Methods
 
-| Method                        | Parameter(s)                                    | Visibility  | Description                                                                                                                   |
-|-------------------------------|-------------------------------------------------|-------------|-------------------------------------------------------------------------------------------------------------------------------|
-| `__construct`                 | `$files = false`, `$options = array()`          | `public`    | Creates the ICal object                                                                                                       |
-| `initFile`                    | `$file`                                         | `protected` | Initialises lines from a file                                                                                                 |
-| `initLines`                   | `$lines`                                        | `protected` | Initialises the parser using an array containing each line of iCal content                                                    |
-| `initString`                  | `$string`                                       | `protected` | Initialises lines from a string                                                                                               |
-| `initUrl`                     | `$url`                                          | `protected` | Initialises lines from a URL                                                                                                  |
-| `cleanData`                   | `$data`                                         | `protected` | Replace curly quotes and other special characters with their standard equivalents                                             |
-| `convertDayOrdinalToPositive` | `$dayNumber`, `$weekday`, `$timestamp`          | `protected` | Convert a negative day ordinal to its equivalent positive form                                                                |
-| `fileOrUrl`                   | `$filename`                                     | `protected` | Reads an entire file or URL into an array                                                                                     |
-| `isFileOrUrl`                 | `$filename`                                     | `protected` | Check if filename exists as a file or URL                                                                                     |
-| `isValidTimeZoneId`           | `$timeZone`                                     | `protected` | Check if a time zone is valid                                                                                                 |
-| `mb_str_replace`              | `$search`, `$replace`, `$subject`, `$count = 0` | `protected` | Replace all occurrences of the search string with the replacement string. Multibyte safe.                                     |
-| `numberOfDays`                | `$days`, `$start`, `$end`                       | `protected` | Get the number of days between a start and end date                                                                           |
-| `parseDuration`               | `$date`, `$duration`                            | `protected` | Parse a duration and apply it to a date                                                                                       |
-| `processDateConversions`      | -                                               | `protected` | Add fields `DTSTART_tz` and `DTEND_tz` to each Event                                                                          |
-| `processEvents`               | -                                               | `protected` | Performs some admin tasks on all events as taken straight from the ics file.                                                  |
-| `processRecurrences`          | -                                               | `protected` | Processes recurrence rules                                                                                                    |
-| `removeUnprintableChars`      | `$data`                                         | `protected` | Remove unprintable ASCII and UTF-8 characters                                                                                 |
-| `unfold`                      | `$lines`                                        | `protected` | Unfold an iCal file in preparation for parsing                                                                                |
-| `calendarDescription`         | -                                               | `public`    | Returns the calendar description                                                                                              |
-| `calendarName`                | -                                               | `public`    | Returns the calendar name                                                                                                     |
-| `calendarTimeZone`            | -                                               | `public`    | Returns the calendar time zone                                                                                                |
-| `events`                      | -                                               | `public`    | Returns an array of Events. Every event is a class with the event details being properties within it.                         |
-| `eventsFromInterval`          | `$interval`                                     | `public`    | Returns a sorted array of the events following a given string, or false if no events exist in the range.                      |
-| `eventsFromRange`             | `$rangeStart = false`, `$rangeEnd = false`      | `public`    | Returns a sorted array of the events in a given range, or an empty array if no events exist in the range.                     |
-| `freeBusyEvents`              | -                                               | `public`    | Returns an array of arrays with all free/busy events. Every event is an associative array and each property is an element it. |
-| `hasEvents`                   | -                                               | `public`    | Returns a boolean value whether the current calendar has events or not                                                        |
-| `iCalDateToUnixTimestamp`     | `$icalDate`, `$forceTimeZone = false`           | `public`    | Return Unix timestamp from iCal date time format                                                                              |
-| `iCalDateWithTimeZone`        | `$event`, `$key`, `$forceTimeZone`              | `public`    | Return a date adapted to the calendar time zone depending on the event TZID                                                   |
-| `isValidDate`                 | `$value`                                        | `public`    | Check if a date string is a valid date                                                                                        |
-| `parseExdates`                | `$event`                                        | `public`    | Parse a list of excluded dates to be applied to an Event                                                                      |
-| `sortEventsWithOrder`         | `$events`, `$sortOrder = SORT_ASC`              | `public`    | Sort events based on a given sort order                                                                                       |
+| Method                                | Parameter(s)                                               | Visibility  | Description                                                                                           |
+|---------------------------------------|------------------------------------------------------------|-------------|-------------------------------------------------------------------------------------------------------|
+| `__construct`                         | `$files = false`, `$options = array()`                     | `public`    | Creates the ICal object                                                                               |
+| `initFile`                            | `$file`                                                    | `protected` | Initialises lines from a file                                                                         |
+| `initLines`                           | `$lines`                                                   | `protected` | Initialises the parser using an array containing each line of iCal content                            |
+| `initString`                          | `$string`                                                  | `protected` | Initialises lines from a string                                                                       |
+| `initUrl`                             | `$url`                                                     | `protected` | Initialises lines from a URL                                                                          |
+| `addCalendarComponentWithKeyAndValue` | `$component`, `$keyword`, `$value`                         | `protected` | Add one key and value pair to the `$this->cal` array                                                  |
+| `cleanData`                           | `$data`                                                    | `protected` | Replaces curly quotes and other special characters with their standard equivalents                    |
+| `convertDayOrdinalToPositive`         | `$dayNumber`, `$weekday`, `$timestamp`                     | `protected` | Converts a negative day ordinal to its equivalent positive form                                       |
+| `fileOrUrl`                           | `$filename`                                                | `protected` | Reads an entire file or URL into an array                                                             |
+| `isFileOrUrl`                         | `$filename`                                                | `protected` | Checks if a filename exists as a file or URL                                                          |
+| `isValidTimeZoneId`                   | `$timeZone`                                                | `protected` | Checks if a time zone is valid                                                                        |
+| `keyValueFromString`                  | `$text`                                                    | `protected` | Gets the key value pair from an iCal string                                                           |
+| `mb_str_replace`                      | `$search`, `$replace`, `$subject`, `$count = 0`            | `protected` | Replaces all occurrences of a search string with a given replacement string                           |
+| `numberOfDays`                        | `$days`, `$start`, `$end`                                  | `protected` | Gets the number of days between a start and end date                                                  |
+| `parseDuration`                       | `$date`, `$duration`, `$format = 'U'`                      | `protected` | Parses a duration and applies it to a date                                                            |
+| `processDateConversions`              | -                                                          | `protected` | Processes date conversions using the time zone                                                        |
+| `processEventIcalDate`                | `$event`, `$index = 3`                                     | `protected` | Extends the `{DTSTART\|DTEND\|RECURRENCE-ID}_array` array to include an iCal date time for each event |
+| `processEvents`                       | -                                                          | `protected` | Performs admin tasks on all events as read from the iCal file                                         |
+| `processRecurrences`                  | -                                                          | `protected` | Processes recurrence rules                                                                            |
+| `removeUnprintableChars`              | `$data`                                                    | `protected` | Removes unprintable ASCII and UTF-8 characters                                                        |
+| `unfold`                              | `$lines`                                                   | `protected` | Unfolds an iCal file in preparation for parsing                                                       |
+| `calendarDescription`                 | -                                                          | `public`    | Returns the calendar description                                                                      |
+| `calendarName`                        | -                                                          | `public`    | Returns the calendar name                                                                             |
+| `calendarTimeZone`                    | `$ignoreUtc`                                               | `public`    | Returns the calendar time zone                                                                        |
+| `events`                              | -                                                          | `public`    | Returns an array of Events                                                                            |
+| `eventsFromInterval`                  | `$interval`                                                | `public`    | Returns a sorted array of events following a given string, or `false` if no events exist in the range |
+| `eventsFromRange`                     | `$rangeStart = false`, `$rangeEnd = false`                 | `public`    | Returns a sorted array of events in a given range, or an empty array if no events exist in the range  |
+| `freeBusyEvents`                      | -                                                          | `public`    | Returns an array of arrays with all free/busy events                                                  |
+| `hasEvents`                           | -                                                          | `public`    | Returns a boolean value whether the current calendar has events or not                                |
+| `iCalDateToDateTime`                  | `$icalDate`, `$forceTimeZone = false`, `$forceUtc = false` | `public`    | Returns a `DateTime` object from an iCal date time format                                             |
+| `iCalDateToUnixTimestamp`             | `$icalDate`, `$forceTimeZone = false`, `$forceUtc = false` | `public`    | Returns a Unix timestamp from an iCal date time format                                                |
+| `iCalDateWithTimeZone`                | `$event`, `$key`, `$format = DATE_TIME_FORMAT`             | `public`    | Returns a date adapted to the calendar time zone depending on the event `TZID`                        |
+| `isValidDate`                         | `$value`                                                   | `public`    | Checks if a date string is a valid date                                                               |
+| `parseExdates`                        | `$event`                                                   | `public`    | Parses a list of excluded dates to be applied to an Event                                             |
+| `sortEventsWithOrder`                 | `$events`, `$sortOrder = SORT_ASC`                         | `public`    | Sorts events based on a given sort order                                                              |
 
 ---
 
-### `Event` API
+### `Event` API (extends `ICal` API)
 
 #### Methods
 
-| Method        | Parameter(s)                                | Visibility  | Description                                                        |
-|---------------|---------------------------------------------|-------------|--------------------------------------------------------------------|
-| `__construct` | `$data = array()`                           | `public`    | Creates the Event object                                           |
-| `printData`   | `$html = '<p>%s: %s</p>'`                   | `public`    | Return Event data excluding anything blank within an HTML template |
-| `prepareData` | `$value`                                    | `protected` | Prepares the data for output                                       |
-| `snakeCase`   | `$input`, `$glue = '_'`, `$separator = '-'` | `protected` | Convert the given input to snake_case                              |
+| Method        | Parameter(s)                                | Visibility  | Description                                                         |
+|---------------|---------------------------------------------|-------------|---------------------------------------------------------------------|
+| `__construct` | `$data = array()`                           | `public`    | Creates the Event object                                            |
+| `printData`   | `$html = '<p>%s: %s</p>'`                   | `public`    | Returns Event data excluding anything blank within an HTML template |
+| `prepareData` | `$value`                                    | `protected` | Prepares the data for output                                        |
+| `snakeCase`   | `$input`, `$glue = '_'`, `$separator = '-'` | `protected` | Converts the given input to snake_case                              |
 
 ---
 
