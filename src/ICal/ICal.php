@@ -664,11 +664,12 @@ class ICal
     /**
      * Returns a date adapted to the calendar time zone depending on the event `TZID`
      *
-     * @param  array  $event An event
-     * @param  string $key   An event property (`DTSTART` or `DTEND`)
+     * @param  array  $event  An event
+     * @param  string $key    An event property (`DTSTART` or `DTEND`)
+     * @param  string $format The date format to apply
      * @return string
      */
-    public function iCalDateWithTimeZone(array $event, $key)
+    public function iCalDateWithTimeZone(array $event, $key, $format = self::DATE_TIME_FORMAT)
     {
         if (!isset($event[$key . '_array']) || !isset($event[$key])) {
             return false;
@@ -684,7 +685,17 @@ class ICal
             $dateTime = $this->iCalDateToDateTime($dateArray[3], true);
         }
 
-        return $dateTime->format(self::DATE_TIME_FORMAT);
+        if (is_null($format)) {
+            $output = $dateTime;
+        } else {
+            if ($format === self::UNIX_FORMAT) {
+                $output = $dateTime->getTimestamp();
+            } else {
+                $output = $dateTime->format($format);
+            }
+        }
+
+        return $output;
     }
 
     /**
@@ -1759,10 +1770,10 @@ class ICal
         if (is_null($format)) {
             $output = $dateTime;
         } else {
-            $output = $dateTime->format($format);
-
             if ($format === self::UNIX_FORMAT) {
-                $output = intval($output);
+                $output = $dateTime->getTimestamp();
+            } else {
+                $output = $dateTime->format($format);
             }
         }
 
