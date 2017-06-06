@@ -15,11 +15,12 @@ namespace ICal;
 class ICal
 {
     const DATE_TIME_FORMAT        = 'Ymd\THis';
-    const TIME_FORMAT             = 'His';
-    const SECONDS_IN_A_WEEK       = 604800;
-    const UNIX_MIN_YEAR           = 1970;
     const ICAL_DATE_TIME_TEMPLATE = 'TZID=%s:';
     const RECURRENCE_EVENT        = 'Generated recurrence event';
+    const SECONDS_IN_A_WEEK       = 604800;
+    const TIME_FORMAT             = 'His';
+    const UNIX_FORMAT             = 'U';
+    const UNIX_MIN_YEAR           = 1970;
 
     /**
      * Tracks the number of events in the current iCal feed
@@ -850,7 +851,7 @@ class ICal
                         // the end date will fall on the same day defined in BYDAY
                         // Use the largest of these to ensure we are going far enough
                         // in the future to capture our final end day
-                        $until = max($until, $dtstart->format('U'));
+                        $until = max($until, $dtstart->format(self::UNIX_FORMAT));
                     }
 
                     unset($offset);
@@ -871,7 +872,7 @@ class ICal
                             // Adjust time zone from initial event
                             $dayRecurringOffset = 0;
                             if ($this->useTimeZoneWithRRules) {
-                                $recurringTimeZone = \DateTime::createFromFormat('U', $dayRecurringTimestamp);
+                                $recurringTimeZone = \DateTime::createFromFormat(self::UNIX_FORMAT, $dayRecurringTimestamp);
                                 $recurringTimeZone->setTimezone($initialStart->getTimezone());
                                 $dayRecurringOffset = $recurringTimeZone->getOffset();
                                 $dayRecurringTimestamp += $dayRecurringOffset;
@@ -960,7 +961,7 @@ class ICal
                             // Adjust time zone from initial event
                             $dayRecurringOffset = 0;
                             if ($this->useTimeZoneWithRRules) {
-                                $dayRecurringTimeZone = \DateTime::createFromFormat('U', $dayRecurringTimestamp);
+                                $dayRecurringTimeZone = \DateTime::createFromFormat(self::UNIX_FORMAT, $dayRecurringTimestamp);
                                 $dayRecurringTimeZone->setTimezone($initialStart->getTimezone());
                                 $dayRecurringOffset = $dayRecurringTimeZone->getOffset();
                                 $dayRecurringTimestamp += $dayRecurringOffset;
@@ -1071,7 +1072,7 @@ class ICal
                                     // Adjust time zone from initial event
                                     $monthRecurringOffset = 0;
                                     if ($this->useTimeZoneWithRRules) {
-                                        $recurringTimeZone = \DateTime::createFromFormat('U', $monthRecurringTimestamp);
+                                        $recurringTimeZone = \DateTime::createFromFormat(self::UNIX_FORMAT, $monthRecurringTimestamp);
                                         $recurringTimeZone->setTimezone($initialStart->getTimezone());
                                         $monthRecurringOffset = $recurringTimeZone->getOffset();
                                         $monthRecurringTimestamp += $monthRecurringOffset;
@@ -1139,7 +1140,7 @@ class ICal
                                 // Adjust time zone from initial event
                                 $monthRecurringOffset = 0;
                                 if ($this->useTimeZoneWithRRules) {
-                                    $recurringTimeZone = \DateTime::createFromFormat('U', $monthRecurringTimestamp);
+                                    $recurringTimeZone = \DateTime::createFromFormat(self::UNIX_FORMAT, $monthRecurringTimestamp);
                                     $recurringTimeZone->setTimezone($initialStart->getTimezone());
                                     $monthRecurringOffset = $recurringTimeZone->getOffset();
                                     $monthRecurringTimestamp += $monthRecurringOffset;
@@ -1252,7 +1253,7 @@ class ICal
                                 // Adjust time zone from initial event
                                 $yearRecurringOffset = 0;
                                 if ($this->useTimeZoneWithRRules) {
-                                    $recurringTimeZone = \DateTime::createFromFormat('U', $yearRecurringTimestamp);
+                                    $recurringTimeZone = \DateTime::createFromFormat(self::UNIX_FORMAT, $yearRecurringTimestamp);
                                     $recurringTimeZone->setTimezone($initialStart->getTimezone());
                                     $yearRecurringOffset = $recurringTimeZone->getOffset();
                                     $yearRecurringTimestamp += $yearRecurringOffset;
@@ -1342,7 +1343,7 @@ class ICal
                                 // Adjust time zone from initial event
                                 $yearRecurringOffset = 0;
                                 if ($this->useTimeZoneWithRRules) {
-                                    $recurringTimeZone = \DateTime::createFromFormat('U', $yearRecurringTimestamp);
+                                    $recurringTimeZone = \DateTime::createFromFormat(self::UNIX_FORMAT, $yearRecurringTimestamp);
                                     $recurringTimeZone->setTimezone($initialStart->getTimezone());
                                     $yearRecurringOffset = $recurringTimeZone->getOffset();
                                     $yearRecurringTimestamp += $yearRecurringOffset;
@@ -1747,7 +1748,7 @@ class ICal
      * @param  string $format   The format to apply to the DateTime object
      * @return integer|DateTime
      */
-    protected function parseDuration($date, $duration, $format = 'U')
+    protected function parseDuration($date, $duration, $format = self::UNIX_FORMAT)
     {
         $dateTime = date_create($date);
         $dateTime->modify($duration->y . ' year');
@@ -1762,7 +1763,7 @@ class ICal
         } else {
             $output = $dateTime->format($format);
 
-            if ($format === 'U') {
+            if ($format === self::UNIX_FORMAT) {
                 $output = intval($output);
             }
         }
@@ -1814,7 +1815,7 @@ class ICal
             return $dayOrdinals[$dayNumber];
         }
 
-        $timestamp = (is_object($timestamp)) ? $timestamp : \DateTime::createFromFormat('U', $timestamp);
+        $timestamp = (is_object($timestamp)) ? $timestamp : \DateTime::createFromFormat(self::UNIX_FORMAT, $timestamp);
         $start     = strtotime('first day of ' . $timestamp->format('F Y H:i:s'));
         $end       = strtotime('last day of '  . $timestamp->format('F Y H:i:s'));
 

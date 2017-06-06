@@ -75,6 +75,7 @@ var_dump($event->dtstart_array);
 | `RECURRENCE_EVENT`        | Used to isolate generated recurrence events   |
 | `SECONDS_IN_A_WEEK`       | The number of seconds in a week               |
 | `TIME_FORMAT`             | Default time format to use                    |
+| `UNIX_FORMAT`             | Unix timestamp date format                    |
 | `UNIX_MIN_YEAR`           | The year Unix time began                      |
 
 #### Variables
