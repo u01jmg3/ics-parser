@@ -682,7 +682,12 @@ class ICal
             $duration = end($dateArray);
             $dateTime = $this->parseDuration($event['DTSTART'], $duration, null);
         } else {
-            $dateTime = $this->iCalDateToDateTime($dateArray[3], true);
+            $dateTime = $this->iCalDateToDateTime($dateArray[3], false, true);
+        }
+
+        // Force time zone
+        if (isset($dateArray[0]['TZID'])) {
+            $dateTime->setTimezone(new \DateTimeZone($dateArray[0]['TZID']));
         }
 
         if (is_null($format)) {
