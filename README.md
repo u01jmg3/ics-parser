@@ -11,12 +11,12 @@
 
 ### Requirements
  - PHP 5 (≥ 5.3.0)
- - Valid ICS (`.ics`, `.ical`, `.ifb`) file
+ - [Valid ICS](https://icalendar.org/validator.html) (`.ics`, `.ical`, `.ifb`) file
 
 ### Setup
 
  - Install [Composer](https://getcomposer.org/)
-   - Add the following requirement to `composer.json`
+   - Add the following dependency to `composer.json`
      - :warning: **Note with Composer the owner is `johngrogg` and not `u01jmg3`**
    - To access new features require [`dev-master`](https://getcomposer.org/doc/articles/aliases.md#branch-alias)
 
@@ -28,15 +28,17 @@
    }
    ```
 
+## How to use
+
 ### How to instantiate the Parser
 
-- Using the example script as a guide, [refer to this code](https://github.com/u01jmg3/ics-parser/blob/master/examples/index.php#L1-L21)
+ - Using the example script as a guide, [refer to this code](https://github.com/u01jmg3/ics-parser/blob/master/examples/index.php#L1-L21)
 
 #### What will the parser return?
 
-- Each key/value pair from the iCal file will be parsed creating an associate array for both the calendar and every event it contains.
-- Also injected will be content under `dtstart_tz` and `dtend_tz` for accessing start and end dates with time zone data applied.
-- Where possible [`DateTime`](https://secure.php.net/manual/en/class.datetime.php) objects are used and returned.
+ - Each key/value pair from the iCal file will be parsed creating an associate array for both the calendar and every event it contains.
+ - Also injected will be content under `dtstart_tz` and `dtend_tz` for accessing start and end dates with time zone data applied.
+ - Where possible [`DateTime`](https://secure.php.net/manual/en/class.datetime.php) objects are used and returned.
 
 ```php
 // Dump the whole calendar
@@ -46,7 +48,7 @@ var_dump($ical->cal);
 var_dump($ical->events());
 ```
 
-- Also included are special `{property}_array` arrays which further resolve the contents of a key/value pair.
+ - Also included are special `{property}_array` arrays which further resolve the contents of a key/value pair.
 
 ```php
 // Dump a parsed event's start date
@@ -169,5 +171,6 @@ var_dump($event->dtstart_array);
 
 ## Tools for Testing
 
- - [https://jakubroztocil.github.io/rrule/](https://jakubroztocil.github.io/rrule/)
- - [http://www.unixtimestamp.com/](http://www.unixtimestamp.com/)
+ - [iCal Validator](https://icalendar.org/validator.html)
+ - [Recurrence Rule Tester](https://jakubroztocil.github.io/rrule/)
+ - [Unix Timestamp Converter](http://www.unixtimestamp.com)
