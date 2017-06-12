@@ -137,7 +137,7 @@ class Event extends ICal
     {
         if (is_string($value)) {
             return stripslashes(trim(str_replace('\n', "\n", $value)));
-        } else if (is_array($value)) {
+        } elseif (is_array($value)) {
             return array_map('self::prepareData', $value);
         }
 

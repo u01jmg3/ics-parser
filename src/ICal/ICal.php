@@ -7,7 +7,7 @@
  *
  * @author  Jonathan Goode <https://github.com/u01jmg3>, John Grogg <john.grogg@gmail.com>, Martin Thoma <info@martin-thoma.de>
  * @license https://opensource.org/licenses/mit-license.php MIT License
- * @version 2.0.5
+ * @version 2.0.6
  */
 
 namespace ICal;
