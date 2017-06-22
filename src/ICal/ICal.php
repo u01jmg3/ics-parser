@@ -688,7 +688,11 @@ class ICal
 
         // Force time zone
         if (isset($dateArray[0]['TZID'])) {
-            $dateTime->setTimezone(new \DateTimeZone($dateArray[0]['TZID']));
+            if ($this->isValidTimeZoneId($dateArray[0]['TZID'])) {
+                $dateTime->setTimezone(new \DateTimeZone($dateArray[0]['TZID']));
+            } else {
+                $dateTime->setTimezone(new \DateTimeZone($this->defaultTimeZone));
+            }
         }
 
         if (is_null($format)) {
