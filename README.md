@@ -36,7 +36,7 @@
 
 #### What will the parser return?
 
- - Each key/value pair from the iCal file will be parsed creating an associate array for both the calendar and every event it contains.
+ - Each key/value pair from the iCal file will be parsed creating an associative array for both the calendar and every event it contains.
  - Also injected will be content under `dtstart_tz` and `dtend_tz` for accessing start and end dates with time zone data applied.
  - Where possible [`DateTime`](https://secure.php.net/manual/en/class.datetime.php) objects are used and returned.
 
