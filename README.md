@@ -1,9 +1,11 @@
 # PHP ICS Parser
 
-[![Latest Stable Version](https://poser.pugx.org/johngrogg/ics-parser/v/stable.png "Latest Stable Version")](https://packagist.org/packages/johngrogg/ics-parser)
+[![Latest Stable Release](https://poser.pugx.org/johngrogg/ics-parser/v/stable.png "Latest Stable Release")](https://packagist.org/packages/johngrogg/ics-parser)
 [![Total Downloads](https://poser.pugx.org/johngrogg/ics-parser/downloads.png "Total Downloads")](https://packagist.org/packages/johngrogg/ics-parser)
 [![Reference Status](https://www.versioneye.com/php/johngrogg:ics-parser/reference_badge.svg?style=flat "Reference Status")](https://www.versioneye.com/php/johngrogg:ics-parser/references)
 [![Dependency Status](https://www.versioneye.com/php/johngrogg:ics-parser/badge.svg "Dependency Status")](https://www.versioneye.com/php/johngrogg:ics-parser)
+[![Issue Closure Rate](http://issuestats.com/github/u01jmg3/ics-parser/badge/issue?style=flat "Issue Closure Rate")](https://github.com/u01jmg3/ics-parser/issues)
+[![Pull Request Closure Rate](http://issuestats.com/github/u01jmg3/ics-parser/badge/pr?style=flat "Pull Request Closure Rate")](https://github.com/u01jmg3/ics-parser/pulls)
 
 ---
 
