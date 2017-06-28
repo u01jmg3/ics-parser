@@ -1954,7 +1954,7 @@ class ICal
             foreach ($subArray as $key => $value) {
                 if ($key === 'TZID') {
                     $currentTimeZone = $subArray[$key];
-                } else {
+                } elseif (is_numeric($key)) {
                     $icalDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $currentTimeZone) . $subArray[$key];
                     $output[] = $this->iCalDateToUnixTimestamp($icalDate);
 
