@@ -683,7 +683,8 @@ class ICal
             $duration = end($dateArray);
             $dateTime = $this->parseDuration($event['DTSTART'], $duration, null);
         } else {
-            $dateTime = $this->iCalDateToDateTime($dateArray[3], false, true);
+            $dateTime = new \DateTime($dateArray[1], new \DateTimeZone('UTC'));
+            $dateTime->setTimezone(new \DateTimeZone($this->calendarTimeZone()));
         }
 
         // Force time zone
@@ -838,7 +839,7 @@ class ICal
                     // Get Until
                     $until = strtotime($rrules['UNTIL']);
                 } elseif (isset($rrules['COUNT'])) {
-                    $countOrig  = (is_numeric($rrules['COUNT']) && $rrules['COUNT'] > 1) ? $rrules['COUNT'] : 0;
+                    $countOrig = (is_numeric($rrules['COUNT']) && $rrules['COUNT'] > 1) ? $rrules['COUNT'] : 0;
 
                     // Increment count by the number of excluded dates
                     $countOrig += sizeof($exdates);
@@ -1459,8 +1460,6 @@ class ICal
                         $recurrenceEvents    = array(); // Reset
 
                         break;
-
-                        $events = (isset($countOrig) && sizeof($events) > $countOrig) ? array_slice($events, 0, $countOrig) : $events; // Ensure we abide by COUNT if defined
                 }
             }
         }
