@@ -759,6 +759,9 @@ class ICal
     {
         $events = (isset($this->cal['VEVENT'])) ? $this->cal['VEVENT'] : array();
 
+        $recurrenceEvents    = array();
+        $allRecurrenceEvents = array();
+
         if (empty($events)) {
             return false;
         }
@@ -932,8 +935,8 @@ class ICal
                             }
 
                             if (!$isExcluded) {
-                                $anEvent  = $this->processEventIcalDateTime($anEvent);
-                                $events[] = $anEvent;
+                                $anEvent            = $this->processEventIcalDateTime($anEvent);
+                                $recurrenceEvents[] = $anEvent;
                                 $this->eventCount++;
 
                                 // If RRULE[COUNT] is reached then break
@@ -949,6 +952,11 @@ class ICal
                             // Move forwards
                             $recurringTimestamp = strtotime($offset, $recurringTimestamp);
                         }
+
+                        $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
+                        $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
+                        $recurrenceEvents    = array(); // Reset
+
                         break;
 
                     case 'WEEKLY':
@@ -1026,8 +1034,8 @@ class ICal
                                     }
 
                                     if (!$isExcluded) {
-                                        $anEvent  = $this->processEventIcalDateTime($anEvent);
-                                        $events[] = $anEvent;
+                                        $anEvent            = $this->processEventIcalDateTime($anEvent);
+                                        $recurrenceEvents[] = $anEvent;
                                         $this->eventCount++;
 
                                         // If RRULE[COUNT] is reached then break
@@ -1048,6 +1056,11 @@ class ICal
                             // Move forwards $interval weeks
                             $weekRecurringTimestamp = strtotime($offset, $weekRecurringTimestamp);
                         }
+
+                        $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
+                        $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
+                        $recurrenceEvents    = array(); // Reset
+
                         break;
 
                     case 'MONTHLY':
@@ -1135,8 +1148,8 @@ class ICal
                                     }
 
                                     if (!$isExcluded) {
-                                        $anEvent  = $this->processEventIcalDateTime($anEvent);
-                                        $events[] = $anEvent;
+                                        $anEvent            = $this->processEventIcalDateTime($anEvent);
+                                        $recurrenceEvents[] = $anEvent;
                                         $this->eventCount++;
 
                                         // If RRULE[COUNT] is reached then break
@@ -1225,8 +1238,8 @@ class ICal
                                         }
 
                                         if (!$isExcluded) {
-                                            $anEvent  = $this->processEventIcalDateTime($anEvent);
-                                            $events[] = $anEvent;
+                                            $anEvent            = $this->processEventIcalDateTime($anEvent);
+                                            $recurrenceEvents[] = $anEvent;
                                             $this->eventCount++;
 
                                             // If RRULE[COUNT] is reached then break
@@ -1253,6 +1266,11 @@ class ICal
                                 $recurringTimestamp = strtotime($offset, $recurringTimestamp);
                             }
                         }
+
+                        $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
+                        $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
+                        $recurrenceEvents    = array(); // Reset
+
                         break;
 
                     case 'YEARLY':
@@ -1331,8 +1349,8 @@ class ICal
                                             }
 
                                             if (!$isExcluded) {
-                                                $anEvent  = $this->processEventIcalDateTime($anEvent);
-                                                $events[] = $anEvent;
+                                                $anEvent            = $this->processEventIcalDateTime($anEvent);
+                                                $recurrenceEvents[] = $anEvent;
                                                 $this->eventCount++;
 
                                                 // If RRULE[COUNT] is reached then break
@@ -1415,8 +1433,8 @@ class ICal
                                         }
 
                                         if (!$isExcluded) {
-                                            $anEvent  = $this->processEventIcalDateTime($anEvent);
-                                            $events[] = $anEvent;
+                                            $anEvent            = $this->processEventIcalDateTime($anEvent);
+                                            $recurrenceEvents[] = $anEvent;
                                             $this->eventCount++;
 
                                             // If RRULE[COUNT] is reached then break
@@ -1435,12 +1453,19 @@ class ICal
                                 $recurringTimestamp = strtotime($offset, $recurringTimestamp);
                             }
                         }
+
+                        $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
+                        $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
+                        $recurrenceEvents    = array(); // Reset
+
                         break;
 
                         $events = (isset($countOrig) && sizeof($events) > $countOrig) ? array_slice($events, 0, $countOrig) : $events; // Ensure we abide by COUNT if defined
                 }
             }
         }
+
+        $events = array_merge($events, $allRecurrenceEvents);
 
         $this->cal['VEVENT'] = $events;
     }
@@ -2016,5 +2041,27 @@ class ICal
         }
 
         return $lines;
+    }
+
+    /**
+     * Ensures the recurrence count is enforced against generated recurrence events.
+     *
+     * @param  array $rrules
+     * @param  array $recurrenceEvents
+     * @return array
+     */
+    protected function trimToRecurrenceCount(array $rrules, array $recurrenceEvents)
+    {
+        if (isset($rrules['COUNT'])) {
+            $recurrenceCount = (intval($rrules['COUNT']) - 1);
+            $surplusCount    = (sizeof($recurrenceEvents) - $recurrenceCount);
+
+            if ($surplusCount > 0) {
+                $recurrenceEvents  = array_slice($recurrenceEvents, 0, $recurrenceCount);
+                $this->eventCount -= $surplusCount;
+            }
+        }
+
+        return $recurrenceEvents;
     }
 }
