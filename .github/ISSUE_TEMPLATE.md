@@ -5,6 +5,8 @@
 
 - PHP Version: `5.#.#`
 - PHP date.timezone: `[Country]/[City]`
+- ICS Parser Version: `2.#.#`
+- Windows/Mac/Linux
 
 ### Description of the Issue:
 
