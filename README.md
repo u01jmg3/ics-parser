@@ -4,8 +4,8 @@
 [![Total Downloads](https://poser.pugx.org/johngrogg/ics-parser/downloads.png "Total Downloads")](https://packagist.org/packages/johngrogg/ics-parser)
 [![Reference Status](https://www.versioneye.com/php/johngrogg:ics-parser/reference_badge.svg?style=flat "Reference Status")](https://www.versioneye.com/php/johngrogg:ics-parser/references)
 [![Dependency Status](https://www.versioneye.com/php/johngrogg:ics-parser/badge.svg "Dependency Status")](https://www.versioneye.com/php/johngrogg:ics-parser)
-[![Issue Closure Rate](https://img.shields.io/issuestats/i/github/u01jmg3/ics-parser.svg?maxAge=3600&colorB=95c20d "Issue Closure Rate")](https://github.com/u01jmg3/ics-parser/issues)
-[![Pull Request Closure Rate](https://img.shields.io/issuestats/p/github/u01jmg3/ics-parser.svg?maxAge=2592000 "Pull Request Closure Rate")](https://github.com/u01jmg3/ics-parser/pulls)
+[![Issue Closure Rate](https://img.shields.io/badge/issue%20closure-4%20days-brightgreen.svg "Issue Closure Rate")](https://github.com/u01jmg3/ics-parser/issues)
+[![Pull Request Closure Rate](https://img.shields.io/badge/pull%20closure-1%20day-brightgreen.svg "Pull Request Closure Rate")](https://github.com/u01jmg3/ics-parser/pulls)
 
 ---
 
