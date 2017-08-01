@@ -326,7 +326,7 @@ class ICal
                                 $this->todoCount++;
                             }
                             $component = 'VTODO';
-                            break;
+                        break;
 
                         // http://www.kanzaki.com/docs/ical/vevent.html
                         case 'BEGIN:VEVENT':
@@ -334,7 +334,7 @@ class ICal
                                 $this->eventCount++;
                             }
                             $component = 'VEVENT';
-                            break;
+                        break;
 
                         // http://www.kanzaki.com/docs/ical/vfreebusy.html
                         case 'BEGIN:VFREEBUSY':
@@ -342,7 +342,7 @@ class ICal
                                 $this->freeBusyIndex++;
                             }
                             $component = 'VFREEBUSY';
-                            break;
+                        break;
 
                         case 'BEGIN:DAYLIGHT':
                         case 'BEGIN:STANDARD':
@@ -350,7 +350,7 @@ class ICal
                         case 'BEGIN:VCALENDAR':
                         case 'BEGIN:VTIMEZONE':
                             $component = $value;
-                            break;
+                        break;
 
                         case 'END:DAYLIGHT':
                         case 'END:STANDARD':
@@ -361,11 +361,11 @@ class ICal
                         case 'END:VTIMEZONE':
                         case 'END:VTODO':
                             $component = 'VCALENDAR';
-                            break;
+                        break;
 
                         default:
                             $this->addCalendarComponentWithKeyAndValue($component, $keyword, $value);
-                            break;
+                        break;
                     }
                 }
             }
@@ -413,7 +413,7 @@ class ICal
         switch ($component) {
             case 'VTODO':
                 $this->cal[$component][$this->todoCount - 1][$keyword] = $value;
-                break;
+            break;
 
             case 'VEVENT':
                 if (!isset($this->cal[$component][$this->eventCount - 1][$keyword . '_array'])) {
@@ -449,7 +449,7 @@ class ICal
                         $this->cal[$component][$this->eventCount - 1][$keyword] .= ',' . $value;
                     }
                 }
-                break;
+            break;
 
             case 'VFREEBUSY':
                 if ($keyword === 'FREEBUSY') {
@@ -467,11 +467,11 @@ class ICal
                 } else {
                     $this->cal[$component][$this->freeBusyIndex - 1][$keyword][] = $value;
                 }
-                break;
+            break;
 
             default:
                 $this->cal[$component][$keyword] = $value;
-                break;
+            break;
         }
 
         $this->lastKeyword = $keyword;
@@ -958,7 +958,7 @@ class ICal
                         $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
                         $recurrenceEvents    = array(); // Reset
 
-                        break;
+                    break;
 
                     case 'WEEKLY':
                         // Create offset
@@ -1062,7 +1062,7 @@ class ICal
                         $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
                         $recurrenceEvents    = array(); // Reset
 
-                        break;
+                    break;
 
                     case 'MONTHLY':
                         // Create offset
@@ -1272,7 +1272,7 @@ class ICal
                         $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
                         $recurrenceEvents    = array(); // Reset
 
-                        break;
+                    break;
 
                     case 'YEARLY':
                         // Create offset
@@ -1459,7 +1459,7 @@ class ICal
                         $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
                         $recurrenceEvents    = array(); // Reset
 
-                        break;
+                    break;
                 }
             }
         }
@@ -1860,7 +1860,7 @@ class ICal
 
         $timestamp = (is_object($timestamp)) ? $timestamp : \DateTime::createFromFormat(self::UNIX_FORMAT, $timestamp);
         $start     = strtotime('first day of ' . $timestamp->format(self::DATE_TIME_FORMAT_PRETTY));
-        $end       = strtotime('last day of '  . $timestamp->format(self::DATE_TIME_FORMAT_PRETTY));
+        $end       = strtotime('last day of ' . $timestamp->format(self::DATE_TIME_FORMAT_PRETTY));
 
         // Used with pow(2, X) so pow(2, 4) is THURSDAY
         $weekdays = array_flip(array_keys($this->weekdays));
