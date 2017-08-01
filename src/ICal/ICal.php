@@ -1930,7 +1930,7 @@ class ICal
      */
     protected function mb_chr($code)
     {
-        if (function_exists("mb_chr")) {
+        if (function_exists('mb_chr')) {
             return mb_chr($code);
         } else {
             if (0x80 > $code %= 0x200000) {
