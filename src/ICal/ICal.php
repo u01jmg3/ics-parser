@@ -1922,6 +1922,32 @@ class ICal
     }
 
     /**
+     * Provides a polyfill for PHP 7.2's mb_chr(), which is a multibyte safe version of chr().
+     * Multibyte safe.
+     *
+     * @param integer $code
+     * @return string
+     */
+    protected function mb_chr($code)
+    {
+        if (function_exists("mb_chr")) {
+            return mb_chr($code);
+        } else {
+            if (0x80 > $code %= 0x200000) {
+                $s = chr($code);
+            } elseif (0x800 > $code) {
+                $s = chr(0xC0 | $code >> 6) . chr(0x80 | $code & 0x3F);
+            } elseif (0x10000 > $code) {
+                $s = chr(0xE0 | $code >> 12) . chr(0x80 | $code >> 6 & 0x3F) . chr(0x80 | $code & 0x3F);
+            } else {
+                $s = chr(0xF0 | $code >> 18) . chr(0x80 | $code >> 12 & 0x3F) . chr(0x80 | $code >> 6 & 0x3F) . chr(0x80 | $code & 0x3F);
+            }
+
+            return $s;
+        }
+    }
+
+    /**
      * Replaces curly quotes and other special characters
      * with their standard equivalents
      *
@@ -1948,7 +1974,10 @@ class ICal
         $cleanedData = strtr($data, $replacementChars);
 
         // Replace Windows-1252 equivalents
-        $cleanedData = $this->mb_str_replace(array(chr(145), chr(146), chr(147), chr(148), chr(150), chr(151), chr(133), chr(194)), $replacementChars, $cleanedData);
+        $charsToReplace = array_map(function ($code) {
+            return $this->mb_chr($code);
+        }, array(133, 145, 146, 147, 148, 150, 151, 194));
+        $cleanedData = $this->mb_str_replace($charsToReplace, $replacementChars, $cleanedData);
 
         return $cleanedData;
     }
