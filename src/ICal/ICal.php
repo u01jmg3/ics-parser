@@ -757,7 +757,7 @@ class ICal
             if ((bool) array_product($checks)) {
                 $eventDtstartUnix = $this->iCalDateToUnixTimestamp($event['DTSTART_array'][3], true, true);
 
-                if ($alteredEventKey = array_search($eventDtstartUnix, $this->alteredRecurrenceInstances[$event['UID']])) {
+                if (false !== $alteredEventKey = array_search($eventDtstartUnix, $this->alteredRecurrenceInstances[$event['UID']])) {
                     $events[$key]        = array_replace_recursive($events[$key], $events[$alteredEventKey]);
                     $eventKeysToRemove[] = $alteredEventKey;
                 }
