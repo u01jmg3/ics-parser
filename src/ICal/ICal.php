@@ -742,11 +742,29 @@ class ICal
                     $this->alteredRecurrenceInstances[$uid] = array();
                 }
                 $recurrenceDateUtc = $this->iCalDateToUnixTimestamp($anEvent['RECURRENCE-ID_array'][3], true, true);
-                $this->alteredRecurrenceInstances[$uid][] = $recurrenceDateUtc;
+                $this->alteredRecurrenceInstances[$uid][$key] = $recurrenceDateUtc;
             }
 
             $events[$key] = $anEvent;
         }
+
+        $eventKeysToRemove = array();
+        foreach ($events as $key => $event) {
+            $checks[] = !isset($event['RECURRENCE-ID']);
+            $checks[] = isset($event['UID']);
+            $checks[] = isset($this->alteredRecurrenceInstances[$event['UID']]);
+
+            if ((bool) array_product($checks)) {
+                $eventDtstartUnix = $this->iCalDateToUnixTimestamp($event['DTSTART_array'][3], true, true);
+
+                if ($alteredEventKey = array_search($eventDtstartUnix, $this->alteredRecurrenceInstances[$event['UID']])) {
+                    $events[$key]        = array_replace_recursive($events[$key], $events[$alteredEventKey]);
+                    $eventKeysToRemove[] = $alteredEventKey;
+                }
+            }
+            unset($checks);
+        }
+        $events = array_diff_key($events, array_flip($eventKeysToRemove));
 
         $this->cal['VEVENT'] = $events;
     }
@@ -882,6 +900,8 @@ class ICal
                 } else {
                     $until = $untilDefault->getTimestamp();
                 }
+
+                $until = intval($until);
 
                 // Decide how often to add events and do so
                 switch ($frequency) {
