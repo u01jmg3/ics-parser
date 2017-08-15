@@ -24,6 +24,13 @@ class ICal
     const UNIX_MIN_YEAR           = 1970;
 
     /**
+     * Tracks the number of alarms in the current iCal feed
+     *
+     * @var integer
+     */
+    public $alarmCount = 0;
+
+    /**
      * Tracks the number of events in the current iCal feed
      *
      * @var integer
@@ -344,9 +351,19 @@ class ICal
                             $component = 'VFREEBUSY';
                         break;
 
+                        case 'BEGIN:VALARM':
+                            if (!is_array($value)) {
+                                $this->alarmCount++;
+                            }
+                            $component = 'VALARM';
+                        break;
+
+                        case 'END:VALARM':
+                            $component = 'VEVENT';
+                        break;
+
                         case 'BEGIN:DAYLIGHT':
                         case 'BEGIN:STANDARD':
-                        case 'BEGIN:VALARM':
                         case 'BEGIN:VCALENDAR':
                         case 'BEGIN:VTIMEZONE':
                             $component = $value;
@@ -354,7 +371,6 @@ class ICal
 
                         case 'END:DAYLIGHT':
                         case 'END:STANDARD':
-                        case 'END:VALARM':
                         case 'END:VCALENDAR':
                         case 'END:VEVENT':
                         case 'END:VFREEBUSY':
@@ -411,62 +427,92 @@ class ICal
         }
 
         switch ($component) {
-            case 'VTODO':
-                $this->cal[$component][$this->todoCount - 1][$keyword] = $value;
-            break;
+            case 'VALARM':
+                $key1 = 'VEVENT';
+                $key2 = ($this->eventCount - 1);
+                $key3 = $component;
 
-            case 'VEVENT':
-                if (!isset($this->cal[$component][$this->eventCount - 1][$keyword . '_array'])) {
-                    $this->cal[$component][$this->eventCount - 1][$keyword . '_array'] = array();
+                if (!isset($this->cal[$key1][$key2][$key3]["{$keyword}_array"])) {
+                    $this->cal[$key1][$key2][$key3]["{$keyword}_array"] = array();
                 }
 
                 if (is_array($value)) {
                     // Add array of properties to the end
-                    array_push($this->cal[$component][$this->eventCount - 1][$keyword . '_array'], $value);
+                    array_push($this->cal[$key1][$key2][$key3]["{$keyword}_array"], $value);
                 } else {
-                    if (!isset($this->cal[$component][$this->eventCount - 1][$keyword])) {
-                        $this->cal[$component][$this->eventCount - 1][$keyword] = $value;
+                    if (!isset($this->cal[$key1][$key2][$key3][$keyword])) {
+                        $this->cal[$key1][$key2][$key3][$keyword] = $value;
+                    }
+
+                    if ($this->cal[$key1][$key2][$key3][$keyword] !== $value) {
+                        $this->cal[$key1][$key2][$key3][$keyword] .= ',' . $value;
+                    }
+                }
+            break;
+
+            case 'VEVENT':
+                $key1 = $component;
+                $key2 = ($this->eventCount - 1);
+
+                if (!isset($this->cal[$key1][$key2]["{$keyword}_array"])) {
+                    $this->cal[$key1][$key2]["{$keyword}_array"] = array();
+                }
+
+                if (is_array($value)) {
+                    // Add array of properties to the end
+                    array_push($this->cal[$key1][$key2]["{$keyword}_array"], $value);
+                } else {
+                    if (!isset($this->cal[$key1][$key2][$keyword])) {
+                        $this->cal[$key1][$key2][$keyword] = $value;
                     }
 
                     if ($keyword === 'EXDATE') {
                         if (trim($value) === $value) {
                             $array = array_filter(explode(',', $value));
-                            $this->cal[$component][$this->eventCount - 1][$keyword . '_array'][] = $array;
+                            $this->cal[$key1][$key2]["{$keyword}_array"][] = $array;
                         } else {
-                            $value = explode(',', implode(',', $this->cal[$component][$this->eventCount - 1][$keyword . '_array'][1]) . trim($value));
-                            $this->cal[$component][$this->eventCount - 1][$keyword . '_array'][1] = $value;
+                            $value = explode(',', implode(',', $this->cal[$key1][$key2]["{$keyword}_array"][1]) . trim($value));
+                            $this->cal[$key1][$key2]["{$keyword}_array"][1] = $value;
                         }
                     } else {
-                        $this->cal[$component][$this->eventCount - 1][$keyword . '_array'][] = $value;
+                        $this->cal[$key1][$key2]["{$keyword}_array"][] = $value;
 
                         if ($keyword === 'DURATION') {
                             $duration = new \DateInterval($value);
-                            array_push($this->cal[$component][$this->eventCount - 1][$keyword . '_array'], $duration);
+                            array_push($this->cal[$key1][$key2]["{$keyword}_array"], $duration);
                         }
                     }
 
-                    if ($this->cal[$component][$this->eventCount - 1][$keyword] !== $value) {
-                        $this->cal[$component][$this->eventCount - 1][$keyword] .= ',' . $value;
+                    if ($this->cal[$key1][$key2][$keyword] !== $value) {
+                        $this->cal[$key1][$key2][$keyword] .= ',' . $value;
                     }
                 }
             break;
 
             case 'VFREEBUSY':
+                $key1 = $component;
+                $key2 = ($this->freeBusyIndex - 1);
+                $key3 = $keyword;
+
                 if ($keyword === 'FREEBUSY') {
                     if (is_array($value)) {
-                        $this->cal[$component][$this->freeBusyIndex - 1][$keyword][][] = $value;
+                        $this->cal[$key1][$key2][$key3][][] = $value;
                     } else {
                         $this->freeBusyCount++;
 
-                        end($this->cal[$component][$this->freeBusyIndex - 1][$keyword]);
-                        $key = key($this->cal[$component][$this->freeBusyIndex - 1][$keyword]);
+                        end($this->cal[$key1][$key2][$key3]);
+                        $key = key($this->cal[$key1][$key2][$key3]);
 
                         $value = explode('/', $value);
-                        $this->cal[$component][$this->freeBusyIndex - 1][$keyword][$key][] = $value;
+                        $this->cal[$key1][$key2][$key3][$key][] = $value;
                     }
                 } else {
-                    $this->cal[$component][$this->freeBusyIndex - 1][$keyword][] = $value;
+                    $this->cal[$key1][$key2][$key3][] = $value;
                 }
+            break;
+
+            case 'VTODO':
+                $this->cal[$component][$this->todoCount - 1][$keyword] = $value;
             break;
 
             default:

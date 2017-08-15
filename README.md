@@ -89,6 +89,7 @@ var_dump($event->dtstart_array);
 | Name                     | Description                                                         | Configurable       | Default Value  |
 |--------------------------|---------------------------------------------------------------------|:------------------:|----------------|
 | `$cal`                   | The parsed calendar                                                 |         :x:        | N/A            |
+| `$alarmCount`            | Tracks the number of alarms in the current iCal feed                |         :x:        | N/A            |
 | `$eventCount`            | Tracks the number of events in the current iCal feed                |         :x:        | N/A            |
 | `$freeBusyCount`         | Tracks the free/busy count in the current iCal feed                 |         :x:        | N/A            |
 | `$todoCount`             | Tracks the number of todos in the current iCal feed                 |         :x:        | N/A            |

@@ -44,6 +44,10 @@ $forceTimeZone = false;
             <span class="badge"><?php echo $ical->todoCount ?></span>
             The number of todos
         </li>
+        <li class="list-group-item">
+            <span class="badge"><?php echo $ical->alarmCount ?></span>
+            The number of alarms
+        </li>
     </ul>
 
     <?php
