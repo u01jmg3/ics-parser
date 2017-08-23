@@ -226,7 +226,7 @@ class ICal
             $files = is_array($files) ? $files : array($files);
 
             foreach ($files as $file) {
-                if ($this->isFileOrUrl($file)) {
+                if (!is_array($file) && $this->isFileOrUrl($file)) {
                     $lines = $this->fileOrUrl($file);
                 } else {
                     $lines = is_array($file) ? $file : array($file);
