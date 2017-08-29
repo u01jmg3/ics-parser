@@ -660,7 +660,14 @@ class ICal
             // A Unix timestamp cannot represent a date prior to 1 Jan 1970
             $year = $date[2];
             if ($year <= self::UNIX_MIN_YEAR) {
-                $dateTime = new \DateTime($icalDate, new \DateTimeZone($this->defaultTimeZone));
+                $eventTimeZone = ltrim(strstr($icalDate, ':', true), 'TZID=');
+
+                if (empty($eventTimeZone)) {
+                    $dateTime = new \DateTime($icalDate, new \DateTimeZone($this->defaultTimeZone));
+                } else {
+                    $icalDate = ltrim(strstr($icalDate, ':'), ':');
+                    $dateTime = new \DateTime($icalDate, new \DateTimeZone($eventTimeZone));
+                }
             } else {
                 if ($forceTimeZone) {
                     // TZID={Time Zone}:
