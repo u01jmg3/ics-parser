@@ -108,6 +108,13 @@ class ICal
     protected $lastKeyword;
 
     /**
+     * Cache valid time zones to avoid unnecessary lookups
+     *
+     * @var array
+     */
+    protected $validTimeZones = array();
+
+    /**
      * Event recurrence instances that have been altered
      *
      * @var array
@@ -1838,6 +1845,9 @@ class ICal
      */
     protected function isValidTimeZoneId($timeZone)
     {
+        if (in_array($timeZone, $this->validTimeZones)) {
+            return true;
+        }
         $valid = array();
         $tza   = timezone_abbreviations_list();
 
@@ -1850,6 +1860,7 @@ class ICal
         unset($valid['']);
 
         if (isset($valid[$timeZone]) || in_array($timeZone, timezone_identifiers_list(\DateTimeZone::ALL_WITH_BC))) {
+            $this->validTimeZones[] = $timeZone;
             return true;
         }
 
