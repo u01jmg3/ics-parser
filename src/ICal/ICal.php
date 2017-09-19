@@ -2185,7 +2185,7 @@ class ICal
     /**
      * Checks if an excluded date matches a given date by reconciling time zones.
      *
-     * @param  string  $exdate
+     * @param  integer $exdate
      * @param  string  $searchDate
      * @param  integer $recurringOffset
      * @return boolean
