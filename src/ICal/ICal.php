@@ -665,7 +665,9 @@ class ICal
             $dateTime = $icalDate;
         } else {
             // A Unix timestamp cannot represent a date prior to 1 Jan 1970
-            $year = $date[2];
+            $year  = $date[2];
+            $isUtc = false;
+
             if ($year <= self::UNIX_MIN_YEAR) {
                 $eventTimeZone = ltrim(strstr($icalDate, ':', true), 'TZID=');
 
@@ -683,6 +685,7 @@ class ICal
                     }
 
                     if ($date[8] === 'Z') {
+                        $isUtc    = true;
                         $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
                     } elseif (isset($eventTimeZone) && $this->isValidTimeZoneId($eventTimeZone)) {
                         $dateTime = new \DateTime('now', new \DateTimeZone($eventTimeZone));
@@ -697,7 +700,9 @@ class ICal
                 $dateTime->setTime((int) $date[5], (int) $date[6], (int) $date[7]);
             }
 
-            if ($forceUtc) {
+            if ($forceTimeZone && $isUtc) {
+                $dateTime->setTimezone(new \DateTimeZone($this->defaultTimeZone));
+            } elseif ($forceUtc) {
                 $dateTime->setTimezone(new \DateTimeZone('UTC'));
             }
         }
@@ -718,8 +723,13 @@ class ICal
     public function iCalDateToUnixTimestamp($icalDate, $forceTimeZone = false, $forceUtc = false)
     {
         $dateTime = $this->iCalDateToDateTime($icalDate, $forceTimeZone, $forceUtc);
+        $offset   = 0;
 
-        return $dateTime->getTimestamp();
+        if ($forceTimeZone) {
+            $offset = $dateTime->getOffset();
+        }
+
+        return $dateTime->getTimestamp() + $offset;
     }
 
     /**
@@ -1000,7 +1010,12 @@ class ICal
                                 $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
                             }
                             $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $dayRecurringOffset) {
-                                $a = $this->iCalDateToUnixTimestamp($searchDate);
+                                $forceTimeZone = false;
+                                if (substr($searchDate, -1) === 'Z') {
+                                    $forceTimeZone = true;
+                                }
+
+                                $a = $this->iCalDateToUnixTimestamp($searchDate, $forceTimeZone);
                                 $b = ($exdate + $dayRecurringOffset);
 
                                 return $a === $b;
@@ -1099,7 +1114,12 @@ class ICal
                                         $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
                                     }
                                     $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $dayRecurringOffset) {
-                                        $a = $this->iCalDateToUnixTimestamp($searchDate);
+                                        $forceTimeZone = false;
+                                        if (substr($searchDate, -1) === 'Z') {
+                                            $forceTimeZone = true;
+                                        }
+
+                                        $a = $this->iCalDateToUnixTimestamp($searchDate, $forceTimeZone);
                                         $b = ($exdate + $dayRecurringOffset);
 
                                         return $a === $b;
@@ -1213,7 +1233,12 @@ class ICal
                                         $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
                                     }
                                     $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $monthRecurringOffset) {
-                                        $a = $this->iCalDateToUnixTimestamp($searchDate);
+                                        $forceTimeZone = false;
+                                        if (substr($searchDate, -1) === 'Z') {
+                                            $forceTimeZone = true;
+                                        }
+
+                                        $a = $this->iCalDateToUnixTimestamp($searchDate, $forceTimeZone);
                                         $b = ($exdate + $monthRecurringOffset);
 
                                         return $a === $b;
@@ -1303,7 +1328,12 @@ class ICal
                                             $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
                                         }
                                         $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $monthRecurringOffset) {
-                                            $a = $this->iCalDateToUnixTimestamp($searchDate);
+                                            $forceTimeZone = false;
+                                            if (substr($searchDate, -1) === 'Z') {
+                                                $forceTimeZone = true;
+                                            }
+
+                                            $a = $this->iCalDateToUnixTimestamp($searchDate, $forceTimeZone);
                                             $b = ($exdate + $monthRecurringOffset);
 
                                             return $a === $b;
@@ -1414,7 +1444,12 @@ class ICal
                                                 $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
                                             }
                                             $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $yearRecurringOffset) {
-                                                $a = $this->iCalDateToUnixTimestamp($searchDate);
+                                                $forceTimeZone = false;
+                                                if (substr($searchDate, -1) === 'Z') {
+                                                    $forceTimeZone = true;
+                                                }
+
+                                                $a = $this->iCalDateToUnixTimestamp($searchDate, $forceTimeZone);
                                                 $b = ($exdate + $yearRecurringOffset);
 
                                                 return $a === $b;
@@ -1498,7 +1533,12 @@ class ICal
                                             $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
                                         }
                                         $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $yearRecurringOffset) {
-                                            $a = $this->iCalDateToUnixTimestamp($searchDate);
+                                            $forceTimeZone = false;
+                                            if (substr($searchDate, -1) === 'Z') {
+                                                $forceTimeZone = true;
+                                            }
+
+                                            $a = $this->iCalDateToUnixTimestamp($searchDate, $forceTimeZone);
                                             $b = ($exdate + $yearRecurringOffset);
 
                                             return $a === $b;
@@ -2093,8 +2133,16 @@ class ICal
                 if ($key === 'TZID') {
                     $currentTimeZone = $subArray[$key];
                 } elseif (is_numeric($key)) {
-                    $icalDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $currentTimeZone) . $subArray[$key];
-                    $output[] = $this->iCalDateToUnixTimestamp($icalDate);
+                    $forceTimeZone = false;
+                    $icalDate      = $subArray[$key];
+
+                    if (substr($icalDate, -1) === 'Z') {
+                        $forceTimeZone = true;
+                    } else {
+                        $icalDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $currentTimeZone) . $icalDate;
+                    }
+
+                    $output[] = $this->iCalDateToUnixTimestamp($icalDate, $forceTimeZone);
 
                     if ($key === $finalKey) {
                         // Reset to default
