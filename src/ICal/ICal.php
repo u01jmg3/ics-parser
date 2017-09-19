@@ -1861,6 +1861,7 @@ class ICal
 
         if (isset($valid[$timeZone]) || in_array($timeZone, timezone_identifiers_list(\DateTimeZone::ALL_WITH_BC))) {
             $this->validTimeZones[] = $timeZone;
+
             return true;
         }
 

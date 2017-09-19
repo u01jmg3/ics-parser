@@ -2,7 +2,7 @@
 
 namespace ICal;
 
-class Event extends ICal
+class Event
 {
     const HTML_TEMPLATE = '<p>%s: %s</p>';
 
