@@ -15,11 +15,12 @@ namespace ICal;
 class ICal
 {
     const DATE_TIME_FORMAT        = 'Ymd\THis';
-    const ICAL_DATE_TIME_TEMPLATE = 'TZID=%s:';
     const DATE_TIME_FORMAT_PRETTY = 'F Y H:i:s';
+    const ICAL_DATE_TIME_TEMPLATE = 'TZID=%s:';
     const RECURRENCE_EVENT        = 'Generated recurrence event';
     const SECONDS_IN_A_WEEK       = 604800;
     const TIME_FORMAT             = 'His';
+    const TIME_ZONE_UTC           = 'UTC';
     const UNIX_FORMAT             = 'U';
     const UNIX_MIN_YEAR           = 1970;
 
@@ -686,7 +687,7 @@ class ICal
 
                     if ($date[8] === 'Z') {
                         $isUtc    = true;
-                        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+                        $dateTime = new \DateTime('now', new \DateTimeZone(self::TIME_ZONE_UTC));
                     } elseif (isset($eventTimeZone) && $this->isValidTimeZoneId($eventTimeZone)) {
                         $dateTime = new \DateTime('now', new \DateTimeZone($eventTimeZone));
                     } else {
@@ -694,7 +695,7 @@ class ICal
                     }
                 } else {
                     if ($forceUtc) {
-                        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+                        $dateTime = new \DateTime('now', new \DateTimeZone(self::TIME_ZONE_UTC));
                     } else {
                         $dateTime = new \DateTime('now');
                     }
@@ -707,7 +708,7 @@ class ICal
             if ($forceTimeZone && $isUtc) {
                 $dateTime->setTimezone(new \DateTimeZone($this->defaultTimeZone));
             } elseif ($forceUtc) {
-                $dateTime->setTimezone(new \DateTimeZone('UTC'));
+                $dateTime->setTimezone(new \DateTimeZone(self::TIME_ZONE_UTC));
             }
         }
 
@@ -757,7 +758,7 @@ class ICal
             $duration = end($dateArray);
             $dateTime = $this->parseDuration($event['DTSTART'], $duration, null);
         } else {
-            $dateTime = new \DateTime($dateArray[1], new \DateTimeZone('UTC'));
+            $dateTime = new \DateTime($dateArray[1], new \DateTimeZone(self::TIME_ZONE_UTC));
             $dateTime->setTimezone(new \DateTimeZone($this->calendarTimeZone()));
         }
 
@@ -1673,7 +1674,7 @@ class ICal
             $timeZone = $this->defaultTimeZone;
         }
 
-        if ($ignoreUtc && strtoupper($timeZone) === 'UTC') {
+        if ($ignoreUtc && strtoupper($timeZone) === self::TIME_ZONE_UTC) {
             return null;
         }
 
