@@ -12,6 +12,10 @@
 
 namespace ICal;
 
+require '../vendor/autoload.php';
+
+use Carbon\Carbon;
+
 class ICal
 {
     const DATE_TIME_FORMAT        = 'Ymd\THis';
@@ -1010,15 +1014,16 @@ class ICal
                             $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                             // Exclusions
-                            $searchDate = $anEvent['DTSTART'];
-                            if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
-                            }
-                            $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $dayRecurringOffset) {
-                                return self::isExdateMatch($exdate, $searchDate, $dayRecurringOffset);
+                            $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent, $dayRecurringOffset) {
+                                return self::isExdateMatch($exdate, $anEvent, $dayRecurringOffset);
                             });
 
                             if (isset($anEvent['UID'])) {
+                                $searchDate = $anEvent['DTSTART'];
+                                if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
+                                    $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                }
+
                                 if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                     $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate, true, true);
                                     if (in_array($searchDateUtc, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
@@ -1106,15 +1111,16 @@ class ICal
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                     // Exclusions
-                                    $searchDate = $anEvent['DTSTART'];
-                                    if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                        $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
-                                    }
-                                    $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $dayRecurringOffset) {
-                                        return self::isExdateMatch($exdate, $searchDate, $dayRecurringOffset);
+                                    $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent, $dayRecurringOffset) {
+                                        return self::isExdateMatch($exdate, $anEvent, $dayRecurringOffset);
                                     });
 
                                     if (isset($anEvent['UID'])) {
+                                        $searchDate = $anEvent['DTSTART'];
+                                        if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
+                                            $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                        }
+
                                         if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                             $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate, true, true);
                                             if (in_array($searchDateUtc, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
@@ -1217,15 +1223,16 @@ class ICal
                                     $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                     // Exclusions
-                                    $searchDate = $anEvent['DTSTART'];
-                                    if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                        $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
-                                    }
-                                    $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $monthRecurringOffset) {
-                                        return self::isExdateMatch($exdate, $searchDate, $monthRecurringOffset);
+                                    $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent, $monthRecurringOffset) {
+                                        return self::isExdateMatch($exdate, $anEvent, $monthRecurringOffset);
                                     });
 
                                     if (isset($anEvent['UID'])) {
+                                        $searchDate = $anEvent['DTSTART'];
+                                        if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
+                                            $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                        }
+
                                         if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                             $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate, true, true);
                                             if (in_array($searchDateUtc, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
@@ -1304,15 +1311,16 @@ class ICal
                                         $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                         // Exclusions
-                                        $searchDate = $anEvent['DTSTART'];
-                                        if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                            $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
-                                        }
-                                        $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $monthRecurringOffset) {
-                                            return self::isExdateMatch($exdate, $searchDate, $monthRecurringOffset);
+                                        $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent, $monthRecurringOffset) {
+                                            return self::isExdateMatch($exdate, $anEvent, $monthRecurringOffset);
                                         });
 
                                         if (isset($anEvent['UID'])) {
+                                            $searchDate = $anEvent['DTSTART'];
+                                            if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
+                                                $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                            }
+
                                             if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                                 $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate, true, true);
                                                 if (in_array($searchDateUtc, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
@@ -1412,15 +1420,16 @@ class ICal
                                             $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                             // Exclusions
-                                            $searchDate = $anEvent['DTSTART'];
-                                            if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                                $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
-                                            }
-                                            $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $yearRecurringOffset) {
-                                                return self::isExdateMatch($exdate, $searchDate, $yearRecurringOffset);
+                                            $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent, $yearRecurringOffset) {
+                                                return self::isExdateMatch($exdate, $anEvent, $yearRecurringOffset);
                                             });
 
                                             if (isset($anEvent['UID'])) {
+                                                $searchDate = $anEvent['DTSTART'];
+                                                if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
+                                                    $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                                }
+
                                                 if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                                     $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate, true, true);
                                                     if (in_array($searchDateUtc, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
@@ -1493,15 +1502,16 @@ class ICal
                                         $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                         // Exclusions
-                                        $searchDate = $anEvent['DTSTART'];
-                                        if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                            $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
-                                        }
-                                        $isExcluded = array_filter($exdates, function ($exdate) use ($searchDate, $yearRecurringOffset) {
-                                            return self::isExdateMatch($exdate, $searchDate, $yearRecurringOffset);
+                                        $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent, $yearRecurringOffset) {
+                                            return self::isExdateMatch($exdate, $anEvent, $yearRecurringOffset);
                                         });
 
                                         if (isset($anEvent['UID'])) {
+                                            $searchDate = $anEvent['DTSTART'];
+                                            if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
+                                                $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                            }
+
                                             if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                                 $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate, true, true);
                                                 if (in_array($searchDateUtc, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
@@ -2090,16 +2100,13 @@ class ICal
                 if ($key === 'TZID') {
                     $currentTimeZone = $subArray[$key];
                 } elseif (is_numeric($key)) {
-                    $forceTimeZone = false;
-                    $icalDate      = $subArray[$key];
+                    $icalDate = $subArray[$key];
 
                     if (substr($icalDate, -1) === 'Z') {
-                        $forceTimeZone = true;
-                    } else {
-                        $icalDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $currentTimeZone) . $icalDate;
+                        $currentTimeZone = self::TIME_ZONE_UTC;
                     }
 
-                    $output[] = $this->iCalDateToUnixTimestamp($icalDate, $forceTimeZone);
+                    $output[] = new Carbon($icalDate, $currentTimeZone);
 
                     if ($key === $finalKey) {
                         // Reset to default
@@ -2187,23 +2194,25 @@ class ICal
      * Checks if an excluded date matches a given date by reconciling time zones.
      *
      * @param  integer $exdate
-     * @param  string  $searchDate
+     * @param  array   $anEvent
      * @param  integer $recurringOffset
      * @return boolean
      */
-    protected function isExdateMatch($exdate, $searchDate, $recurringOffset)
+    protected function isExdateMatch($exdate, array $anEvent, $recurringOffset)
     {
-        $forceTimeZone = false;
-        $forceUtc      = false;
+        $searchDate = $anEvent['DTSTART'];
+
         if (substr($searchDate, -1) === 'Z') {
-            $forceTimeZone = true;
+            $timeZone = self::TIME_ZONE_UTC;
+        } elseif (isset($anEvent['DTSTART_array'][0]['TZID'])) {
+            $timeZone = $anEvent['DTSTART_array'][0]['TZID'];
         } else {
-            $forceUtc = true;
+            $timeZone = $this->defaultTimeZone;
         }
 
-        $a = $this->iCalDateToUnixTimestamp($searchDate, $forceTimeZone, $forceUtc);
-        $b = ($exdate + $recurringOffset);
+        $a = new Carbon($searchDate, $timeZone);
+        $b = $exdate->addSeconds($recurringOffset);
 
-        return $a === $b;
+        return $a->eq($b);
     }
 }

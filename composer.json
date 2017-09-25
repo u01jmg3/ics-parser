@@ -29,7 +29,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0"
+        "php": ">=5.3.0",
+        "nesbot/carbon": "~1.18"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.0"
