@@ -12,8 +12,6 @@
 
 namespace ICal;
 
-require '../vendor/autoload.php';
-
 use Carbon\Carbon;
 
 class ICal
