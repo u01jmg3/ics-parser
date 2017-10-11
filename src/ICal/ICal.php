@@ -415,6 +415,13 @@ class ICal
      */
     protected function unfold(array $lines)
     {
+        for($i = 0; $i < count($lines); $i++){ // Merge multi line values to a singe line
+            if($lines[$i][0] == ' '){
+                $lines[$i-1] = $lines[$i-1] . trim($lines[$i]);
+                $lines[$i] = "";
+            }
+        }   
+        
         $string = implode(PHP_EOL, $lines);
         $string = preg_replace('/' . PHP_EOL . '[ \t]/', '', $string);
         $lines  = explode(PHP_EOL, $string);
