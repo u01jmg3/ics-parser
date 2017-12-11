@@ -212,9 +212,9 @@ class ICal
         'defaultSpan',
         'defaultTimeZone',
         'defaultWeekStart',
+        'disableCharacterReplacement',
         'skipRecurrence',
         'useTimeZoneWithRRules',
-        'disableCharacterReplacement'
     );
 
     /**
@@ -322,8 +322,10 @@ class ICal
             foreach ($lines as $line) {
                 $line = rtrim($line); // Trim trailing whitespace
                 $line = $this->removeUnprintableChars($line);
-                if (!$this->disableCharacterReplacement) $line = $this->cleanData($line);
-                $add  = $this->keyValueFromString($line);
+                if (!$this->disableCharacterReplacement) {
+                    $line = $this->cleanData($line);
+                }
+                $add = $this->keyValueFromString($line);
 
                 $keyword = $add[0];
                 $values  = $add[1]; // May be an array containing multiple values
