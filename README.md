@@ -87,19 +87,19 @@ var_dump($event->dtstart_array);
 
 #### Variables
 
-| Name                     | Description                                                         | Configurable       | Default Value  |
-|--------------------------|---------------------------------------------------------------------|:------------------:|----------------|
-| `$cal`                            | The parsed calendar                                                 |         :x:        | N/A            |
-| `$alarmCount`                     | Tracks the number of alarms in the current iCal feed                |         :x:        | N/A            |
-| `$eventCount`                     | Tracks the number of events in the current iCal feed                |         :x:        | N/A            |
-| `$freeBusyCount`                  | Tracks the free/busy count in the current iCal feed                 |         :x:        | N/A            |
-| `$todoCount`                      | Tracks the number of todos in the current iCal feed                 |         :x:        | N/A            |
-| `$defaultSpan`                    | The value in years to use for indefinite, recurring events          | :white_check_mark: | `2`            |
-| `$defaultTimeZone`                | Enables customisation of the default time zone                      | :white_check_mark: | System default |
-| `$defaultWeekStart`               | The two letter representation of the first day of the week          | :white_check_mark: | `MO`           |
-| `$skipRecurrence`                 | Toggles whether to skip the parsing of recurrence rules             | :white_check_mark: | `false`        |
-| `$useTimeZoneWithRRules`          | Toggles whether to use time zone info when parsing recurrence rules | :white_check_mark: | `false`        |
-| `$disableCharacterReplacement`    | Toggles whether to disable all character replacement                | :white_check_mark: | `false`        |
+| Name                           | Description                                                         | Configurable       | Default Value  |
+|--------------------------------|---------------------------------------------------------------------|:------------------:|----------------|
+| `$cal`                         | The parsed calendar                                                 |         :x:        | N/A            |
+| `$alarmCount`                  | Tracks the number of alarms in the current iCal feed                |         :x:        | N/A            |
+| `$eventCount`                  | Tracks the number of events in the current iCal feed                |         :x:        | N/A            |
+| `$freeBusyCount`               | Tracks the free/busy count in the current iCal feed                 |         :x:        | N/A            |
+| `$todoCount`                   | Tracks the number of todos in the current iCal feed                 |         :x:        | N/A            |
+| `$defaultSpan`                 | The value in years to use for indefinite, recurring events          | :white_check_mark: | `2`            |
+| `$defaultTimeZone`             | Enables customisation of the default time zone                      | :white_check_mark: | System default |
+| `$defaultWeekStart`            | The two letter representation of the first day of the week          | :white_check_mark: | `MO`           |
+| `$skipRecurrence`              | Toggles whether to skip the parsing of recurrence rules             | :white_check_mark: | `false`        |
+| `$useTimeZoneWithRRules`       | Toggles whether to use time zone info when parsing recurrence rules | :white_check_mark: | `false`        |
+| `$disableCharacterReplacement` | Toggles whether to disable all character replacement                | :white_check_mark: | `false`        |
 
 #### Methods
 
