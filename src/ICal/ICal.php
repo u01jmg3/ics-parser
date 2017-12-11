@@ -90,6 +90,13 @@ class ICal
     public $useTimeZoneWithRRules = false;
 
     /**
+     * Toggles whether to disable all character replacement.
+     *
+     * @var boolean
+     */
+    public $disableCharacterReplacement = false;
+
+    /**
      * The parsed calendar
      *
      * @var array
@@ -207,6 +214,7 @@ class ICal
         'defaultWeekStart',
         'skipRecurrence',
         'useTimeZoneWithRRules',
+        'disableCharacterReplacement'
     );
 
     /**
@@ -314,7 +322,7 @@ class ICal
             foreach ($lines as $line) {
                 $line = rtrim($line); // Trim trailing whitespace
                 $line = $this->removeUnprintableChars($line);
-                $line = $this->cleanData($line);
+                if (!$this->disableCharacterReplacement) $line = $this->cleanData($line);
                 $add  = $this->keyValueFromString($line);
 
                 $keyword = $add[0];

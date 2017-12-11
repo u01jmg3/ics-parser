@@ -10,6 +10,7 @@ try {
         'defaultWeekStart'      => 'MO',  // Default value
         'skipRecurrence'        => false, // Default value
         'useTimeZoneWithRRules' => false, // Default value
+        'disableCharacterReplacement' => false //Default value
     ));
     // $ical->initFile('ICal.ics');
     // $ical->initUrl('https://raw.githubusercontent.com/u01jmg3/ics-parser/master/examples/ICal.ics');
