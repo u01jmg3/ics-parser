@@ -648,6 +648,7 @@ class ICal
      * @param  boolean $forceTimeZone Whether to force the time zone; the event's or the default
      * @param  boolean $forceUtc      Whether to force the time zone as UTC
      * @return DateTime
+     * @throws Exception
      */
     public function iCalDateToDateTime($icalDate, $forceTimeZone = false, $forceUtc = false)
     {
@@ -674,8 +675,8 @@ class ICal
         preg_match($pattern, $icalDate, $date);
 
         if (empty($date)) {
-            throw new \Exception('Invalid iCal date format');
-        } 
+            throw new \Exception('Invalid iCal date format.');
+        }
 
         // A Unix timestamp cannot represent a date prior to 1 Jan 1970
         $year  = $date[2];
