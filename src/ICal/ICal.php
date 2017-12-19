@@ -5,9 +5,9 @@
  *
  * PHP 5 (≥ 5.3.0)
  *
- * @author  Jonathan Goode <https://github.com/u01jmg3>, John Grogg <john.grogg@gmail.com>, Martin Thoma <info@martin-thoma.de>
+ * @author  Jonathan Goode <https://github.com/u01jmg3>
  * @license https://opensource.org/licenses/mit-license.php MIT License
- * @version 2.1.1
+ * @version 2.1.2
  */
 
 namespace ICal;
