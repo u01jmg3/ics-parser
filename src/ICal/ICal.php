@@ -648,7 +648,7 @@ class ICal
      * @param  boolean $forceTimeZone Whether to force the time zone; the event's or the default
      * @param  boolean $forceUtc      Whether to force the time zone as UTC
      * @return DateTime
-     * @throws Exception
+     * @throws \Exception
      */
     public function iCalDateToDateTime($icalDate, $forceTimeZone = false, $forceUtc = false)
     {
@@ -1062,7 +1062,6 @@ class ICal
                         $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
                         $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
                         $recurrenceEvents    = array(); // Reset
-
                     break;
 
                     case 'WEEKLY':
@@ -1164,7 +1163,6 @@ class ICal
                         $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
                         $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
                         $recurrenceEvents    = array(); // Reset
-
                     break;
 
                     case 'MONTHLY':
@@ -1370,7 +1368,6 @@ class ICal
                         $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
                         $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
                         $recurrenceEvents    = array(); // Reset
-
                     break;
 
                     case 'YEARLY':
@@ -1553,7 +1550,6 @@ class ICal
                         $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
                         $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
                         $recurrenceEvents    = array(); // Reset
-
                     break;
                 }
             }
@@ -1745,7 +1741,7 @@ class ICal
      * @param  string $rangeStart Start date of the search range.
      * @param  string $rangeEnd   End date of the search range.
      * @return array
-     * @throws Exception
+     * @throws \Exception
      */
     public function eventsFromRange($rangeStart = false, $rangeEnd = false)
     {
@@ -2132,7 +2128,7 @@ class ICal
      *
      * @param  string $value
      * @return boolean
-     * @throws Exception
+     * @throws \Exception
      */
     public function isValidDate($value)
     {
@@ -2165,7 +2161,7 @@ class ICal
      *
      * @param  string $filename
      * @return array
-     * @throws Exception
+     * @throws \Exception
      */
     protected function fileOrUrl($filename)
     {

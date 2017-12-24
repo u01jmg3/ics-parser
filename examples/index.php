@@ -62,7 +62,11 @@ $forceTimeZone = false;
     <?php
         if ($showExample['interval']) {
             $events = $ical->eventsFromInterval('1 week');
-            if ($events) echo '<h4>Events in the next 7 days:</h4>';
+
+            if ($events) {
+                echo '<h4>Events in the next 7 days:</h4>';
+            }
+
             $count = 1;
     ?>
     <div class="row">
@@ -79,8 +83,13 @@ $forceTimeZone = false;
                 </div>
             </div>
         </div>
-        <?php if ($count > 1 && $count % 3 === 0) { echo '</div><div class="row">'; } ?>
-        <?php $count++; ?>
+        <?php
+            if ($count > 1 && $count % 3 === 0) {
+                echo '</div><div class="row">';
+            }
+
+            $count++;
+        ?>
     <?php
     endforeach
     ?>
@@ -90,7 +99,11 @@ $forceTimeZone = false;
     <?php
         if ($showExample['range']) {
             $events = $ical->eventsFromRange('2017-03-01 12:00:00', '2017-04-31 17:00:00');
-            if ($events) echo '<h4>Events March through April:</h4>';
+
+            if ($events) {
+                echo '<h4>Events March through April:</h4>';
+            }
+
             $count = 1;
     ?>
     <div class="row">
@@ -107,8 +120,13 @@ $forceTimeZone = false;
                 </div>
             </div>
         </div>
-        <?php if ($count > 1 && $count % 3 === 0) { echo '</div><div class="row">'; } ?>
-        <?php $count++; ?>
+        <?php
+            if ($count > 1 && $count % 3 === 0) {
+                echo '</div><div class="row">';
+            }
+
+            $count++;
+        ?>
     <?php
     endforeach
     ?>
@@ -118,7 +136,10 @@ $forceTimeZone = false;
     <?php
         if ($showExample['all']) {
             $events = $ical->sortEventsWithOrder($ical->events());
-            if ($events) echo '<h4>All Events:</h4>';
+
+            if ($events) {
+                echo '<h4>All Events:</h4>';
+            }
     ?>
     <div class="row">
     <?php
@@ -135,8 +156,13 @@ $forceTimeZone = false;
                 </div>
             </div>
         </div>
-        <?php if ($count > 1 && $count % 3 === 0) { echo '</div><div class="row">'; } ?>
-        <?php $count++; ?>
+        <?php
+            if ($count > 1 && $count % 3 === 0) {
+                echo '</div><div class="row">';
+            }
+
+            $count++;
+        ?>
     <?php
     endforeach
     ?>
