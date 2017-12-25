@@ -4,6 +4,8 @@ namespace ICal;
 
 class Event
 {
+    // phpcs:disable Generic.Arrays.DisallowLongArraySyntax.Found
+
     const HTML_TEMPLATE = '<p>%s: %s</p>';
 
     /**

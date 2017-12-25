@@ -16,6 +16,8 @@ use Carbon\Carbon;
 
 class ICal
 {
+    // phpcs:disable Generic.Arrays.DisallowLongArraySyntax.Found
+
     const DATE_TIME_FORMAT        = 'Ymd\THis';
     const DATE_TIME_FORMAT_PRETTY = 'F Y H:i:s';
     const ICAL_DATE_TIME_TEMPLATE = 'TZID=%s:';

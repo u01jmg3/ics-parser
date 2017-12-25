@@ -1,4 +1,6 @@
 <?php
+// phpcs:disable Generic.Arrays.DisallowLongArraySyntax.Found
+
 require_once '../vendor/autoload.php';
 
 use ICal\ICal;
