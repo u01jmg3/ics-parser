@@ -351,7 +351,7 @@ class ICal
 
                 foreach ($values as $value) {
                     switch ($line) {
-                        // http://www.kanzaki.com/docs/ical/vtodo.html
+                        // https://www.kanzaki.com/docs/ical/vtodo.html
                         case 'BEGIN:VTODO':
                             if (!is_array($value)) {
                                 $this->todoCount++;
@@ -360,7 +360,7 @@ class ICal
                             $component = 'VTODO';
                         break;
 
-                        // http://www.kanzaki.com/docs/ical/vevent.html
+                        // https://www.kanzaki.com/docs/ical/vevent.html
                         case 'BEGIN:VEVENT':
                             if (!is_array($value)) {
                                 $this->eventCount++;
@@ -369,7 +369,7 @@ class ICal
                             $component = 'VEVENT';
                         break;
 
-                        // http://www.kanzaki.com/docs/ical/vfreebusy.html
+                        // https://www.kanzaki.com/docs/ical/vfreebusy.html
                         case 'BEGIN:VFREEBUSY':
                             if (!is_array($value)) {
                                 $this->freeBusyIndex++;
@@ -662,7 +662,7 @@ class ICal
     public function iCalDateToDateTime($icalDate, $forceTimeZone = false, $forceUtc = false)
     {
         /**
-         * iCal times may be in 3 formats, (http://www.kanzaki.com/docs/ical/dateTime.html)
+         * iCal times may be in 3 formats, (https://www.kanzaki.com/docs/ical/dateTime.html)
          *
          * UTC:      Has a trailing 'Z'
          * Floating: No time zone reference specified, no trailing 'Z', use local time
