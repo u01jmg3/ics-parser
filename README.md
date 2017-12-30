@@ -175,4 +175,4 @@
 
  - [iCal Validator](https://icalendar.org/validator.html)
  - [Recurrence Rule Tester](https://jakubroztocil.github.io/rrule/)
- - [Unix Timestamp Converter](http://www.unixtimestamp.com)
+ - [Unix Timestamp Converter](https://www.unixtimestamp.com)

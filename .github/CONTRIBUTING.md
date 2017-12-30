@@ -1,6 +1,6 @@
 ## Contributing
 
-ICS Parser is an open source project. It is licensed under the [MIT license](http://opensource.org/licenses/MIT).
+ICS Parser is an open source project. It is licensed under the [MIT license](https://opensource.org/licenses/MIT).
 We appreciate pull requests, here are our guidelines:
 
 1. Firstly, check if your issue is present within the latest version (`dev-master`) as the problem may already have been fixed.
