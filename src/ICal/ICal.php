@@ -853,7 +853,7 @@ class ICal
         foreach ($events as $key => $event) {
             $checks[] = !isset($event['RECURRENCE-ID']);
             $checks[] = isset($event['UID']);
-            $checks[] = isset($this->alteredRecurrenceInstances[$event['UID']]);
+            $checks[] = isset($event['UID']) && isset($this->alteredRecurrenceInstances[$event['UID']]);
 
             if ((bool) array_product($checks)) {
                 $eventDtstartUnix = $this->iCalDateToUnixTimestamp($event['DTSTART_array'][3], true, true);
