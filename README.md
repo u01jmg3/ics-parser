@@ -120,7 +120,7 @@
 | `parseDuration`                       | `$date`, `$duration`, `$format = 'U'`                      | `protected` | Parses a duration and applies it to a date                                                            |
 | `parseExdates`                        | `$event`                                                   | `public`    | Parses a list of excluded dates to be applied to an Event                                             |
 | `processDateConversions`              | -                                                          | `protected` | Processes date conversions using the time zone                                                        |
-| `processEventIcalDate`                | `$event`, `$index = 3`                                     | `protected` | Extends the `{DTSTART\|DTEND\|RECURRENCE-ID}_array` array to include an iCal date time for each event |
+| `processEventIcalDateTime`                | `$event`, `$index = 3`                                     | `protected` | Extends the `{DTSTART\|DTEND\|RECURRENCE-ID}_array` array to include an iCal date time for each event |
 | `processEvents`                       | -                                                          | `protected` | Performs admin tasks on all events as read from the iCal file                                         |
 | `processRecurrences`                  | -                                                          | `protected` | Processes recurrence rules                                                                            |
 | `removeUnprintableChars`              | `$data`                                                    | `protected` | Removes unprintable ASCII and UTF-8 characters                                                        |
