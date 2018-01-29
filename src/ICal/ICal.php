@@ -222,9 +222,9 @@ class ICal
     /**
      * Creates the ICal object
      *
-     * @param  mixed $files   The path or URL to each ICS file to parse
-     *                        or iCal content provided as an array
-     * @param  array $options Default options to be used by the parser
+     * @param  mixed $files
+     *
+     * @param  array $options
      * @return void
      */
     public function __construct($files = false, array $options = array())
@@ -260,7 +260,7 @@ class ICal
     /**
      * Initialises lines from a string
      *
-     * @param  string $string The contents of the ICS file to initialise
+     * @param  string $string
      * @return ICal
      */
     public function initString($string)
@@ -279,7 +279,7 @@ class ICal
     /**
      * Initialises lines from a file
      *
-     * @param  string $file The file path or URL of the ICS to use
+     * @param  string $file
      * @return ICal
      */
     public function initFile($file)
@@ -298,7 +298,7 @@ class ICal
     /**
      * Initialises lines from a URL
      *
-     * @param  string $url The url of the ICS file to download and initialise from
+     * @param  string $url
      * @return ICal
      */
     public function initUrl($url)
@@ -312,7 +312,7 @@ class ICal
      * Initialises the parser using an array
      * containing each line of iCal content
      *
-     * @param  array $lines The lines to initialise
+     * @param  array $lines
      * @return void
      */
     protected function initLines(array $lines)
@@ -428,7 +428,7 @@ class ICal
      * Unfolds an iCal file in preparation for parsing
      * (https://icalendar.org/iCalendar-RFC-5545/3-1-content-lines.html)
      *
-     * @param  array $lines The contents of the iCal string to unfold
+     * @param  array $lines
      * @return string
      */
     protected function unfold(array $lines)
@@ -443,9 +443,9 @@ class ICal
     /**
      * Add one key and value pair to the `$this->cal` array
      *
-     * @param  string         $component This could be VTODO, VEVENT, VCALENDAR, ...
-     * @param  string|boolean $keyword   The keyword, for example DTSTART
-     * @param  string         $value     The value, for example 20110105T090000Z
+     * @param  string         $component
+     * @param  string|boolean $keyword
+     * @param  string         $value
      * @return void
      */
     protected function addCalendarComponentWithKeyAndValue($component, $keyword, $value)
@@ -651,11 +651,9 @@ class ICal
     /**
      * Returns a `DateTime` object from an iCal date time format
      *
-     * @param  string  $icalDate      A Date in the format YYYYMMDD[T]HHMMSS[Z],
-     *                                YYYYMMDD[T]HHMMSS or
-     *                                TZID={Time Zone}:YYYYMMDD[T]HHMMSS
-     * @param  boolean $forceTimeZone Whether to force the time zone; the event's or the default
-     * @param  boolean $forceUtc      Whether to force the time zone as UTC
+     * @param  string  $icalDate
+     * @param  boolean $forceTimeZone
+     * @param  boolean $forceUtc
      * @return DateTime
      * @throws \Exception
      */
@@ -739,11 +737,9 @@ class ICal
     /**
      * Returns a Unix timestamp from an iCal date time format
      *
-     * @param  string  $icalDate      A Date in the format YYYYMMDD[T]HHMMSS[Z],
-     *                                YYYYMMDD[T]HHMMSS or
-     *                                TZID={Time Zone}:YYYYMMDD[T]HHMMSS
-     * @param  boolean $forceTimeZone Whether to force the time zone; the event's or the default
-     * @param  boolean $forceUtc      Whether to force the time zone as UTC
+     * @param  string  $icalDate
+     * @param  boolean $forceTimeZone
+     * @param  boolean $forceUtc
      * @return integer
      */
     public function iCalDateToUnixTimestamp($icalDate, $forceTimeZone = false, $forceUtc = false)
@@ -761,9 +757,9 @@ class ICal
     /**
      * Returns a date adapted to the calendar time zone depending on the event `TZID`
      *
-     * @param  array  $event  An event
-     * @param  string $key    An event property (`DTSTART` or `DTEND`)
-     * @param  string $format The date format to apply
+     * @param  array  $event
+     * @param  string $key
+     * @param  string $format
      * @return string|boolean
      */
     public function iCalDateWithTimeZone(array $event, $key, $format = self::DATE_TIME_FORMAT)
@@ -1762,8 +1758,8 @@ class ICal
      * problem for events on, during, or after 29 Jan 2038.
      * See https://en.wikipedia.org/wiki/Unix_time#Representing_the_number
      *
-     * @param  string $rangeStart Start date of the search range.
-     * @param  string $rangeEnd   End date of the search range.
+     * @param  string $rangeStart
+     * @param  string $rangeEnd
      * @return array
      * @throws \Exception
      */
@@ -1853,7 +1849,7 @@ class ICal
     /**
      * Sorts events based on a given sort order
      *
-     * @param  array   $events    An array of Events
+     * @param  array   $events
      * @param  integer $sortOrder Either SORT_ASC, SORT_DESC, SORT_REGULAR, SORT_NUMERIC, SORT_STRING
      * @return array
      */
@@ -1907,9 +1903,9 @@ class ICal
     /**
      * Parses a duration and applies it to a date
      *
-     * @param  string $date     A date to add a duration to
-     * @param  string $duration A duration to parse
-     * @param  string $format   The format to apply to the DateTime object
+     * @param  string $date
+     * @param  string $duration
+     * @param  string $format
      * @return integer|DateTime
      */
     protected function parseDuration($date, $duration, $format = self::UNIX_FORMAT)
@@ -2038,18 +2034,17 @@ class ICal
      * Replaces all occurrences of a search string with a given replacement string.
      * Multibyte safe.
      *
-     * @param  string|array $search  The value being searched for, otherwise known as the needle. An array may be used to designate multiple needles.
-     * @param  string|array $replace The replacement value that replaces found search values. An array may be used to designate multiple replacements.
-     * @param  string|array $subject The string or array being searched and replaced on, otherwise known as the haystack.
-     *                               If subject is an array, then the search and replace is performed with every entry of subject, and the return value is an array as well.
-     * @param  integer      $count   If passed, this will be set to the number of replacements performed.
+     * @param  string|array $search
+     * @param  string|array $replace
+     * @param  string|array $subject
+     * @param  integer      $count
      * @return array|string
      */
     protected function mb_str_replace($search, $replace, $subject, &$count = 0)
     {
         if (!is_array($subject)) {
             // Normalize `$search` and `$replace` so they are both arrays of the same length
-            $searches     = is_array($search)  ? array_values($search)  : array($search);
+            $searches     = is_array($search) ? array_values($search) : array($search);
             $replacements = is_array($replace) ? array_values($replace) : array($replace);
             $replacements = array_pad($replacements, count($searches), '');
 
