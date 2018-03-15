@@ -71,19 +71,19 @@
 
 #### Variables
 
-| Name                           | Description                                                         | Configurable       | Default Value                                                                                   |
-|--------------------------------|---------------------------------------------------------------------|:------------------:|-------------------------------------------------------------------------------------------------|
-| `$defaultSpan`                 | The value in years to use for indefinite, recurring events          | :white_check_mark: | `2`                                                                                             |
-| `$defaultTimeZone`             | Enables customisation of the default time zone                      | :white_check_mark: | [System default](https://secure.php.net/manual/en/function.date-default-timezone-get.php) |
-| `$defaultWeekStart`            | The two letter representation of the first day of the week          | :white_check_mark: | `MO`                                                                                            |
-| `$disableCharacterReplacement` | Toggles whether to disable all character replacement                | :white_check_mark: | `false`                                                                                         |
-| `$skipRecurrence`              | Toggles whether to skip the parsing of recurrence rules             | :white_check_mark: | `false`                                                                                         |
-| `$useTimeZoneWithRRules`       | Toggles whether to use time zone info when parsing recurrence rules | :white_check_mark: | `false`                                                                                         |
-| `$alarmCount`                  | Tracks the number of alarms in the current iCal feed                |         :x:        | N/A                                                                                             |
-| `$cal`                         | The parsed calendar                                                 |         :x:        | N/A                                                                                             |
-| `$eventCount`                  | Tracks the number of events in the current iCal feed                |         :x:        | N/A                                                                                             |
-| `$freeBusyCount`               | Tracks the free/busy count in the current iCal feed                 |         :x:        | N/A                                                                                             |
-| `$todoCount`                   | Tracks the number of todos in the current iCal feed                 |         :x:        | N/A                                                                                             |
+| Name                           | Description                                                         | Configurable             | Default Value                                                                                     |
+|--------------------------------|---------------------------------------------------------------------|:------------------------:|---------------------------------------------------------------------------------------------------|
+| `$defaultSpan`                 | The value in years to use for indefinite, recurring events          | :ballot_box_with_check:  | `2`                                                                                               |
+| `$defaultTimeZone`             | Enables customisation of the default time zone                      | :ballot_box_with_check:  | [System default](https://secure.php.net/manual/en/function.date-default-timezone-get.php) |
+| `$defaultWeekStart`            | The two letter representation of the first day of the week          | :ballot_box_with_check:  | `MO`                                                                                              |
+| `$disableCharacterReplacement` | Toggles whether to disable all character replacement                | :ballot_box_with_check:  | `false`                                                                                           |
+| `$skipRecurrence`              | Toggles whether to skip the parsing of recurrence rules             | :ballot_box_with_check:  | `false`                                                                                           |
+| `$useTimeZoneWithRRules`       | Toggles whether to use time zone info when parsing recurrence rules | :ballot_box_with_check:  | `false`                                                                                           |
+| `$alarmCount`                  | Tracks the number of alarms in the current iCal feed                | :heavy_multiplication_x: | N/A                                                                                               |
+| `$cal`                         | The parsed calendar                                                 | :heavy_multiplication_x: | N/A                                                                                               |
+| `$eventCount`                  | Tracks the number of events in the current iCal feed                | :heavy_multiplication_x: | N/A                                                                                               |
+| `$freeBusyCount`               | Tracks the free/busy count in the current iCal feed                 | :heavy_multiplication_x: | N/A                                                                                               |
+| `$todoCount`                   | Tracks the number of todos in the current iCal feed                 | :heavy_multiplication_x: | N/A                                                                                               |
 
 #### Methods
 
