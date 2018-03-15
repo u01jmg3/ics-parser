@@ -2,8 +2,6 @@
 
 [![Latest Stable Release](https://poser.pugx.org/johngrogg/ics-parser/v/stable.png "Latest Stable Release")](https://packagist.org/packages/johngrogg/ics-parser)
 [![Total Downloads](https://poser.pugx.org/johngrogg/ics-parser/downloads.png "Total Downloads")](https://packagist.org/packages/johngrogg/ics-parser)
-[![Reference Status](https://www.versioneye.com/php/johngrogg:ics-parser/reference_badge.svg?style=flat "Reference Status")](https://www.versioneye.com/php/johngrogg:ics-parser/references)
-[![Dependency Status](https://www.versioneye.com/php/johngrogg:ics-parser/badge.svg "Dependency Status")](https://www.versioneye.com/php/johngrogg:ics-parser)
 
 ---
 
@@ -74,7 +72,7 @@
 | Name                           | Description                                                         | Configurable             | Default Value                                                                                     |
 |--------------------------------|---------------------------------------------------------------------|:------------------------:|---------------------------------------------------------------------------------------------------|
 | `$defaultSpan`                 | The value in years to use for indefinite, recurring events          | :ballot_box_with_check:  | `2`                                                                                               |
-| `$defaultTimeZone`             | Enables customisation of the default time zone                      | :ballot_box_with_check:  | [System default](https://secure.php.net/manual/en/function.date-default-timezone-get.php) |
+| `$defaultTimeZone`             | Enables customisation of the default time zone                      | :ballot_box_with_check:  | [System default](https://secure.php.net/manual/en/function.date-default-timezone-get.php)         |
 | `$defaultWeekStart`            | The two letter representation of the first day of the week          | :ballot_box_with_check:  | `MO`                                                                                              |
 | `$disableCharacterReplacement` | Toggles whether to disable all character replacement                | :ballot_box_with_check:  | `false`                                                                                           |
 | `$skipRecurrence`              | Toggles whether to skip the parsing of recurrence rules             | :ballot_box_with_check:  | `false`                                                                                           |
