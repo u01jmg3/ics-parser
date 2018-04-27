@@ -825,7 +825,7 @@ class ICal
                         $date = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent[$type . '_array'][0]['TZID']) . $date;
                     }
 
-                    $anEvent[$type . '_array'][2] = $this->iCalDateToUnixTimestamp($date);
+                    $anEvent[$type . '_array'][2] = $this->iCalDateToUnixTimestamp($date, true, true);
                     $anEvent[$type . '_array'][3] = $date;
                 }
             }
