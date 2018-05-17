@@ -418,6 +418,19 @@ class ICal
 
             if (!$this->skipRecurrence) {
                 $this->processRecurrences();
+
+                // Apply changes to altered recurrence instances
+                if (!empty($this->alteredRecurrenceInstances)) {
+                    $events = $this->cal['VEVENT'];
+
+                    foreach ($this->alteredRecurrenceInstances as $alteredRecurrenceInstance) {
+                        $alteredEvent = $alteredRecurrenceInstance['altered-event'];
+                        $key          = key($alteredEvent);
+                        $events[$key] = $alteredEvent[$key];
+                    }
+
+                    $this->cal['VEVENT'] = $events;
+                }
             }
 
             $this->processDateConversions();
@@ -859,8 +872,10 @@ class ICal
                 $eventDtstartUnix = $this->iCalDateToUnixTimestamp($event['DTSTART_array'][3], true, true);
 
                 if (false !== $alteredEventKey = array_search($eventDtstartUnix, $this->alteredRecurrenceInstances[$event['UID']])) {
-                    $events[$key]        = array_replace_recursive($events[$key], $events[$alteredEventKey]);
                     $eventKeysToRemove[] = $alteredEventKey;
+
+                    $alteredEvent = array_replace_recursive($events[$key], $events[$alteredEventKey]);
+                    $this->alteredRecurrenceInstances[$event['UID']]['altered-event'] = array($key => $alteredEvent);
                 }
             }
 
