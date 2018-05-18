@@ -424,9 +424,11 @@ class ICal
                     $events = $this->cal['VEVENT'];
 
                     foreach ($this->alteredRecurrenceInstances as $alteredRecurrenceInstance) {
-                        $alteredEvent = $alteredRecurrenceInstance['altered-event'];
-                        $key          = key($alteredEvent);
-                        $events[$key] = $alteredEvent[$key];
+                        if (isset($alteredRecurrenceInstance['altered-event'])) {
+                            $alteredEvent = $alteredRecurrenceInstance['altered-event'];
+                            $key          = key($alteredEvent);
+                            $events[$key] = $alteredEvent[$key];
+                        }
                     }
 
                     $this->cal['VEVENT'] = $events;
