@@ -10,6 +10,7 @@
 ### Requirements
  - PHP 5 (≥ 5.3.0)
  - [Valid ICS](https://icalendar.org/validator.html) (`.ics`, `.ical`, `.ifb`) file
+ - [IANA](https://www.iana.org/time-zones) or [Unicode CLDR](http://cldr.unicode.org/translation/timezones) Time Zones
 
 ### Setup
 
