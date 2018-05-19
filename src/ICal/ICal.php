@@ -885,8 +885,10 @@ class ICal
         }
 
         if (!empty($eventKeysToRemove)) {
-            $this->eventCount -= count($eventKeysToRemove);
-            $events = array_diff_key($events, array_flip($eventKeysToRemove));
+            foreach ($eventKeysToRemove as $eventKeyToRemove) {
+                $events[$eventKeyToRemove] = null;
+            }
+
             $this->cal['VEVENT'] = $events;
         }
     }
