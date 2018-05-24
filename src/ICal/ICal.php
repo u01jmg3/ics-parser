@@ -888,9 +888,9 @@ class ICal
             foreach ($eventKeysToRemove as $eventKeyToRemove) {
                 $events[$eventKeyToRemove] = null;
             }
-
-            $this->cal['VEVENT'] = $events;
         }
+
+        $this->cal['VEVENT'] = $events;
     }
 
     /**
