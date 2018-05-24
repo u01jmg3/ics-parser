@@ -42,7 +42,6 @@ workbench
 # Package Managers #
 ####################
 auth.json
-composer.lock
 node_modules
 vendor
 
