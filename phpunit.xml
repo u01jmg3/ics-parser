@@ -1,0 +1,8 @@
+<phpunit >
+  <testsuites>
+    <testsuite name="ics-parser">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>
+

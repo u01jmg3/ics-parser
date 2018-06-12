@@ -1,7 +1,7 @@
 {
-    "name": "johngrogg/ics-parser",
+    "name": "churchtools/ics-parser",
     "description": "ICS Parser",
-    "homepage": "https://github.com/u01jmg3/ics-parser",
+    "homepage": "https://github.com/churchtools/ics-parser",
     "keywords": [
         "icalendar",
         "ics",
@@ -26,6 +26,10 @@
             "name": "Martin Thoma",
             "email": "info@martin-thoma.de",
             "role": "Original Developer"
+        },
+        {
+            "name": "Matthias Huber",
+            "role": "Developer"
         }
     ],
     "require": {
@@ -34,7 +38,8 @@
         "nesbot/carbon": "~1.28"
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "~2.9.1"
+        "squizlabs/php_codesniffer": "~2.9.1",
+        "phpunit/phpunit": "^6"
     },
     "autoload": {
         "psr-0": {
@@ -43,7 +48,12 @@
     },
     "config": {
         "platform": {
-            "php": "5.3.29"
+            "php": "7.0.26"
         }
+    },
+    "scripts": {
+        "test": [
+            "phpunit --colors=always"
+        ]
     }
 }
