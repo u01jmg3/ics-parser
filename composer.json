@@ -1,7 +1,7 @@
 {
-    "name": "churchtools/ics-parser",
+    "name": "johngrogg/ics-parser",
     "description": "ICS Parser",
-    "homepage": "https://github.com/churchtools/ics-parser",
+    "homepage": "https://github.com/u01jmg3/ics-parser",
     "keywords": [
         "icalendar",
         "ics",
@@ -26,10 +26,6 @@
             "name": "Martin Thoma",
             "email": "info@martin-thoma.de",
             "role": "Original Developer"
-        },
-        {
-            "name": "Matthias Huber",
-            "role": "Developer"
         }
     ],
     "require": {
