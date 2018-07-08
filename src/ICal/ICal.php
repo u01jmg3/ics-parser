@@ -762,13 +762,7 @@ class ICal
     public function iCalDateToUnixTimestamp($icalDate, $forceTimeZone = false, $forceUtc = false)
     {
         $dateTime = $this->iCalDateToDateTime($icalDate, $forceTimeZone, $forceUtc);
-        $offset   = 0;
-
-        if ($forceTimeZone) {
-            $offset = $dateTime->getOffset();
-        }
-
-        return $dateTime->getTimestamp() + $offset;
+        return $dateTime->getTimestamp();
     }
 
     /**
