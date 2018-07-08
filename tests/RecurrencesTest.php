@@ -74,7 +74,7 @@ class RecurrencesTest extends TestCase
         $this->assertEventFile(
             'Europe/Berlin',
             "./tests/icalmonthly.txt",
-            24,
+            25,
             $checks);
     }
 
