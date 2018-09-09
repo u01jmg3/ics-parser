@@ -1349,7 +1349,7 @@ class ICal
                                         continue;
                                     }
 
-                                    if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
+                                    if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp <= $until) {
                                         $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . ($isAllDayEvent || ($initialStartTimeZoneName === 'Z') ? 'Z' : '');
                                         $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
                                         $anEvent['DTSTART_array'][2] = $eventStartTimestamp;
@@ -1459,7 +1459,7 @@ class ICal
                                     $lastDayTimestamp = strtotime($lastDayDesc);
 
                                     do {
-                                        if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
+                                        if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp <= $until) {
                                             $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . ($isAllDayEvent || ($initialStartTimeZoneName === 'Z') ? 'Z' : '');
                                             $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
                                             $anEvent['DTSTART_array'][2] = $eventStartTimestamp;
@@ -1541,7 +1541,7 @@ class ICal
                                 foreach ($eventStartDescs as $eventStartDesc) {
                                     $eventStartTimestamp = strtotime($eventStartDesc);
 
-                                    if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp < $until) {
+                                    if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp <= $until) {
                                         $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . ($isAllDayEvent || ($initialStartTimeZoneName === 'Z') ? 'Z' : '');
                                         $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
                                         $anEvent['DTSTART_array'][2] = $eventStartTimestamp;
