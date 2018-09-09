@@ -1630,7 +1630,7 @@ class ICal
 
             if ($this->useTimeZoneWithRRules && isset($anEvent['RRULE_array'][2]) && $anEvent['RRULE_array'][2] === self::RECURRENCE_EVENT) {
                 $events[$key]['DTSTART_tz'] = $anEvent['DTSTART'];
-                $events[$key]['DTEND_tz']   = $anEvent['DTEND'];
+                $events[$key]['DTEND_tz']   = isset($anEvent['DTEND']) ? $anEvent['DTEND'] : $anEvent['DTSTART'];
             } else {
                 $events[$key]['DTSTART_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTSTART');
 
@@ -1638,6 +1638,8 @@ class ICal
                     $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTEND');
                 } elseif ($this->iCalDateWithTimeZone($anEvent, 'DURATION')) {
                     $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DURATION');
+                } elseif ($this->iCalDateWithTimeZone($anEvent, 'DTSTART')) {
+                    $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTSTART');
                 }
             }
         }
