@@ -917,12 +917,10 @@ class ICal
                 $isAllDayEvent = (strlen($anEvent['DTSTART_array'][1]) === 8) ? true : false;
 
                 $initialStart             = new \DateTime($anEvent['DTSTART_array'][1]);
-                $initialStartOffset       = $initialStart->getOffset();
                 $initialStartTimeZoneName = $initialStart->getTimezone()->getName();
 
                 if (isset($anEvent['DTEND'])) {
                     $initialEnd             = new \DateTime($anEvent['DTEND_array'][1]);
-                    $initialEndOffset       = $initialEnd->getOffset();
                     $initialEndTimeZoneName = $initialEnd->getTimezone()->getName();
                 } else {
                     $initialEndTimeZoneName = $initialStartTimeZoneName;
@@ -998,8 +996,8 @@ class ICal
                     }
 
                     $countNb = 1;
-                    $offset = "+{$count} " . $this->frequencyConversion[$frequency];
-                    $until = strtotime($offset, $startTimestamp);
+                    $offset  = "+{$count} " . $this->frequencyConversion[$frequency];
+                    $until   = strtotime($offset, $startTimestamp);
 
                     if (in_array($frequency, array('MONTHLY', 'YEARLY'))
                         && isset($rrules['BYDAY']) && $rrules['BYDAY'] !== ''
