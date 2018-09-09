@@ -972,9 +972,13 @@ class ICal
                     $weekday = substr($byDay, -2);
                 }
 
-                $untilDefault = date_create('now');
-                $untilDefault->modify($this->defaultSpan . ' year');
-                $untilDefault->setTime(23, 59, 59); // End of the day
+                if (is_int($this->defaultSpan)) {
+                    $untilDefault = date_create('now');
+                    $untilDefault->modify($this->defaultSpan . ' year');
+                    $untilDefault->setTime(23, 59, 59); // End of the day
+                } else {
+                    trigger_error('ICal::defaultSpan: User defined value is not an integer', E_USER_NOTICE);
+                }
 
                 // Compute EXDATEs
                 $exdates = $this->parseExdates($anEvent);
