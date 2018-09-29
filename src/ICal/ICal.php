@@ -99,6 +99,13 @@ class ICal
     public $disableCharacterReplacement = false;
 
     /**
+     * Toggles whether to replace (non-CLDR) Windows time zone ids with their IANA equivalent.
+     *
+     * @var boolean
+     */
+    public $replaceWindowsTimeZoneIds = false;
+
+    /**
      * The parsed calendar
      *
      * @var array
@@ -217,6 +224,7 @@ class ICal
         'disableCharacterReplacement',
         'skipRecurrence',
         'useTimeZoneWithRRules',
+        'replaceWindowsTimeZoneIds',
     );
 
     /**
@@ -480,9 +488,7 @@ class ICal
                     $line = $this->cleanData($line);
                 }
 
-                // TODO make this configurable (disabled by default) to avoid paying the performance penalty when
-                // parsing unaffected calendars
-                if (strpos($line, 'TZID') !== false) {
+                if ($this->replaceWindowsTimeZoneIds && strpos($line, 'TZID') !== false) {
                     $line = $this->replaceWindowsTimeZoneId($line);
                 }
 
@@ -2595,7 +2601,8 @@ class ICal
      * @param $lineWithTzid string containing a time zone id
      * @return string
      */
-    protected function replaceWindowsTimeZoneId($lineWithTzid) {
+    protected function replaceWindowsTimeZoneId($lineWithTzid)
+    {
         return str_replace($this->windowsTimeZones, $this->windowsTimeZonesIana, $lineWithTzid);
     }
 }
