@@ -11,6 +11,7 @@ try {
         'defaultTimeZone'             => 'UTC',
         'defaultWeekStart'            => 'MO',  // Default value
         'disableCharacterReplacement' => false, // Default value
+        'replaceWindowsTimeZoneIds'   => false, // Default value
         'skipRecurrence'              => false, // Default value
         'useTimeZoneWithRRules'       => false, // Default value
     ));

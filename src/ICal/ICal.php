@@ -222,9 +222,9 @@ class ICal
         'defaultTimeZone',
         'defaultWeekStart',
         'disableCharacterReplacement',
+        'replaceWindowsTimeZoneIds',
         'skipRecurrence',
         'useTimeZoneWithRRules',
-        'replaceWindowsTimeZoneIds',
     );
 
     /**
