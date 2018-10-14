@@ -10,7 +10,7 @@
 ### Requirements
  - PHP 5 (≥ 5.3.0)
  - [Valid ICS](https://icalendar.org/validator.html) (`.ics`, `.ical`, `.ifb`) file
- - [IANA](https://www.iana.org/time-zones) or [Unicode CLDR](http://cldr.unicode.org/translation/timezones) Time Zones
+ - [IANA](https://www.iana.org/time-zones), [Unicode CLDR](http://cldr.unicode.org/translation/timezones) or [Windows](https://support.microsoft.com/en-ca/help/973627/microsoft-time-zone-index-values) Time Zones (Windows needs `$replaceWindowsTimeZoneIds = true` configuration)
 
 ### Setup
 
@@ -79,6 +79,7 @@
 | `$disableCharacterReplacement` | Toggles whether to disable all character replacement. Will replace curly quotes and other special characters with their standard equivalents if `false`. Can be a costly operation!                | :ballot_box_with_check:  | `false`                                                                                   |
 | `$skipRecurrence`              | Toggles whether to skip the parsing of recurrence rules             | :ballot_box_with_check:  | `false`                                                                                   |
 | `$useTimeZoneWithRRules`       | Toggles whether to use time zone info when parsing recurrence rules | :ballot_box_with_check:  | `false`                                                                                   |
+| `$replaceWindowsTimeZoneIds`   | Toggles whether to replace (non-CLDR) Windows time zone ids with their IANA equivalent e.g. "Mountain Standard Time" would be replaced with "America/Denver". As there are 130+ Windows time zone ids that need to be searched and replaced this flag should only be turned on if you know that your calendar file contains such time zone ids. **Microsoft Exchange** calendars are often seen using such ids. | :ballot_box_with_check:  | `false`                                                                                   |
 | `$alarmCount`                  | Tracks the number of alarms in the current iCal feed                | :heavy_multiplication_x: | N/A                                                                                       |
 | `$cal`                         | The parsed calendar                                                 | :heavy_multiplication_x: | N/A                                                                                       |
 | `$eventCount`                  | Tracks the number of events in the current iCal feed                | :heavy_multiplication_x: | N/A                                                                                       |
