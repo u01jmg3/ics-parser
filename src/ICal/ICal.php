@@ -379,7 +379,6 @@ class ICal
      * Creates the ICal object
      *
      * @param  mixed $files
-     *
      * @param  array $options
      * @return void
      */
@@ -398,7 +397,7 @@ class ICal
             $this->defaultTimeZone = date_default_timezone_get();
         }
 
-        $this->windowsTimeZones = array_keys(self::$windowsTimeZonesMap);
+        $this->windowsTimeZones     = array_keys(self::$windowsTimeZonesMap);
         $this->windowsTimeZonesIana = array_values(self::$windowsTimeZonesMap);
 
         if ($files !== false) {
@@ -1695,7 +1694,7 @@ class ICal
                                 $eventStartDescs = array();
                                 if (isset($rrules['BYMONTH']) && $rrules['BYMONTH'] !== '') {
                                     foreach ($bymonths as $bymonth) {
-                                        array_push($eventStartDescs, "$day {$this->monthNames[$bymonth]} " . gmdate('Y H:i:s', $yearRecurringTimestamp));
+                                        array_push($eventStartDescs, "{$day} {$this->monthNames[$bymonth]} " . gmdate('Y H:i:s', $yearRecurringTimestamp));
                                     }
                                 } else {
                                     array_push($eventStartDescs, $day . gmdate(self::DATE_TIME_FORMAT_PRETTY, $yearRecurringTimestamp));
