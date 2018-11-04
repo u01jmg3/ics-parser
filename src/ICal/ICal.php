@@ -106,18 +106,18 @@ class ICal
     public $replaceWindowsTimeZoneIds = false;
 
     /**
-     * With this being non-null the parser will ignore all events more than roughly this many days before now.
-     *
-     * @var integer
-     */
-    public $filterDaysAfter;
-
-    /**
      * With this being non-null the parser will ignore all events more than roughly this many days after now.
      *
      * @var integer
      */
-    public $filterDaysBefore;
+    public $filterDaysBefore = null;
+
+    /**
+     * With this being non-null the parser will ignore all events more than roughly this many days before now.
+     *
+     * @var integer
+     */
+    public $filterDaysAfter = null;
 
     /**
      * The parsed calendar
@@ -625,7 +625,7 @@ class ICal
                 }
             }
 
-            if (!is_null($this->filterDaysAfter) || !is_null($this->filterDaysBefore)) {
+            if (!is_null($this->filterDaysBefore) || !is_null($this->filterDaysAfter)) {
                 $this->reduceEventsToMinMaxRange();
             }
 
@@ -633,36 +633,48 @@ class ICal
         }
     }
 
-    function reduceEventsToMinMaxRange()
+    /**
+     * Reduces the number of events to the defined minimum and maximum range
+     *
+     * @return void
+     */
+    protected function reduceEventsToMinMaxRange()
     {
         $events = (isset($this->cal['VEVENT'])) ? $this->cal['VEVENT'] : array();
 
-        if (empty($events)) {
-            return false;
-        }
+        if (!empty($events)) {
+            // Ideally you would use `PHP_INT_MIN` from PHP 7
+            $php_int_min = -2147483648;
 
-        // ideally you would use PHP_INT_MIN but that was only introduced with PHP 7
-        $minTimestamp = is_null($this->filterDaysBefore) ? -2147483648 : (new \DateTime('now'))->sub(new \DateInterval('P' . $this->filterDaysBefore . 'D'))->getTimestamp();
-        $maxTimestamp = is_null($this->filterDaysAfter) ? PHP_INT_MAX : (new \DateTime('now'))->add(new \DateInterval('P' . $this->filterDaysAfter . 'D'))->getTimestamp();
+            $minTimestamp = is_null($this->filterDaysBefore) ? $php_int_min : (new \DateTime('now'))->sub(new \DateInterval('P' . $this->filterDaysBefore . 'D'))->getTimestamp();
+            $maxTimestamp = is_null($this->filterDaysAfter) ? PHP_INT_MAX : (new \DateTime('now'))->add(new \DateInterval('P' . $this->filterDaysAfter . 'D'))->getTimestamp();
 
-        foreach ($events as $key => $anEvent) {
-            if (!$this->isValidDate($anEvent['DTSTART']) || $this->isOutOfRange($anEvent['DTSTART'], $minTimestamp, $maxTimestamp)) {
-                unset($events[$key]);
-                $this->eventCount--;
+            foreach ($events as $key => $anEvent) {
+                if (!$this->isValidDate($anEvent['DTSTART']) || $this->isOutOfRange($anEvent['DTSTART'], $minTimestamp, $maxTimestamp)) {
+                    $this->eventCount--;
 
-                continue;
+                    unset($events[$key]);
+
+                    continue;
+                }
             }
-        }
 
-        $this->cal['VEVENT'] = $events;
+            $this->cal['VEVENT'] = $events;
+        }
     }
 
-
-    private function isOutOfRange($eventStart, $minTimestamp, $maxTimestamp)
+    /**
+     * Determines whether an event's start time is within a given range
+     *
+     * @param  string  $eventStart
+     * @param  integer $minTimestamp
+     * @param  integer $maxTimestamp
+     * @return boolean
+     */
+    protected function isOutOfRange($eventStart, $minTimestamp, $maxTimestamp)
     {
-        // at this point $dtstart is guaranteed to be stripped of any timezone identifier i.e. it's a pure timestamp
-        // and won't look like e.g. DTSTART;TZID=US-Eastern:19980119T020000
-        $eventStartTimestamp = strtotime(explode("T", $eventStart)[0]);
+        $eventStartTimestamp = strtotime(explode('T', $eventStart)[0]);
+
         return $eventStartTimestamp < $minTimestamp || $eventStartTimestamp > $maxTimestamp;
     }
 
