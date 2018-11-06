@@ -49,3 +49,9 @@ vendor
 # Custom #
 ##########
 *-report.*
+
+########
+# IDEs #
+########
+.idea
+*.iml
