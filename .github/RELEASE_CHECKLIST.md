@@ -1,5 +1,6 @@
 # Release Checklist
 
+- [ ] Update docblock in `src/ICal/ICal.php`
 - [ ] Ensure the documentation is up to date
 - [ ] Push the code changes to GitHub (`git push`)
 - [ ] Tag the release (`git tag v1.2.3`)
