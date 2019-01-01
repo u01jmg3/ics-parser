@@ -2444,32 +2444,42 @@ class ICal
     }
 
     /**
-     * Replaces all occurrences of a search string with a given replacement string.
+     * Replace all occurrences of the search string with the replacement string.
      * Multibyte safe.
      *
      * @param  string|array $search
      * @param  string|array $replace
      * @param  string|array $subject
+     * @param  string       $encoding
      * @param  integer      $count
      * @return array|string
      */
-    protected function mb_str_replace($search, $replace, $subject, &$count = 0)
+    protected static function mb_str_replace($search, $replace, $subject, $encoding = 'auto', &$count = 0)
     {
-        if (!is_array($subject)) {
-            // Normalize `$search` and `$replace` so they are both arrays of the same length
-            $searches     = is_array($search) ? array_values($search) : array($search);
-            $replacements = is_array($replace) ? array_values($replace) : array($replace);
+        if (is_array($subject)) {
+            // Call `mb_str_replace` for each subject in array, recursively
+            foreach ($subject as $key => $value) {
+                $subject[$key] = self::mb_str_replace($search, $replace, $value, $encoding, $count);
+            }
+        } else {
+            // Normalize $search and $replace so they are both arrays of the same length
+            $searches     = is_array($search) ? array_values($search) : [$search];
+            $replacements = is_array($replace) ? array_values($replace) : [$replace];
             $replacements = array_pad($replacements, count($searches), '');
 
             foreach ($searches as $key => $search) {
-                $parts   = mb_split(preg_quote($search), $subject);
-                $count  += count($parts) - 1;
-                $subject = implode($replacements[$key], $parts);
-            }
-        } else {
-            // Call `mb_str_replace` for each subject in array, recursively
-            foreach ($subject as $key => $value) {
-                $subject[$key] = $this->mb_str_replace($search, $replace, $value, $count);
+                $replace   = $replacements[$key];
+                $searchLen = mb_strlen($search, $encoding);
+
+                $sb = [];
+                while (($offset = mb_strpos($subject, $search, 0, $encoding)) !== false) {
+                    $sb[]    = mb_substr($subject, 0, $offset, $encoding);
+                    $subject = mb_substr($subject, $offset + $searchLen, null, $encoding);
+                    ++$count;
+                }
+
+                $sb[]    = $subject;
+                $subject = implode($replace, $sb);
             }
         }
 
