@@ -227,6 +227,13 @@ class ICal
     );
 
     /**
+     * Holds the username and password for HTTP basic authentication
+     *
+     * @var array
+     */
+    protected $httpBasicAuth = array();
+
+    /**
      * Define which variables can be configured
      *
      * @var array
@@ -485,10 +492,17 @@ class ICal
      * Initialises lines from a URL
      *
      * @param  string $url
+     * @param  string $username
+     * @param  string $password
      * @return ICal
      */
-    public function initUrl($url)
+    public function initUrl($url, $username = null, $password = null)
     {
+        if (!is_null($username) && !is_null($password)) {
+            $this->httpBasicAuth['username'] = $username;
+            $this->httpBasicAuth['password'] = $password;
+        }
+
         $this->initFile($url);
 
         return $this;
@@ -2616,7 +2630,20 @@ class ICal
      */
     protected function fileOrUrl($filename)
     {
-        if (!$lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)) {
+        $options = array();
+        if (!empty($this->httpBasicAuth)) {
+            $options['http'] = array();
+
+            $username  = $this->httpBasicAuth['username'];
+            $password  = $this->httpBasicAuth['password'];
+            $basicAuth = base64_encode("{$username}:{$password}");
+
+            $options['http']['header'] = "Authorization: Basic {$basicAuth}";
+        }
+
+        $context = stream_context_create($options);
+
+        if (($lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES, $context)) === false) {
             throw new \Exception("The file path or URL '{$filename}' does not exist.");
         }
 
