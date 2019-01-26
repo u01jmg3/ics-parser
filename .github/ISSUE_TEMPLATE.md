@@ -7,7 +7,7 @@
 >   - Complete - provide all parts needed to reproduce the problem
 >   - Verifiable - test the code you're about to provide to make sure it reproduces the problem
 
-- PHP Version: `5.#.#`
+- PHP Version: `7.#.#`
 - PHP date.timezone: `[Country]/[City]`
 - ICS Parser Version: `2.#.#`
 - Windows/Mac/Linux
@@ -17,3 +17,6 @@
 
 ### Steps to Reproduce:
 
+1.
+1.
+1.
