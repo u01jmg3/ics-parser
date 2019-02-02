@@ -2468,10 +2468,10 @@ class ICal
      * @param  integer      $count
      * @return array|string
      */
-    protected static function mb_str_replace($search, $replace, $subject, $encoding = 'auto', &$count = 0)
+    protected static function mb_str_replace($search, $replace, $subject, $encoding = null, &$count = 0)
     {
         if (is_array($subject)) {
-            // Call `mb_str_replace` for each subject in array, recursively
+            // Call `mb_str_replace()` for each subject in the array, recursively
             foreach ($subject as $key => $value) {
                 $subject[$key] = self::mb_str_replace($search, $replace, $value, $encoding, $count);
             }
@@ -2482,6 +2482,10 @@ class ICal
             $replacements = array_pad($replacements, count($searches), '');
 
             foreach ($searches as $key => $search) {
+                if (is_null($encoding)) {
+                    $encoding = mb_detect_encoding($search, 'UTF-8', true);
+                }
+
                 $replace   = $replacements[$key];
                 $searchLen = mb_strlen($search, $encoding);
 
