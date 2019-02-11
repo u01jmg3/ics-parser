@@ -2393,31 +2393,27 @@ class ICal
      */
     protected function convertDayOrdinalToPositive($dayNumber, $weekday, $timestamp)
     {
-        $dayNumber = empty($dayNumber) ? 1 : $dayNumber; // Returns 0 when no number defined in BYDAY
+		$dayNumber = empty($dayNumber) ? 1 : $dayNumber; // Returns 0 when no number defined in BYDAY
 
-        $dayOrdinals = $this->dayOrdinals;
+		$dayOrdinals = $this->dayOrdinals;
 
-        // We only care about negative BYDAY values
-        if ($dayNumber >= 1) {
-            return $dayOrdinals[$dayNumber];
-        }
+		// We only care about negative BYDAY values
+		if ($dayNumber >= 1) {
+			return $dayOrdinals[$dayNumber];
+		}
 
-        $timestamp = (is_object($timestamp)) ? $timestamp : \DateTime::createFromFormat(self::UNIX_FORMAT, $timestamp);
-        $start     = strtotime('first day of ' . $timestamp->format(self::DATE_TIME_FORMAT_PRETTY));
-        $end       = strtotime('last day of ' . $timestamp->format(self::DATE_TIME_FORMAT_PRETTY));
+		$ords = array("", "second", "third", "fourth", "fifth");
+		$weekdays = array("SU"=>"Sunday", "MO"=>"Monday", "TU"=>"Tuesday", "WE"=>"Wednesday", "TH"=>"Thursday", "FR"=>"Friday", "SA"=>"Saturday");
+		$month = date("F", $timestamp);
+		$dayIndex = $dayNumber * -1 - 1;
+		
+		$date = strtotime($ords[$dayIndex] . " last " . $weekdays[$weekday] . " of " . $month);
 
-        // Used with pow(2, X) so pow(2, 4) is THURSDAY
-        $weekdays = array_flip(array_keys($this->weekdays));
-
-        $numberOfDays = $this->numberOfDays(pow(2, $weekdays[$weekday]), $start, $end);
-
-        // Create subset
-        $dayOrdinals = array_slice($dayOrdinals, 0, $numberOfDays, true);
-
-        // Reverse only the values
-        $dayOrdinals = array_combine(array_keys($dayOrdinals), array_reverse(array_values($dayOrdinals)));
-
-        return $dayOrdinals[$dayNumber * -1];
+		$week = intval(date("j", $date) / 7);
+		
+		$ords[0] = "first";
+		
+		return $ords[$week];
     }
 
     /**
