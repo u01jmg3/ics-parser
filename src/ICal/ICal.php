@@ -234,6 +234,13 @@ class ICal
     protected $httpBasicAuth = array();
 
     /**
+     * Holds the custom User Agent string header
+     *
+     * @var string
+     */
+    protected $httpUserAgent = null;
+
+    /**
      * Define which variables can be configured
      *
      * @var array
@@ -494,13 +501,18 @@ class ICal
      * @param  string $url
      * @param  string $username
      * @param  string $password
+     * @param  string $userAgent
      * @return ICal
      */
-    public function initUrl($url, $username = null, $password = null)
+    public function initUrl($url, $username = null, $password = null, $userAgent = null)
     {
         if (!is_null($username) && !is_null($password)) {
             $this->httpBasicAuth['username'] = $username;
             $this->httpBasicAuth['password'] = $password;
+        }
+
+        if (!is_null($userAgent)) {
+            $this->httpUserAgent = $userAgent;
         }
 
         $this->initFile($url);
@@ -2635,14 +2647,21 @@ class ICal
     protected function fileOrUrl($filename)
     {
         $options = array();
-        if (!empty($this->httpBasicAuth)) {
+        if (!empty($this->httpBasicAuth) || !empty($this->httpUserAgent)) {
             $options['http'] = array();
+            $options['http']['header'] = array();
 
-            $username  = $this->httpBasicAuth['username'];
-            $password  = $this->httpBasicAuth['password'];
-            $basicAuth = base64_encode("{$username}:{$password}");
+            if (!empty($this->httpBasicAuth)) {
+                $username  = $this->httpBasicAuth['username'];
+                $password  = $this->httpBasicAuth['password'];
+                $basicAuth = base64_encode("{$username}:{$password}");
 
-            $options['http']['header'] = "Authorization: Basic {$basicAuth}";
+                array_push($options['http']['header'], "Authorization: Basic {$basicAuth}");
+            }
+
+            if (!empty($this->httpUserAgent)) {
+                array_push($options['http']['header'], "User-Agent: {$httpUserAgent}");
+            }
         }
 
         $context = stream_context_create($options);
