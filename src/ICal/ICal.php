@@ -2369,14 +2369,13 @@ class ICal
      */
     protected function numberOfDays($days, $start, $end)
     {
-        $w       = array(date('w', $start), date('w', $end));
-        $oneWeek = self::SECONDS_IN_A_WEEK;
-        $x       = floor(($end - $start) / $oneWeek);
-        $sum     = 0;
+        $w    = array(date('w', $start), date('w', $end));
+        $base = floor(($end - $start) / self::SECONDS_IN_A_WEEK);
+        $sum  = 0;
 
         for ($day = 0; $day < 7; ++$day) {
             if ($days & pow(2, $day)) {
-                $sum += $x + (($w[0] > $w[1]) ? $w[0] <= $day || $day <= $w[1] : $w[0] <= $day && $day <= $w[1]);
+                $sum += $base + (($w[0] > $w[1]) ? $w[0] <= $day || $day <= $w[1] : $w[0] <= $day && $day <= $w[1]);
             }
         }
 
