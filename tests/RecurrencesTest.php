@@ -81,6 +81,25 @@ class RecurrencesTest extends TestCase
     /**
      * @runInSeparateProcess
      */
+    public function testIssue196FromFile() {
+        $checks = array(
+            array('index' => 0, 'dateString' => '20191105T190000', 'timezone' => 'Europe/Berlin', 'message' => '1st event, CEST: '),
+            array('index' => 1, 'dateString' => '20191106T190000', 'timezone' => 'Europe/Berlin', 'message' => '2nd event, CEST: '),
+            array('index' => 2, 'dateString' => '20191107T190000', 'timezone' => 'Europe/Berlin', 'message' => '3rd event, CEST: '),
+            array('index' => 3, 'dateString' => '20191108T190000', 'timezone' => 'Europe/Berlin', 'message' => '4th event, CEST: '),
+            array('index' => 4, 'dateString' => '20191109T170000', 'timezone' => 'Europe/Berlin', 'message' => '5th event, CEST: '),
+            array('index' => 5, 'dateString' => '20191110T180000', 'timezone' => 'Europe/Berlin', 'message' => '6th event, CEST: '),
+        );
+        $this->assertEventFile(
+            'UTC',
+            "./tests/issue196.txt",
+            6,
+            $checks);
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
     public function testWeeklyFullDayTimeZoneBerlin() {
         $checks = array(
             array('index' => 0, 'dateString' => '20000301', 'message' => '1st event, CET: '),
@@ -225,6 +244,8 @@ class RecurrencesTest extends TestCase
         $events = $ical->events();
 
         $this->assertCount($count, $events);
+
+        $events = $ical->sortEventsWithOrder($events);
 
         foreach($checks as $check) {
             $this->assertEvent($events[$check['index']], $check['dateString'], $check['message'], isset($check['timezone']) ? $check['timezone'] : $defaultTimezone);
