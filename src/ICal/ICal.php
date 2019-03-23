@@ -645,8 +645,9 @@ class ICal
                             if ($this->shouldFilterByWindow) {
                                 $this->removeLastEventIfOutsideWindowAndNonRecurring();
                             }
+
                             $component = 'VCALENDAR';
-                        break;
+                            break;
 
                         default:
                             $this->addCalendarComponentWithKeyAndValue($component, $keyword, $value);
@@ -688,14 +689,13 @@ class ICal
      * Removes the last event (i.e. most recently parsed) if its start date is outside the window spanned by
      * `$windowMinTimestamp` / `$windowMaxTimestamp`.
      *
-     * @throws \Exception
+     * @return void
      */
     protected function removeLastEventIfOutsideWindowAndNonRecurring()
     {
         $events = $this->cal['VEVENT'];
 
         if (!empty($events)) {
-
             $lastIndex = sizeof($events) - 1;
             $lastEvent = $events[$lastIndex];
 
@@ -721,6 +721,7 @@ class ICal
             foreach ($events as $key => $anEvent) {
                 if ($this->isEventStartOutsideWindow($anEvent)) {
                     $this->eventCount--;
+
                     unset($events[$key]);
 
                     continue;
@@ -737,7 +738,6 @@ class ICal
      *
      * @param  array $event
      * @return boolean
-     * @throws \Exception
      */
     protected function isEventStartOutsideWindow(array $event)
     {
