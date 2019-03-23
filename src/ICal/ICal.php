@@ -427,7 +427,7 @@ class ICal
     private $windowMaxTimestamp = null;
 
     /**
-     * True if either `$filterDaysBefore` or `$filterDaysAfter` are set.
+     * `true` if either `$filterDaysBefore` or `$filterDaysAfter` are set.
      *
      * @var boolean
      */
@@ -699,8 +699,9 @@ class ICal
             $lastIndex = sizeof($events) - 1;
             $lastEvent = $events[$lastIndex];
 
-            if (!isset($lastEvent['RRULE']) || $lastEvent['RRULE'] === '' && $this->isEventStartOutsideWindow($lastEvent)) {
+            if (!isset($lastEvent['RRULE']) || $lastEvent['RRULE'] === '' && $this->doesEventStartOutsideWindow($lastEvent)) {
                 $this->eventCount--;
+
                 unset($events[$lastIndex]);
             }
 
@@ -719,7 +720,7 @@ class ICal
 
         if (!empty($events)) {
             foreach ($events as $key => $anEvent) {
-                if ($this->isEventStartOutsideWindow($anEvent)) {
+                if ($this->doesEventStartOutsideWindow($anEvent)) {
                     $this->eventCount--;
 
                     unset($events[$key]);
@@ -734,12 +735,12 @@ class ICal
 
     /**
      * Determines whether the event start date is outside `$windowMinTimestamp` / `$windowMaxTimestamp`.
-     * Returns true for invalid dates.
+     * Returns `true` for invalid dates.
      *
      * @param  array $event
      * @return boolean
      */
-    protected function isEventStartOutsideWindow(array $event)
+    protected function doesEventStartOutsideWindow(array $event)
     {
         return !$this->isValidDate($event['DTSTART']) || $this->isOutOfRange($event['DTSTART'], $this->windowMinTimestamp, $this->windowMaxTimestamp);
     }
