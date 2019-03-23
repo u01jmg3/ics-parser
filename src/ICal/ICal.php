@@ -411,20 +411,27 @@ class ICal
     private $windowsTimeZonesIana;
 
     /**
-     * If $filterDaysBefore or $filterDaysBefore are set then the events are filtered according to the window defined
-     * by the below two fields.
+     * If `$filterDaysBefore` or `$filterDaysAfter` are set then the events are filtered according to the window defined
+     * by this field and `$windowMaxTimestamp`.
      *
-     * @var int
+     * @var integer
      */
-    private $windowMinTimestamp;
-    private $windowMaxTimestamp;
+    private $windowMinTimestamp = null;
 
     /**
-     * True if either $filterDaysBefore or $filterDaysAfter are set.
+     * If `$filterDaysBefore` or `$filterDaysAfter` are set then the events are filtered according to the window defined
+     * by this field and `$windowMinTimestamp`.
+     *
+     * @var integer
+     */
+    private $windowMaxTimestamp = null;
+
+    /**
+     * True if either `$filterDaysBefore` or `$filterDaysAfter` are set.
      *
      * @var boolean
      */
-    private $shouldFilterByWindow;
+    private $shouldFilterByWindow = false;
 
     /**
      * Creates the ICal object
@@ -679,11 +686,11 @@ class ICal
 
     /**
      * Removes the last event (i.e. most recently parsed) if its start date is outside the window spanned by
-     * windowMinTimestamp/windowMaxTimestamp.
+     * `$windowMinTimestamp` / `$windowMaxTimestamp`.
      *
      * @throws \Exception
      */
-    private function removeLastEventIfOutsideWindowAndNonRecurring()
+    protected function removeLastEventIfOutsideWindowAndNonRecurring()
     {
         $events = $this->cal['VEVENT'];
 
@@ -725,14 +732,14 @@ class ICal
     }
 
     /**
-     * Determines whether the event start date is outside the windowMinTimestamp/windowMaxTimestamp. Returns true for
-     * invalid dates.
+     * Determines whether the event start date is outside `$windowMinTimestamp` / `$windowMaxTimestamp`.
+     * Returns true for invalid dates.
      *
-     * @param $event
+     * @param  array $event
      * @return boolean
      * @throws \Exception
      */
-    private function isEventStartOutsideWindow($event)
+    protected function isEventStartOutsideWindow(array $event)
     {
         return !$this->isValidDate($event['DTSTART']) || $this->isOutOfRange($event['DTSTART'], $this->windowMinTimestamp, $this->windowMaxTimestamp);
     }
