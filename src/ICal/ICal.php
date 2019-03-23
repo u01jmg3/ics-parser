@@ -411,6 +411,22 @@ class ICal
     private $windowsTimeZonesIana;
 
     /**
+     * If $filterDaysBefore or $filterDaysBefore are set then the events are filtered according to the window defined
+     * by the below two fields.
+     *
+     * @var int
+     */
+    private $windowMinTimestamp;
+    private $windowMaxTimestamp;
+
+    /**
+     * True if either $filterDaysBefore or $filterDaysAfter are set.
+     *
+     * @var boolean
+     */
+    private $shouldFilterByWindow;
+
+    /**
      * Creates the ICal object
      *
      * @param  mixed $files
@@ -434,6 +450,14 @@ class ICal
 
         $this->windowsTimeZones     = array_keys(self::$windowsTimeZonesMap);
         $this->windowsTimeZonesIana = array_values(self::$windowsTimeZonesMap);
+
+        // Ideally you would use `PHP_INT_MIN` from PHP 7
+        $php_int_min = -2147483648;
+
+        $this->windowMinTimestamp = is_null($this->filterDaysBefore) ? $php_int_min : (new \DateTime('now'))->sub(new \DateInterval('P' . $this->filterDaysBefore . 'D'))->getTimestamp();
+        $this->windowMaxTimestamp = is_null($this->filterDaysAfter) ? PHP_INT_MAX : (new \DateTime('now'))->add(new \DateInterval('P' . $this->filterDaysAfter . 'D'))->getTimestamp();
+
+        $this->shouldFilterByWindow = !is_null($this->filterDaysBefore) || !is_null($this->filterDaysAfter);
 
         if ($files !== false) {
             $files = is_array($files) ? $files : array($files);
@@ -604,10 +628,16 @@ class ICal
                         case 'END:DAYLIGHT':
                         case 'END:STANDARD':
                         case 'END:VCALENDAR':
-                        case 'END:VEVENT':
                         case 'END:VFREEBUSY':
                         case 'END:VTIMEZONE':
                         case 'END:VTODO':
+                            $component = 'VCALENDAR';
+                        break;
+
+                        case 'END:VEVENT':
+                            if ($this->shouldFilterByWindow) {
+                                $this->removeLastEventIfOutsideWindowAndNonRecurring();
+                            }
                             $component = 'VCALENDAR';
                         break;
 
@@ -639,11 +669,35 @@ class ICal
                 }
             }
 
-            if (!is_null($this->filterDaysBefore) || !is_null($this->filterDaysAfter)) {
+            if ($this->shouldFilterByWindow) {
                 $this->reduceEventsToMinMaxRange();
             }
 
             $this->processDateConversions();
+        }
+    }
+
+    /**
+     * Removes the last event (i.e. most recently parsed) if its start date is outside the window spanned by
+     * windowMinTimestamp/windowMaxTimestamp.
+     *
+     * @throws \Exception
+     */
+    private function removeLastEventIfOutsideWindowAndNonRecurring()
+    {
+        $events = $this->cal['VEVENT'];
+
+        if (!empty($events)) {
+
+            $lastIndex = sizeof($events) - 1;
+            $lastEvent = $events[$lastIndex];
+
+            if (!isset($lastEvent['RRULE']) || $lastEvent['RRULE'] === '' && $this->isEventStartOutsideWindow($lastEvent)) {
+                $this->eventCount--;
+                unset($events[$lastIndex]);
+            }
+
+            $this->cal['VEVENT'] = $events;
         }
     }
 
@@ -657,16 +711,9 @@ class ICal
         $events = (isset($this->cal['VEVENT'])) ? $this->cal['VEVENT'] : array();
 
         if (!empty($events)) {
-            // Ideally you would use `PHP_INT_MIN` from PHP 7
-            $php_int_min = -2147483648;
-
-            $minTimestamp = is_null($this->filterDaysBefore) ? $php_int_min : (new \DateTime('now'))->sub(new \DateInterval('P' . $this->filterDaysBefore . 'D'))->getTimestamp();
-            $maxTimestamp = is_null($this->filterDaysAfter) ? PHP_INT_MAX : (new \DateTime('now'))->add(new \DateInterval('P' . $this->filterDaysAfter . 'D'))->getTimestamp();
-
             foreach ($events as $key => $anEvent) {
-                if (!$this->isValidDate($anEvent['DTSTART']) || $this->isOutOfRange($anEvent['DTSTART'], $minTimestamp, $maxTimestamp)) {
+                if ($this->isEventStartOutsideWindow($anEvent)) {
                     $this->eventCount--;
-
                     unset($events[$key]);
 
                     continue;
@@ -678,18 +725,31 @@ class ICal
     }
 
     /**
-     * Determines whether an event's start time is within a given range
+     * Determines whether the event start date is outside the windowMinTimestamp/windowMaxTimestamp. Returns true for
+     * invalid dates.
      *
-     * @param  string  $eventStart
+     * @param $event
+     * @return boolean
+     * @throws \Exception
+     */
+    private function isEventStartOutsideWindow($event)
+    {
+        return !$this->isValidDate($event['DTSTART']) || $this->isOutOfRange($event['DTSTART'], $this->windowMinTimestamp, $this->windowMaxTimestamp);
+    }
+
+    /**
+     * Determines whether a valid iCalendar date is within a given range
+     *
+     * @param  string  $calendarDate
      * @param  integer $minTimestamp
      * @param  integer $maxTimestamp
      * @return boolean
      */
-    protected function isOutOfRange($eventStart, $minTimestamp, $maxTimestamp)
+    protected function isOutOfRange($calendarDate, $minTimestamp, $maxTimestamp)
     {
-        $eventStartTimestamp = strtotime(explode('T', $eventStart)[0]);
+        $timestamp = strtotime(explode('T', $calendarDate)[0]);
 
-        return $eventStartTimestamp < $minTimestamp || $eventStartTimestamp > $maxTimestamp;
+        return $timestamp < $minTimestamp || $timestamp > $maxTimestamp;
     }
 
     /**

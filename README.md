@@ -11,7 +11,7 @@
  - PHP 5 (≥ 5.3.0)
  - [Valid ICS](https://icalendar.org/validator.html) (`.ics`, `.ical`, `.ifb`) file
  - [IANA](https://www.iana.org/time-zones), [Unicode CLDR](http://cldr.unicode.org/translation/timezones) or [Windows](https://support.microsoft.com/en-ca/help/973627/microsoft-time-zone-index-values) Time Zones
-   - Windows will need the `$replaceWindowsTimeZoneIds = true` configuration
+   - Windows Time Zones will need the `$replaceWindowsTimeZoneIds = true` configuration
 
 ### Setup
 
@@ -63,6 +63,44 @@
    //   2 => int 1460192400
    //   3 => string 'TZID=America/Detroit:20160409T090000' (length=36)
    ```
+
+---
+
+## On parsing iCal
+Parsing [iCal/iCalendar/ICS](https://en.wikipedia.org/wiki/ICalendar) resources poses several challenges. One is that
+the specification is a moving target; the original RFC was updated four times in ten years. The other is that vendors
+were both liberal (read: creative) in interpreting the specification and productive implementing proprietary extensions.
+
+However, what impedes efficient parsing most directly are recurrence rules for events. This library parses the original
+calendar into an easy to work with memory model. This requires that each recurring event is expanded or exploded. Hence,
+a single event that occurs daily will generate a new event instance for every day when this parser processes the
+calendar ([`$defaultSpan`](#variables) limits this). To get an idea how this is done take a look at the
+[call graph](https://user-images.githubusercontent.com/624195/45904641-f3cd0a80-bded-11e8-925f-7bcee04b8575.png).
+
+As a consequence the _entire_ calendar is parsed line-by-line, and thus loaded into memory, first. As you can imagine
+large calendars tend to get huge when exploded i.e. with all their recurrence rules evaluated. This is exacerbated when
+old calendars do not remove past events as they get fatter and fatter every year.
+
+This limitation is particularly painful if you only need a window into the original calendar. It seems wasteful to parse
+the entire fully exploded calendar into memory if you later are going to call the 
+[`eventsFromInterval()` or `eventsFromRange()`](#methods) on it.
+
+In late 2018 [#190](https://github.com/u01jmg3/ics-parser/pull/190) added the option to drop all events outside a given 
+range very early in the parse process at the cost of some precision (timezone calculations not done at that point). This 
+massively reduces the total time for parsing a calendar. Same goes for memory consumption of course. Precondition is that 
+you know upfront that you don't care about events outside a given range.
+
+Let's say your are only interested in events from yesterday, today and tomorrow. To compensate for the fact that the
+tricky timezone transformations and calculations have not been executed yet by the time the parser has to decide whether
+to keep or drop an event you tell it to filter for **+-2d** instead of +-1d. Once it is done you would then call
+`eventsFromRange()` with +-1d to get precisely the events in the window you are interested in. That is what the variables
+[`$filterDaysBefore` and `$filterDaysAfter`]((#variables)) are for.
+
+In Q1 2019 [#213](https://github.com/u01jmg3/ics-parser/pull/213) further improved the performance by immediately 
+dropping _non-recurring_ events once parsed if they are outside that fuzzy window. This greatly reduces the maximum 
+memory consumption for large calendars. PHP by default does not allocate more than 128MB heap and would otherwise crash 
+with `Fatal error: Allowed memory size of 134217728 bytes exhausted`. It goes without saying that recurring events first 
+need to be evaluated before non-fitting events can be dropped.
 
 ---
 
