@@ -75,9 +75,6 @@ class RecurrencesTest extends TestCase
             $checks);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testIssue196FromFile() {
         $checks = array(
             array('index' => 0, 'dateString' => '20191105T190000', 'timezone' => 'Europe/Berlin', 'message' => '1st event, CEST: '),
@@ -89,7 +86,7 @@ class RecurrencesTest extends TestCase
         );
         $this->assertEventFile(
             'UTC',
-            "./tests/issue196.txt",
+            "./tests/ical/issue-196.ics",
             6,
             $checks);
     }
