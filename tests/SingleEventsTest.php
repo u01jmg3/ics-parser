@@ -1,16 +1,24 @@
 <?php
 
-namespace Churchtools\Tests\ICal;
-
 use ICal\ICal;
 use PHPUnit\Framework\TestCase;
 
 class SingleEventsTest extends TestCase {
 
+    private $originalTimeZone = null;
+
+    public function setUp() {
+        $this->originalTimeZone = date_default_timezone_get();
+    }
+
+    public function tearDown() {
+        date_default_timezone_set($this->originalTimeZone);
+    }
+
     public function testFullDayTimeZoneBerlin() {
-        $checks = [
-            ['index' => 0, 'dateString' => '20000301', 'message' => '1st event, CET: '],
-        ];
+        $checks = array(
+            array('index' => 0, 'dateString' => '20000301', 'message' => '1st event, CET: '),
+        );
         $this->assertVEVENT(
             'Europe/Berlin',
             "DTSTART;VALUE=DATE:20000301",
@@ -21,9 +29,9 @@ class SingleEventsTest extends TestCase {
     }
 
     public function testSeveralFullDaysTimeZoneBerlin() {
-        $checks = [
-            ['index' => 0, 'dateString' => '20000301', 'message' => '1st event, CET: '],
-        ];
+        $checks = array(
+            array('index' => 0, 'dateString' => '20000301', 'message' => '1st event, CET: '),
+        );
         $this->assertVEVENT(
             'Europe/Berlin',
             "DTSTART;VALUE=DATE:20000301",
@@ -33,9 +41,9 @@ class SingleEventsTest extends TestCase {
     }
 
     public function testEventTimeZoneUTC() {
-        $checks = [
-            ['index' => 0, 'dateString' => '20180626T070000Z', 'message' => '1st event, UTC: '],
-        ];
+        $checks = array(
+            array('index' => 0, 'dateString' => '20180626T070000Z', 'message' => '1st event, UTC: '),
+        );
         $this->assertVEVENT(
             'Europe/Berlin',
             "DTSTART:20180626T070000Z",
@@ -46,9 +54,9 @@ class SingleEventsTest extends TestCase {
     }
 
     public function testEventTimeZoneBerlin() {
-        $checks = [
-            ['index' => 0, 'dateString' => '20180626T070000', 'message' => '1st event, CEST: '],
-        ];
+        $checks = array(
+            array('index' => 0, 'dateString' => '20180626T070000', 'message' => '1st event, CEST: '),
+        );
         $this->assertVEVENT(
             'Europe/Berlin',
             "DTSTART:20180626T070000",
