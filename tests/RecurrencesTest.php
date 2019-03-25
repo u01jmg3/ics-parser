@@ -7,10 +7,16 @@ class RecurrencesTest extends TestCase
 {
 
     private $useTimeZoneWithRRules = false;
+    private $originalTimeZone = null;
 
-    /**
-     * @runInSeparateProcess
-     */
+    public function setUp() {
+        $this->originalTimeZone = date_default_timezone_get();
+    }
+
+    public function tearDown() {
+        date_default_timezone_set($this->originalTimeZone);
+    }
+
     public function testYearlyFullDayTimeZoneBerlin() {
         $checks = array(
             array('index' => 0, 'dateString' => '20000301', 'message' => '1st event, CET: '),
@@ -26,9 +32,6 @@ class RecurrencesTest extends TestCase
             $checks);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testMonthlyFullDayTimeZoneBerlin() {
         $checks = array(
             array('index' => 0, 'dateString' => '20000301', 'message' => '1st event, CET: '),
@@ -44,9 +47,6 @@ class RecurrencesTest extends TestCase
             $checks);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testMonthlyFullDayTimeZoneBerlinSummerTime() {
         $checks = array(
             array('index' => 0, 'dateString' => '20180701', 'message' => '1st event, CEST: '),
@@ -62,9 +62,6 @@ class RecurrencesTest extends TestCase
             $checks);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testMonthlyFullDayTimeZoneBerlinFromFile() {
         $checks = array(
             array('index' => 0, 'dateString' => '20180701', 'message' => '1st event, CEST: '),
@@ -73,14 +70,11 @@ class RecurrencesTest extends TestCase
         );
         $this->assertEventFile(
             'Europe/Berlin',
-            "./tests/icalmonthly.txt",
+            "./tests/ical/ical-monthly.ics",
             25,
             $checks);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testWeeklyFullDayTimeZoneBerlin() {
         $checks = array(
             array('index' => 0, 'dateString' => '20000301', 'message' => '1st event, CET: '),
@@ -99,9 +93,6 @@ class RecurrencesTest extends TestCase
             $checks);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testDailyFullDayTimeZoneBerlin() {
         $checks = array(
             array('index' => 0, 'dateString' => '20000301', 'message' => '1st event, CET: '),
@@ -117,9 +108,6 @@ class RecurrencesTest extends TestCase
             $checks);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testWeeklyFullDayTimeZoneBerlinLocal() {
         $checks = array(
             array('index' => 0, 'dateString' => '20000301T000000', 'message' => '1st event, CET: '),
@@ -138,9 +126,6 @@ class RecurrencesTest extends TestCase
             $checks);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testRFCDaily10NewYork() {
         // (1997 9:00 AM EDT)September 2-11
         $checks = array(
@@ -157,9 +142,6 @@ class RecurrencesTest extends TestCase
             $checks);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testRFCDaily10Berlin() {
         // (1997 9:00 AM CEST)September 2-11
         $checks = array(
@@ -176,9 +158,6 @@ class RecurrencesTest extends TestCase
             $checks);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testRFCDaily10BerlinFromNewYork() {
         // (1997 9:00 AM CEST)September 2-11
         $checks = array(
@@ -211,8 +190,6 @@ class RecurrencesTest extends TestCase
         $this->assertCount($count, $events);
 
         foreach($checks as $check) {
-            //echo $events[$check['index']]->dtstart_array[3].PHP_EOL;
-
             $this->assertEvent($events[$check['index']], $check['dateString'], $check['message'], isset($check['timezone']) ? $check['timezone'] : $defaultTimezone);
         }
     }
@@ -280,6 +257,4 @@ X-WR-CALDESC:
         return "END:VCALENDAR
 ";
     }
-
-
 }
