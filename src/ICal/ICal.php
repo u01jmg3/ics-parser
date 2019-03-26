@@ -3,7 +3,7 @@
  * This PHP class will read an ICS (`.ics`, `.ical`, `.ifb`) file, parse it and return an
  * array of its contents.
  *
- * PHP 5 (≥ 5.3.0)
+ * PHP 5 (≥ 5.3.9)
  *
  * @author  Jonathan Goode <https://github.com/u01jmg3>
  * @license https://opensource.org/licenses/mit-license.php MIT License
@@ -411,6 +411,29 @@ class ICal
     private $windowsTimeZonesIana;
 
     /**
+     * If `$filterDaysBefore` or `$filterDaysAfter` are set then the events are filtered according to the window defined
+     * by this field and `$windowMaxTimestamp`.
+     *
+     * @var integer
+     */
+    private $windowMinTimestamp = null;
+
+    /**
+     * If `$filterDaysBefore` or `$filterDaysAfter` are set then the events are filtered according to the window defined
+     * by this field and `$windowMinTimestamp`.
+     *
+     * @var integer
+     */
+    private $windowMaxTimestamp = null;
+
+    /**
+     * `true` if either `$filterDaysBefore` or `$filterDaysAfter` are set.
+     *
+     * @var boolean
+     */
+    private $shouldFilterByWindow = false;
+
+    /**
      * Creates the ICal object
      *
      * @param  mixed $files
@@ -434,6 +457,14 @@ class ICal
 
         $this->windowsTimeZones     = array_keys(self::$windowsTimeZonesMap);
         $this->windowsTimeZonesIana = array_values(self::$windowsTimeZonesMap);
+
+        // Ideally you would use `PHP_INT_MIN` from PHP 7
+        $php_int_min = -2147483648;
+
+        $this->windowMinTimestamp = is_null($this->filterDaysBefore) ? $php_int_min : (new \DateTime('now'))->sub(new \DateInterval('P' . $this->filterDaysBefore . 'D'))->getTimestamp();
+        $this->windowMaxTimestamp = is_null($this->filterDaysAfter) ? PHP_INT_MAX : (new \DateTime('now'))->add(new \DateInterval('P' . $this->filterDaysAfter . 'D'))->getTimestamp();
+
+        $this->shouldFilterByWindow = !is_null($this->filterDaysBefore) || !is_null($this->filterDaysAfter);
 
         if ($files !== false) {
             $files = is_array($files) ? $files : array($files);
@@ -562,7 +593,7 @@ class ICal
                             }
 
                             $component = 'VTODO';
-                        break;
+                            break;
 
                         // https://www.kanzaki.com/docs/ical/vevent.html
                         case 'BEGIN:VEVENT':
@@ -571,7 +602,7 @@ class ICal
                             }
 
                             $component = 'VEVENT';
-                        break;
+                            break;
 
                         // https://www.kanzaki.com/docs/ical/vfreebusy.html
                         case 'BEGIN:VFREEBUSY':
@@ -580,7 +611,7 @@ class ICal
                             }
 
                             $component = 'VFREEBUSY';
-                        break;
+                            break;
 
                         case 'BEGIN:VALARM':
                             if (!is_array($value)) {
@@ -588,32 +619,39 @@ class ICal
                             }
 
                             $component = 'VALARM';
-                        break;
+                            break;
 
                         case 'END:VALARM':
                             $component = 'VEVENT';
-                        break;
+                            break;
 
                         case 'BEGIN:DAYLIGHT':
                         case 'BEGIN:STANDARD':
                         case 'BEGIN:VCALENDAR':
                         case 'BEGIN:VTIMEZONE':
                             $component = $value;
-                        break;
+                            break;
 
                         case 'END:DAYLIGHT':
                         case 'END:STANDARD':
                         case 'END:VCALENDAR':
-                        case 'END:VEVENT':
                         case 'END:VFREEBUSY':
                         case 'END:VTIMEZONE':
                         case 'END:VTODO':
                             $component = 'VCALENDAR';
-                        break;
+                            break;
+
+                        case 'END:VEVENT':
+                            if ($this->shouldFilterByWindow) {
+                                $this->removeLastEventIfOutsideWindowAndNonRecurring();
+                            }
+
+                            $component = 'VCALENDAR';
+                            break;
 
                         default:
                             $this->addCalendarComponentWithKeyAndValue($component, $keyword, $value);
-                        break;
+                            break;
                     }
                 }
             }
@@ -639,11 +677,35 @@ class ICal
                 }
             }
 
-            if (!is_null($this->filterDaysBefore) || !is_null($this->filterDaysAfter)) {
+            if ($this->shouldFilterByWindow) {
                 $this->reduceEventsToMinMaxRange();
             }
 
             $this->processDateConversions();
+        }
+    }
+
+    /**
+     * Removes the last event (i.e. most recently parsed) if its start date is outside the window spanned by
+     * `$windowMinTimestamp` / `$windowMaxTimestamp`.
+     *
+     * @return void
+     */
+    protected function removeLastEventIfOutsideWindowAndNonRecurring()
+    {
+        $events = $this->cal['VEVENT'];
+
+        if (!empty($events)) {
+            $lastIndex = sizeof($events) - 1;
+            $lastEvent = $events[$lastIndex];
+
+            if (!isset($lastEvent['RRULE']) || $lastEvent['RRULE'] === '' && $this->doesEventStartOutsideWindow($lastEvent)) {
+                $this->eventCount--;
+
+                unset($events[$lastIndex]);
+            }
+
+            $this->cal['VEVENT'] = $events;
         }
     }
 
@@ -657,14 +719,8 @@ class ICal
         $events = (isset($this->cal['VEVENT'])) ? $this->cal['VEVENT'] : array();
 
         if (!empty($events)) {
-            // Ideally you would use `PHP_INT_MIN` from PHP 7
-            $php_int_min = -2147483648;
-
-            $minTimestamp = is_null($this->filterDaysBefore) ? $php_int_min : (new \DateTime('now'))->sub(new \DateInterval('P' . $this->filterDaysBefore . 'D'))->getTimestamp();
-            $maxTimestamp = is_null($this->filterDaysAfter) ? PHP_INT_MAX : (new \DateTime('now'))->add(new \DateInterval('P' . $this->filterDaysAfter . 'D'))->getTimestamp();
-
             foreach ($events as $key => $anEvent) {
-                if (!$this->isValidDate($anEvent['DTSTART']) || $this->isOutOfRange($anEvent['DTSTART'], $minTimestamp, $maxTimestamp)) {
+                if ($this->doesEventStartOutsideWindow($anEvent)) {
                     $this->eventCount--;
 
                     unset($events[$key]);
@@ -678,18 +734,30 @@ class ICal
     }
 
     /**
-     * Determines whether an event's start time is within a given range
+     * Determines whether the event start date is outside `$windowMinTimestamp` / `$windowMaxTimestamp`.
+     * Returns `true` for invalid dates.
      *
-     * @param  string  $eventStart
+     * @param  array $event
+     * @return boolean
+     */
+    protected function doesEventStartOutsideWindow(array $event)
+    {
+        return !$this->isValidDate($event['DTSTART']) || $this->isOutOfRange($event['DTSTART'], $this->windowMinTimestamp, $this->windowMaxTimestamp);
+    }
+
+    /**
+     * Determines whether a valid iCalendar date is within a given range
+     *
+     * @param  string  $calendarDate
      * @param  integer $minTimestamp
      * @param  integer $maxTimestamp
      * @return boolean
      */
-    protected function isOutOfRange($eventStart, $minTimestamp, $maxTimestamp)
+    protected function isOutOfRange($calendarDate, $minTimestamp, $maxTimestamp)
     {
-        $eventStartTimestamp = strtotime(explode('T', $eventStart)[0]);
+        $timestamp = strtotime(explode('T', $calendarDate)[0]);
 
-        return $eventStartTimestamp < $minTimestamp || $eventStartTimestamp > $maxTimestamp;
+        return $timestamp < $minTimestamp || $timestamp > $maxTimestamp;
     }
 
     /**
@@ -744,7 +812,7 @@ class ICal
                         $this->cal[$key1][$key2][$key3][$keyword] .= ',' . $value;
                     }
                 }
-            break;
+                break;
 
             case 'VEVENT':
                 $key1 = $component;
@@ -783,7 +851,7 @@ class ICal
                         $this->cal[$key1][$key2][$keyword] .= ',' . $value;
                     }
                 }
-            break;
+                break;
 
             case 'VFREEBUSY':
                 $key1 = $component;
@@ -805,15 +873,15 @@ class ICal
                 } else {
                     $this->cal[$key1][$key2][$key3][] = $value;
                 }
-            break;
+                break;
 
             case 'VTODO':
                 $this->cal[$component][$this->todoCount - 1][$keyword] = $value;
-            break;
+                break;
 
             default:
                 $this->cal[$component][$keyword] = $value;
-            break;
+                break;
         }
 
         $this->lastKeyword = $keyword;
@@ -1310,9 +1378,9 @@ class ICal
                                 $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
                                 $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
                                 $anEvent['DTEND'] = date(
-                                        self::DATE_TIME_FORMAT,
-                                        $anEvent['DTEND_array'][2]
-                                    ) . ($isAllDayEvent || ($initialEndTimeZoneName === 'Z') ? 'Z' : '');
+                                    self::DATE_TIME_FORMAT,
+                                    $anEvent['DTEND_array'][2]
+                                ) . ($isAllDayEvent || ($initialEndTimeZoneName === 'Z') ? 'Z' : '');
                                 $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                 // Exclusions
@@ -1356,7 +1424,7 @@ class ICal
                             $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
                             $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
                             $recurrenceEvents    = array(); // Reset
-                        break;
+                            break;
 
                         case 'WEEKLY':
                             // Create offset
@@ -1406,9 +1474,9 @@ class ICal
                                         $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
                                         $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
                                         $anEvent['DTEND'] = date(
-                                                self::DATE_TIME_FORMAT,
-                                                $anEvent['DTEND_array'][2]
-                                            ) . ($isAllDayEvent || ($initialEndTimeZoneName === 'Z') ? 'Z' : '');
+                                            self::DATE_TIME_FORMAT,
+                                            $anEvent['DTEND_array'][2]
+                                        ) . ($isAllDayEvent || ($initialEndTimeZoneName === 'Z') ? 'Z' : '');
                                         $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                         // Exclusions
@@ -1457,7 +1525,7 @@ class ICal
                             $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
                             $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
                             $recurrenceEvents    = array(); // Reset
-                        break;
+                            break;
 
                         case 'MONTHLY':
                             // Create offset
@@ -1475,16 +1543,16 @@ class ICal
                                         if ($key === 0) {
                                             // Ensure original event conforms to monthday rule
                                             $anEvent['DTSTART'] = gmdate(
-                                                    'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
-                                                    strtotime($anEvent['DTSTART'])
-                                                ) . ($isAllDayEvent || ($initialStartTimeZoneName === 'Z') ? 'Z' : '');
+                                                'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
+                                                strtotime($anEvent['DTSTART'])
+                                            ) . ($isAllDayEvent || ($initialStartTimeZoneName === 'Z') ? 'Z' : '');
 
                                             $anEvent['DTEND'] = gmdate(
-                                                    'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
-                                                    isset($anEvent['DURATION'])
+                                                'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
+                                                isset($anEvent['DURATION'])
                                                         ? $this->parseDuration($anEvent['DTSTART'], end($anEvent['DURATION_array']))
                                                         : strtotime($anEvent['DTEND'])
-                                                ) . ($isAllDayEvent || ($initialEndTimeZoneName === 'Z') ? 'Z' : '');
+                                            ) . ($isAllDayEvent || ($initialEndTimeZoneName === 'Z') ? 'Z' : '');
 
                                             $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
                                             $anEvent['DTSTART_array'][2] = $this->iCalDateToUnixTimestamp($anEvent['DTSTART']);
@@ -1511,17 +1579,17 @@ class ICal
 
                                         // Add event
                                         $anEvent['DTSTART'] = date(
-                                                'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
-                                                $monthRecurringTimestamp
-                                            ) . ($isAllDayEvent || ($initialStartTimeZoneName === 'Z') ? 'Z' : '');
+                                            'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
+                                            $monthRecurringTimestamp
+                                        ) . ($isAllDayEvent || ($initialStartTimeZoneName === 'Z') ? 'Z' : '');
                                         $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
                                         $anEvent['DTSTART_array'][2] = $monthRecurringTimestamp;
                                         $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
                                         $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
                                         $anEvent['DTEND'] = date(
-                                                self::DATE_TIME_FORMAT,
-                                                $anEvent['DTEND_array'][2]
-                                            ) . ($isAllDayEvent || ($initialEndTimeZoneName === 'Z') ? 'Z' : '');
+                                            self::DATE_TIME_FORMAT,
+                                            $anEvent['DTEND_array'][2]
+                                        ) . ($isAllDayEvent || ($initialEndTimeZoneName === 'Z') ? 'Z' : '');
                                         $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                         // Exclusions
@@ -1609,9 +1677,9 @@ class ICal
                                             $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
                                             $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
                                             $anEvent['DTEND'] = date(
-                                                    self::DATE_TIME_FORMAT,
-                                                    $anEvent['DTEND_array'][2]
-                                                ) . ($isAllDayEvent || ($initialEndTimeZoneName === 'Z') ? 'Z' : '');
+                                                self::DATE_TIME_FORMAT,
+                                                $anEvent['DTEND_array'][2]
+                                            ) . ($isAllDayEvent || ($initialEndTimeZoneName === 'Z') ? 'Z' : '');
                                             $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                             // Exclusions
@@ -1666,7 +1734,7 @@ class ICal
                             $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
                             $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
                             $recurrenceEvents    = array(); // Reset
-                        break;
+                            break;
 
                         case 'YEARLY':
                             // Create offset
@@ -1721,9 +1789,9 @@ class ICal
                                                 $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
                                                 $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
                                                 $anEvent['DTEND'] = date(
-                                                        self::DATE_TIME_FORMAT,
-                                                        $anEvent['DTEND_array'][2]
-                                                    ) . ($isAllDayEvent || ($initialEndTimeZoneName === 'Z') ? 'Z' : '');
+                                                    self::DATE_TIME_FORMAT,
+                                                    $anEvent['DTEND_array'][2]
+                                                ) . ($isAllDayEvent || ($initialEndTimeZoneName === 'Z') ? 'Z' : '');
                                                 $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                                 // Exclusions
@@ -1803,9 +1871,9 @@ class ICal
                                             $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
                                             $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
                                             $anEvent['DTEND'] = date(
-                                                    self::DATE_TIME_FORMAT,
-                                                    $anEvent['DTEND_array'][2]
-                                                ) . ($isAllDayEvent || ($initialEndTimeZoneName === 'Z') ? 'Z' : '');
+                                                self::DATE_TIME_FORMAT,
+                                                $anEvent['DTEND_array'][2]
+                                            ) . ($isAllDayEvent || ($initialEndTimeZoneName === 'Z') ? 'Z' : '');
                                             $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                                             // Exclusions
@@ -1852,7 +1920,7 @@ class ICal
                             $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
                             $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
                             $recurrenceEvents    = array(); // Reset
-                        break;
+                            break;
                     }
                 }
             }
@@ -2386,8 +2454,8 @@ class ICal
      * Converts a negative day ordinal to
      * its equivalent positive form
      *
-     * @param  integer $dayNumber
-     * @param  integer $weekday
+     * @param  integer           $dayNumber
+     * @param  integer           $weekday
      * @param  integer|\DateTime $timestamp
      * @return string
      */
@@ -2679,7 +2747,7 @@ class ICal
     /**
      * Checks if an excluded date matches a given date by reconciling time zones.
      *
-     * @param  Carbon $exdate
+     * @param  Carbon  $exdate
      * @param  array   $anEvent
      * @param  integer $recurringOffset
      * @return boolean
