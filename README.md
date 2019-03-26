@@ -8,7 +8,7 @@
 ## Installation
 
 ### Requirements
- - PHP 5 (≥ 5.3.0)
+ - PHP 5 (≥ 5.3.9)
  - [Valid ICS](https://icalendar.org/validator.html) (`.ics`, `.ical`, `.ifb`) file
  - [IANA](https://www.iana.org/time-zones), [Unicode CLDR](http://cldr.unicode.org/translation/timezones) or [Windows](https://support.microsoft.com/en-ca/help/973627/microsoft-time-zone-index-values) Time Zones
    - If Windows time zones are present in your feed you will need to set `$replaceWindowsTimeZoneIds` to `true`
