@@ -26,7 +26,7 @@
     "require": {
         "php": ">=5.3.9",
         "ext-mbstring": "*",
-        "nesbot/carbon": "~1.34 || ^2.0"
+        "nesbot/carbon": "^1.36.2 || ^2.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "~2.9.1"
