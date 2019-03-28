@@ -29,7 +29,8 @@
         "nesbot/carbon": "^1.36.2 || ^2.0"
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "~2.9.1"
+        "squizlabs/php_codesniffer": "~2.9.1",
+        "phpunit/phpunit": "^4"
     },
     "autoload": {
         "psr-0": {
@@ -40,5 +41,10 @@
         "platform": {
             "php": "5.3.29"
         }
+    },
+    "scripts": {
+        "test": [
+            "phpunit --colors=always"
+        ]
     }
 }
