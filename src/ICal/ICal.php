@@ -2660,7 +2660,7 @@ class ICal
             }
 
             if (!empty($this->httpUserAgent)) {
-                array_push($options['http']['header'], "User-Agent: {$httpUserAgent}");
+                array_push($options['http']['header'], "User-Agent: {$this->httpUserAgent}");
             }
         }
 
