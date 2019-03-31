@@ -14,4 +14,5 @@ We appreciate pull requests, here are our guidelines:
    - Use *4 spaces* instead of tabs for indentation
    - Trim all trailing whitespace and blank lines
    - Use single quotes (`'`) where possible instead of double
+   - Use `PHP_EOL` where possible or default to `\n`
    - Abide by the [1TBS](https://en.wikipedia.org/wiki/Indent_style#Variant:_1TBS_.28OTBS.29) indentation style

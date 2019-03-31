@@ -29,6 +29,12 @@
        }
        ```
 
+## Running tests
+
+```sh
+composer test
+```
+
 ## How to use
 
 ### How to instantiate the Parser
