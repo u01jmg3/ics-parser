@@ -1292,7 +1292,9 @@ class ICal
 
                                 $byDaysCounted = array_count_values(explode(',', $rrules['BYDAY']));
 
-                                if ($byDaysCounted == array_count_values(array_slice($this->weeks['MO'], 0, 5))) {
+                                if ($byDaysCounted == array_count_values($this->weeks['MO'])) {
+                                    $weekday = 'day';
+                                } elseif ($byDaysCounted == array_count_values(array_slice($this->weeks['MO'], 0, 5))) {
                                     $weekday = 'weekday';
                                 }
                             }
@@ -1743,7 +1745,7 @@ class ICal
                                     } while ($eventStartTimestamp <= $lastDayTimestamp);
 
                                     // Move forwards
-                                    $recurringTimestamp = strtotime($offset, $recurringTimestamp);
+                                    $recurringTimestamp = strtotime($offset, Carbon::createFromTimestamp($recurringTimestamp)->day(1)->timestamp);
                                 }
                             }
 
@@ -2483,8 +2485,8 @@ class ICal
 
         $dayOrdinals = $this->dayOrdinals;
 
-        if ($dayNumber >= 1) {
-            $dayOrdinal = $dayOrdinals[$dayNumber];
+        if ($dayNumber >= -1) {
+            $dayOrdinal = $dayNumber === -1 ? 'last' : $dayOrdinals[$dayNumber];
 
             if ($weekday === 'weekday') {
                 $dayOrdinal = "-1 day {$dayOrdinal}";
