@@ -5,6 +5,8 @@ use PHPUnit\Framework\TestCase;
 
 class SingleEventsTest extends TestCase
 {
+    // phpcs:disable Generic.Arrays.DisallowLongArraySyntax.Found
+
     private $originalTimeZone = null;
 
     public function setUp()

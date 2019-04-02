@@ -5,6 +5,8 @@ use PHPUnit\Framework\TestCase;
 
 class RecurrencesTest extends TestCase
 {
+    // phpcs:disable Generic.Arrays.DisallowLongArraySyntax.Found
+
     private $useTimeZoneWithRRules = false;
     private $originalTimeZone = null;
 
