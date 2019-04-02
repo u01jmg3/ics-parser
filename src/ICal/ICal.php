@@ -1589,8 +1589,8 @@ class ICal
                                             ) . (($initialStartTimeZoneName === 'Z') ? 'Z' : '');
                                             $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
                                             $anEvent['DTSTART_array'][2] = $monthRecurringTimestamp;
-                                            $anEvent['DTEND_array'] = $anEvent['DTSTART_array'];
-                                            $anEvent['DTEND_array'][2] += $eventTimestampOffset;
+                                            $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
+                                            $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
                                             $anEvent['DTEND'] = date(
                                                 self::DATE_TIME_FORMAT,
                                                 $anEvent['DTEND_array'][2]

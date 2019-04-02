@@ -46,6 +46,7 @@ composer test
  - Each key/value pair from the iCal file will be parsed creating an associative array for both the calendar and every event it contains.
  - Also injected will be content under `dtstart_tz` and `dtend_tz` for accessing start and end dates with time zone data applied.
  - Where possible [`DateTime`](https://secure.php.net/manual/en/class.datetime.php) objects are used and returned.
+   - :information_source: **Note the parser is limited to [relative date formats](https://www.php.net/manual/en/datetime.formats.relative.php) which can inhibit how complex recurrence rule parts are processed (e.g. `BYDAY` combined with `BYSETPOS`)**
 
    ```php
    // Dump the whole calendar
