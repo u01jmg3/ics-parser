@@ -102,7 +102,7 @@ Let's say you are only interested in events from yesterday, today and tomorrow. 
 tricky time zone transformations and calculations have not been executed yet by the time the parser has to decide whether
 to keep or drop an event you can set it to filter for **+-2d** instead of +-1d. Once it is done you would then call
 `eventsFromRange()` with +-1d to get precisely the events in the window you are interested in. That is what the variables
-[`$filterDaysBefore` and `$filterDaysAfter`]((#variables)) are for.
+[`$filterDaysBefore` and `$filterDaysAfter`](#variables) are for.
 
 In Q1 2019 [#213](https://github.com/u01jmg3/ics-parser/pull/213) further improved the performance by immediately
 dropping _non-recurring_ events once parsed if they are outside that fuzzy window. This greatly reduces the maximum
