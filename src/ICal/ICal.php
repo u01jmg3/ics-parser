@@ -1309,6 +1309,9 @@ class ICal
                     if (isset($rrules['UNTIL'])) {
                         // Get Until
                         $until = strtotime($rrules['UNTIL']);
+                        if ($until > strtotime('+' . $this->defaultSpan  . ' years')) {
+                            $until = strtotime('+' . $this->defaultSpan  . ' years');
+                        }
                     } elseif (isset($rrules['COUNT'])) {
                         $countOrig = (is_numeric($rrules['COUNT']) && $rrules['COUNT'] > 1) ? $rrules['COUNT'] : 0;
 
