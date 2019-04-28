@@ -711,7 +711,7 @@ class ICal
             $lastIndex = sizeof($events) - 1;
             $lastEvent = $events[$lastIndex];
 
-            if (!isset($lastEvent['RRULE']) || $lastEvent['RRULE'] === '' && $this->doesEventStartOutsideWindow($lastEvent)) {
+            if ((!isset($lastEvent['RRULE']) || $lastEvent['RRULE'] === '') && $this->doesEventStartOutsideWindow($lastEvent)) {
                 $this->eventCount--;
 
                 unset($events[$lastIndex]);
@@ -732,6 +732,11 @@ class ICal
 
         if (!empty($events)) {
             foreach ($events as $key => $anEvent) {
+                if ($anEvent === null) {
+                    unset($events[$key]);
+                    continue;
+                }
+
                 if ($this->doesEventStartOutsideWindow($anEvent)) {
                     $this->eventCount--;
 
