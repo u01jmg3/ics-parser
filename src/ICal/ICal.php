@@ -173,13 +173,15 @@ class ICal
      * @var array
      */
     protected $weekdays = array(
-        'SU' => 'sunday',
-        'MO' => 'monday',
-        'TU' => 'tuesday',
-        'WE' => 'wednesday',
-        'TH' => 'thursday',
-        'FR' => 'friday',
-        'SA' => 'saturday',
+        'SU'      => 'sunday of',
+        'MO'      => 'monday of',
+        'TU'      => 'tuesday of',
+        'WE'      => 'wednesday of',
+        'TH'      => 'thursday of',
+        'FR'      => 'friday of',
+        'SA'      => 'saturday of',
+        'day'     => 'day of',
+        'weekday' => 'weekday',
     );
 
     /**
@@ -1292,10 +1294,20 @@ class ICal
                                 $dayNumber = 1; // Set first as default
                             } elseif (is_numeric($rrules['BYSETPOS'])) {
                                 $dayNumber = $rrules['BYSETPOS'];
+
+                                $byDaysCounted = array_count_values(explode(',', $rrules['BYDAY']));
+
+                                if ($byDaysCounted == array_count_values($this->weeks['MO'])) {
+                                    $weekday = 'day';
+                                } elseif ($byDaysCounted == array_count_values(array_slice($this->weeks['MO'], 0, 5))) {
+                                    $weekday = 'weekday';
+                                }
                             }
                         }
 
-                        $weekday = substr($byDay, -2);
+                        if (!isset($weekday)) {
+                            $weekday = substr($byDay, -2);
+                        }
                     }
 
                     if (is_int($this->defaultSpan)) {
@@ -1346,7 +1358,7 @@ class ICal
                             for ($i = 1; $i <= $count; $i++) {
                                 $dtstartClone = clone $dtstart;
                                 $dtstartClone->modify('next ' . $this->frequencyConversion[$frequency]);
-                                $offset = "{$this->convertDayOrdinalToPositive($dayNumber, $weekday, $dtstartClone)} {$this->weekdays[$weekday]} of " . $dtstartClone->format('F Y H:i:01');
+                                $offset = "{$this->convertDayOrdinalToPositive($dayNumber, $weekday, $dtstartClone)} {$this->weekdays[$weekday]} " . $dtstartClone->format('F Y H:i:01');
                                 $dtstart->modify($offset);
                             }
 
@@ -1658,15 +1670,15 @@ class ICal
                                         $monthRecurringTimestamp += $monthRecurringOffset;
                                     }
 
-                                    $eventStartDesc = "{$this->convertDayOrdinalToPositive($dayNumber, $weekday, $monthRecurringTimestamp)} {$this->weekdays[$weekday]} of "
+                                    $eventStartDesc = "{$this->convertDayOrdinalToPositive($dayNumber, $weekday, $monthRecurringTimestamp)} {$this->weekdays[$weekday]} "
                                         . date(self::DATE_TIME_FORMAT_PRETTY, $monthRecurringTimestamp);
                                     $eventStartTimestamp = strtotime($eventStartDesc);
 
                                     if (intval($rrules['BYDAY']) === 0) {
-                                        $lastDayDesc = "last {$this->weekdays[$weekday]} of "
+                                        $lastDayDesc = "last {$this->weekdays[$weekday]} "
                                             . date(self::DATE_TIME_FORMAT_PRETTY, $monthRecurringTimestamp);
                                     } else {
-                                        $lastDayDesc = "{$this->convertDayOrdinalToPositive($dayNumber, $weekday, $monthRecurringTimestamp)} {$this->weekdays[$weekday]} of "
+                                        $lastDayDesc = "{$this->convertDayOrdinalToPositive($dayNumber, $weekday, $monthRecurringTimestamp)} {$this->weekdays[$weekday]} "
                                             . date(self::DATE_TIME_FORMAT_PRETTY, $monthRecurringTimestamp);
                                     }
 
@@ -1741,7 +1753,7 @@ class ICal
                                     } while ($eventStartTimestamp <= $lastDayTimestamp);
 
                                     // Move forwards
-                                    $recurringTimestamp = strtotime($offset, $recurringTimestamp);
+                                    $recurringTimestamp = strtotime($offset, Carbon::createFromTimestamp($recurringTimestamp)->day(1)->timestamp);
                                 }
                             }
 
@@ -1779,17 +1791,17 @@ class ICal
 
                                     foreach ($bymonths as $bymonth) {
                                         $eventStartDesc = "{$this->convertDayOrdinalToPositive($dayNumber, $weekday, $yearRecurringTimestamp)} {$this->weekdays[$weekday]}"
-                                            . " of {$this->monthNames[$bymonth]} "
+                                            . " {$this->monthNames[$bymonth]} "
                                             . gmdate('Y H:i:s', $yearRecurringTimestamp);
                                         $eventStartTimestamp = strtotime($eventStartDesc);
 
                                         if (intval($rrules['BYDAY']) === 0) {
                                             $lastDayDesc = "last {$this->weekdays[$weekday]}"
-                                                . " of {$this->monthNames[$bymonth]} "
+                                                . " {$this->monthNames[$bymonth]} "
                                                 . gmdate('Y H:i:s', $yearRecurringTimestamp);
                                         } else {
                                             $lastDayDesc = "{$this->convertDayOrdinalToPositive($dayNumber, $weekday, $yearRecurringTimestamp)} {$this->weekdays[$weekday]}"
-                                                . " of {$this->monthNames[$bymonth]} "
+                                                . " {$this->monthNames[$bymonth]} "
                                                 . gmdate('Y H:i:s', $yearRecurringTimestamp);
                                         }
 
@@ -2476,13 +2488,19 @@ class ICal
      */
     protected function convertDayOrdinalToPositive($dayNumber, $weekday, $timestamp)
     {
-        $dayNumber = empty($dayNumber) ? 1 : $dayNumber; // Returns 0 when no number defined in BYDAY
+        // 0 when no number is defined for BYDAY
+        $dayNumber = empty($dayNumber) ? 1 : intval($dayNumber);
 
         $dayOrdinals = $this->dayOrdinals;
 
-        // We only care about negative BYDAY values
-        if ($dayNumber >= 1) {
-            return $dayOrdinals[$dayNumber];
+        if ($dayNumber >= -1) {
+            $dayOrdinal = $dayNumber === -1 ? 'last' : $dayOrdinals[$dayNumber];
+
+            if ($weekday === 'weekday') {
+                $dayOrdinal = "-1 day {$dayOrdinal}";
+            }
+
+            return $dayOrdinal;
         }
 
         $timestamp = (is_object($timestamp)) ? $timestamp : \DateTime::createFromFormat(self::UNIX_FORMAT, $timestamp);
