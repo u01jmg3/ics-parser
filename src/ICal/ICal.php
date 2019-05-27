@@ -1173,29 +1173,19 @@ class ICal
         $dateArray = $event[$key . '_array'];
 
         if ($key === 'DURATION') {
-            $duration = end($dateArray);
-            $dateTime = $this->parseDuration($event['DTSTART'], $duration, null);
+            $dateTime = $this->parseDuration($event['DTSTART'], $dateArray[2], null);
         } else {
-            $dateTime = new \DateTime($dateArray[1], new \DateTimeZone(self::TIME_ZONE_UTC));
-            $dateTime->setTimezone(new \DateTimeZone($this->calendarTimeZone()));
+            // When constructing from a Unix Timestamp, no timezone needs passing.
+            $dateTime = new \DateTime('@' . $dateArray[2]);
         }
 
-        // Force time zone
-        if (isset($dateArray[0]['TZID'])) {
-            $dateTime->setTimezone($this->timeZoneStringToDateTimeZone($dateArray[0]['TZID']));
-        }
+        // Set the timezone we wish to use when running `$dateTime->format`.
+        $dateTime->setTimezone(new \DateTimeZone($this->calendarTimeZone()));
 
         if (is_null($format)) {
-            $output = $dateTime;
-        } else {
-            if ($format === self::UNIX_FORMAT) {
-                $output = $dateTime->getTimestamp();
-            } else {
-                $output = $dateTime->format($format);
-            }
+            return $dateTime;
         }
-
-        return $output;
+        return $dateTime->format($format);
     }
 
     /**
@@ -2043,8 +2033,8 @@ class ICal
                         $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTEND');
                     } elseif ($this->iCalDateWithTimeZone($anEvent, 'DURATION')) {
                         $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DURATION');
-                    } elseif ($this->iCalDateWithTimeZone($anEvent, 'DTSTART')) {
-                        $events[$key]['DTEND_tz'] = $this->iCalDateWithTimeZone($anEvent, 'DTSTART');
+                    } else {
+                        $events[$key]['DTEND_tz'] = $events[$key]['DTSTART_tz'];
                     }
                 }
             }
