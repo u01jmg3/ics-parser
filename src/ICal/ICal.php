@@ -2083,7 +2083,7 @@ class ICal
 
         // Use default time zone if the calendar's is invalid
         if ($this->isValidIanaTimeZoneId($timeZone) === false) {
-            // phpcs:ignore CustomPHPCS.ControlStructures.AssignmentInCondition.Warning
+            // phpcs:ignore CustomPHPCS.ControlStructures.AssignmentInCondition
             if (($timeZone = $this->isValidCldrTimeZoneId($timeZone, true)) === false) {
                 $timeZone = $this->defaultTimeZone;
             }
