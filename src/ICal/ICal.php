@@ -1049,12 +1049,17 @@ class ICal
             $dateTimeZone = new \DateTimeZone($this->defaultTimeZone);
         }
 
-        $icalDate = $date[2];
+        // The exclamation mark at the start of the format string indicates that if a
+        // time portion is not included, the time in the returned DateTime should be
+        // set to 00:00:00. Without it, the time would be set to the current system time.
+        $dateFormat = '!Ymd';
+        $dateBasic = $date[2];
         if (!empty($date[3])) {
-            $icalDate .= 'T' . $date[3];
+            $dateBasic .= 'T' . $date[3];
+            $dateFormat .= '\THis';
         }
 
-        return new \DateTime($icalDate, $dateTimeZone);
+        return \DateTime::createFromFormat($dateFormat, $dateBasic, $dateTimeZone);
     }
 
     /**
