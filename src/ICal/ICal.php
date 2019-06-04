@@ -20,7 +20,7 @@ class ICal
 
     const DATE_TIME_FORMAT        = 'Ymd\THis';
     const DATE_TIME_FORMAT_PRETTY = 'F Y H:i:s';
-    const ICAL_DATE_TIME_TEMPLATE = 'TZID=%s:';
+    const ICAL_DATE_TIME_TEMPLATE = 'TZID="%s":';
     const RECURRENCE_EVENT        = 'Generated recurrence event';
     const SECONDS_IN_A_WEEK       = 604800;
     const TIME_FORMAT             = 'His';
@@ -1022,17 +1022,21 @@ class ICal
          * Use DateTime class objects to get around limitations with `mktime` and `gmmktime`.
          * Must have a local time zone set to process floating times.
          */
-        $pattern  = '/^(?:TZID=)?([^:]*)'; // [1]: Time zone
-        $pattern .= ':?';                  //      Time zone delimiter
-        $pattern .= '([0-9]{8})';          // [2]: YYYYMMDD
-        $pattern .= 'T?';                  //      Time delimiter
-        $pattern .= '(?(?<=T)([0-9]{6}))'; // [3]: HHMMSS (filled if delimiter present)
-        $pattern .= '(Z?)/';               // [4]: UTC flag
+        $pattern  = '/^(?:TZID=)?([^:]*|".*")'; // [1]: Time zone
+        $pattern .= ':?';                       //      Time zone delimiter
+        $pattern .= '([0-9]{8})';               // [2]: YYYYMMDD
+        $pattern .= 'T?';                       //      Time delimiter
+        $pattern .= '(?(?<=T)([0-9]{6}))';      // [3]: HHMMSS (filled if delimiter present)
+        $pattern .= '(Z?)/';                    // [4]: UTC flag
 
         preg_match($pattern, $icalDate, $date);
 
         if (empty($date)) {
             throw new \Exception('Invalid iCal date format.');
+        }
+
+        if (!empty($date[1])) {
+            $date[1] = trim($date[1], "\"");
         }
 
         // A Unix timestamp usually cannot represent a date prior to 1 Jan 1970.
