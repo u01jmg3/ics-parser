@@ -20,7 +20,7 @@ class ICal
 
     const DATE_TIME_FORMAT        = 'Ymd\THis';
     const DATE_TIME_FORMAT_PRETTY = 'F Y H:i:s';
-    const ICAL_DATE_TIME_TEMPLATE = 'TZID="%s":';
+    const ICAL_DATE_TIME_TEMPLATE = 'TZID=%s:';
     const RECURRENCE_EVENT        = 'Generated recurrence event';
     const SECONDS_IN_A_WEEK       = 604800;
     const TIME_FORMAT             = 'His';
@@ -1143,7 +1143,8 @@ class ICal
                         $date = $anEvent[$type . '_array'][1];
 
                         if (isset($anEvent[$type . '_array'][0]['TZID'])) {
-                            $date = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent[$type . '_array'][0]['TZID']) . $date;
+                            $timeZone = $this->escapeParamText($anEvent[$type . '_array'][0]['TZID']);
+                            $date = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $date;
                         }
 
                         $anEvent[$type . '_array'][2] = $this->iCalDateToUnixTimestamp($date);
@@ -1387,7 +1388,8 @@ class ICal
                                 if (isset($anEvent['UID'])) {
                                     $searchDate = $anEvent['DTSTART'];
                                     if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                        $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                        $timeZone = $this->escapeParamText($anEvent['DTSTART_array'][0]['TZID']);
+                                        $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $searchDate;
                                     }
 
                                     if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
@@ -1483,7 +1485,8 @@ class ICal
                                         if (isset($anEvent['UID'])) {
                                             $searchDate = $anEvent['DTSTART'];
                                             if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                                $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                                $timeZone = $this->escapeParamText($anEvent['DTSTART_array'][0]['TZID']);
+                                                $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $searchDate;
                                             }
 
                                             if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
@@ -1597,7 +1600,8 @@ class ICal
                                             if (isset($anEvent['UID'])) {
                                                 $searchDate = $anEvent['DTSTART'];
                                                 if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                                    $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                                    $timeZone = $this->escapeParamText($anEvent['DTSTART_array'][0]['TZID']);
+                                                    $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $searchDate;
                                                 }
 
                                                 if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
@@ -1688,7 +1692,8 @@ class ICal
                                             if (isset($anEvent['UID'])) {
                                                 $searchDate = $anEvent['DTSTART'];
                                                 if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                                    $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                                    $timeZone = $this->escapeParamText($anEvent['DTSTART_array'][0]['TZID']);
+                                                    $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $searchDate;
                                                 }
 
                                                 if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
@@ -1800,7 +1805,8 @@ class ICal
                                                 if (isset($anEvent['UID'])) {
                                                     $searchDate = $anEvent['DTSTART'];
                                                     if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                                        $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                                        $timeZone = $this->escapeParamText($anEvent['DTSTART_array'][0]['TZID']);
+                                                        $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $searchDate;
                                                     }
 
                                                     if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
@@ -1882,7 +1888,8 @@ class ICal
                                             if (isset($anEvent['UID'])) {
                                                 $searchDate = $anEvent['DTSTART'];
                                                 if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                                    $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                                    $timeZone = $this->escapeParamText($anEvent['DTSTART_array'][0]['TZID']);
+                                                    $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $searchDate;
                                                 }
 
                                                 if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
@@ -1987,6 +1994,7 @@ class ICal
         foreach (array('DTSTART', 'DTEND', 'RECURRENCE-ID') as $type) {
             if (isset($event["{$type}_array"])) {
                 $timeZone = (isset($event["{$type}_array"][0]['TZID'])) ? $event["{$type}_array"][0]['TZID'] : $calendarTimeZone;
+                $timeZone = $this->escapeParamText($timeZone);
                 $event["{$type}_array"][$index] = ((is_null($timeZone)) ? '' : sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone)) . $event["{$type}_array"][1];
                 $event["{$type}_array"][2] = $this->iCalDateToUnixTimestamp($event["{$type}_array"][3]);
             }
@@ -2575,6 +2583,21 @@ class ICal
         }
 
         return $subject;
+    }
+
+    /**
+     * Places double-quotes around texts that have characters not permitted
+     * in parameter-texts, but are permitted in quoted-texts.
+     *
+     * @param  string $candidateText
+     * @return string
+     */
+    protected function escapeParamText($candidateText)
+    {
+        if (strpbrk($candidateText, ':;,') !== false) {
+            return '"' . $candidateText . '"';
+        }
+        return $candidateText;
     }
 
     /**
