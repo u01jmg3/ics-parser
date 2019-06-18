@@ -1559,12 +1559,13 @@ class ICal
                                             $anEvent['DTEND_array'][2]   = $this->iCalDateToUnixTimestamp($anEvent['DTEND']);
 
                                             // Ensure recurring timestamp confirms to BYMONTHDAY rule
-                                            $monthRecurringTimestamp = $this->iCalDateToUnixTimestamp(
-                                                gmdate(
-                                                    'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
-                                                    $recurringTimestamp
-                                                ) . (($initialStartTimeZoneName === 'Z') ? 'Z' : '')
+                                            $monthRecurringDateTime = new \DateTime('@' . $recurringTimestamp);
+                                            $monthRecurringDateTime->setDate(
+                                                $monthRecurringDateTime->format('Y'),
+                                                $monthRecurringDateTime->format('m'),
+                                                $monthday
                                             );
+                                            $monthRecurringTimestamp = $monthRecurringDateTime->getTimestamp();
                                         }
 
                                         // Adjust time zone from initial event
