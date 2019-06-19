@@ -2329,14 +2329,16 @@ class ICal
     }
 
     /**
-     * Checks if a time zone is valid (IANA or CLDR)
+     * Checks if a time zone is valid (IANA, CLDR, or Windows)
      *
      * @param  string $timeZone
      * @return boolean
      */
     protected function isValidTimeZoneId($timeZone)
     {
-        return ($this->isValidIanaTimeZoneId($timeZone) !== false || $this->isValidCldrTimeZoneId($timeZone) !== false);
+        return ($this->isValidIanaTimeZoneId($timeZone) !== false
+            || $this->isValidCldrTimeZoneId($timeZone) !== false
+            || $this->isValidWindowsTimeZoneId($timeZone) !== false);
     }
 
     /**
@@ -2380,6 +2382,17 @@ class ICal
     public function isValidCldrTimeZoneId($timeZone)
     {
         return array_key_exists(html_entity_decode($timeZone), self::$cldrTimeZonesMap);
+    }
+
+    /**
+     * Checks if a time zone is a recognised Windows (non-CLDR) time zone
+     *
+     * @param  string  $timeZone
+     * @return boolean
+     */
+    public function isValidWindowsTimeZoneId($timeZone)
+    {
+        return array_key_exists(html_entity_decode($timeZone), self::$windowsTimeZonesMap);
     }
 
     /**
@@ -2752,6 +2765,10 @@ class ICal
 
         if ($this->isValidCldrTimeZoneId($timezoneString)) {
             return new \DateTimeZone(self::$cldrTimeZonesMap[$timezoneString]);
+        }
+
+        if ($this->isValidWindowsTimeZoneId($timezoneString)) {
+            return new \DateTimeZone(self::$windowsTimeZonesMap[$timezoneString]);
         }
 
         return new \DateTimeZone($this->defaultTimeZone);
