@@ -99,13 +99,6 @@ class ICal
     public $disableCharacterReplacement = false;
 
     /**
-     * Toggles whether to replace (non-CLDR) Windows time zone IDs with their IANA equivalent.
-     *
-     * @var boolean
-     */
-    public $replaceWindowsTimeZoneIds = false;
-
-    /**
      * With this being non-null the parser will ignore all events more than roughly this many days after now.
      *
      * @var integer
@@ -254,7 +247,6 @@ class ICal
         'disableCharacterReplacement',
         'filterDaysAfter',
         'filterDaysBefore',
-        'replaceWindowsTimeZoneIds',
         'skipRecurrence',
         'useTimeZoneWithRRules',
     );
@@ -520,20 +512,6 @@ class ICal
     );
 
     /**
-     * Store the Windows Time Zone IDs to search and replace
-     *
-     * @var array
-     */
-    private $windowsTimeZones;
-
-    /**
-     * Store the IANA IDs to be used as a replacement for Windows Time Zone IDs
-     *
-     * @var array
-     */
-    private $windowsTimeZonesIana;
-
-    /**
      * If `$filterDaysBefore` or `$filterDaysAfter` are set then the events are filtered according to the window defined
      * by this field and `$windowMaxTimestamp`.
      *
@@ -577,9 +555,6 @@ class ICal
         if (!isset($this->defaultTimeZone) || !$this->isValidTimeZoneId($this->defaultTimeZone)) {
             $this->defaultTimeZone = date_default_timezone_get();
         }
-
-        $this->windowsTimeZones     = array_keys(self::$windowsTimeZonesMap);
-        $this->windowsTimeZonesIana = array_values(self::$windowsTimeZonesMap);
 
         // Ideally you would use `PHP_INT_MIN` from PHP 7
         $php_int_min = -2147483648;
@@ -686,10 +661,6 @@ class ICal
 
                 if (!$this->disableCharacterReplacement) {
                     $line = $this->cleanData($line);
-                }
-
-                if ($this->replaceWindowsTimeZoneIds && strpos($line, 'TZID') !== false) {
-                    $line = $this->replaceWindowsTimeZoneId($line);
                 }
 
                 $add = $this->keyValueFromString($line);
@@ -2820,16 +2791,5 @@ class ICal
         $b = $exdate->addSeconds($recurringOffset);
 
         return $a->eq($b);
-    }
-
-    /**
-     * Replaces non-CLDR Windows time zone ID like 'W. Europe Standard Time' with its IANA equivalent.
-     *
-     * @param  string $lineWithTzid
-     * @return string
-     */
-    protected function replaceWindowsTimeZoneId($lineWithTzid)
-    {
-        return str_replace($this->windowsTimeZones, $this->windowsTimeZonesIana, $lineWithTzid);
     }
 }
