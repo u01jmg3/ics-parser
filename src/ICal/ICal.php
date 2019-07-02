@@ -1473,10 +1473,6 @@ class ICal
                         // Move forwards
                         $recurringTimestamp = strtotime($offset, $recurringTimestamp);
                     }
-
-                    $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
-                    $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
-                    $recurrenceEvents    = array(); // Reset
                     break;
 
                 case 'WEEKLY':
@@ -1566,10 +1562,6 @@ class ICal
                         // Move forwards $interval weeks
                         $weekRecurringTimestamp = strtotime($offset, $weekRecurringTimestamp);
                     }
-
-                    $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
-                    $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
-                    $recurrenceEvents    = array(); // Reset
                     break;
 
                 case 'MONTHLY':
@@ -1761,10 +1753,6 @@ class ICal
                             $recurringTimestamp = strtotime($offset, Carbon::createFromTimestamp($recurringTimestamp)->day(1)->timestamp);
                         }
                     }
-
-                    $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
-                    $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
-                    $recurrenceEvents    = array(); // Reset
                     break;
 
                 case 'YEARLY':
@@ -1930,12 +1918,13 @@ class ICal
                             $recurringTimestamp = strtotime($offset, $recurringTimestamp);
                         }
                     }
-
-                    $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
-                    $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
-                    $recurrenceEvents    = array(); // Reset
                     break;
             }
+
+            $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
+            $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
+            $recurrenceEvents    = array(); // Reset
+
         }
 
         $events = array_merge($events, $allRecurrenceEvents);
