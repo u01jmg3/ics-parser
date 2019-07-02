@@ -119,7 +119,6 @@ class SingleEventsTest extends TestCase
             'filterDaysAfter'             => null,             // Default value
             'filterDaysBefore'            => null,             // Default value
             'skipRecurrence'              => false,            // Default value
-            'useTimeZoneWithRRules'       => false,            // Default value
         );
 
         return $options;

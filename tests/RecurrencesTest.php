@@ -10,7 +10,6 @@ class RecurrencesTest extends TestCase
     // phpcs:disable Squiz.Commenting.FunctionComment
     // phpcs:disable Squiz.Commenting.VariableComment
 
-    private $useTimeZoneWithRRules = false;
     private $originalTimeZone = null;
 
     public function setUp()
@@ -276,7 +275,6 @@ class RecurrencesTest extends TestCase
             'filterDaysAfter'             => null,                         // Default value
             'filterDaysBefore'            => null,                         // Default value
             'skipRecurrence'              => false,                        // Default value
-            'useTimeZoneWithRRules'       => $this->useTimeZoneWithRRules, // Default value: false
         );
 
         return $options;
