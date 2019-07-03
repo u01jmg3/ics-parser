@@ -1545,191 +1545,85 @@ class ICal
                 }
 
                 case 'MONTHLY':
-                    // Create offset
-                    $recurringTimestamp = $startTimestamp;
-                    $offset = "+{$interval} month";
+                {
+                    $monthlyRecurringDatetime = \DateTime::createFromImmutable($initialImmutableDate);
 
-                    if (isset($rrules['BYMONTHDAY']) && $rrules['BYMONTHDAY'] !== '') {
-                        // Deal with BYMONTHDAY
-                        $monthdays = $rrules['BYMONTHDAY'];
+                    while ($monthlyRecurringDatetime->getTimestamp() <= $until) {
+                        $recurringDatetimes = array();
 
-                        while ($recurringTimestamp <= $until) {
-                            foreach ($monthdays as $key => $monthday) {
-                                $monthRecurringTimestamp = null;
+                        $matching_days = array();
 
-                                if ($key === 0) {
-                                    // Ensure original event conforms to monthday rule
-                                    $anEvent['DTSTART'] = gmdate(
-                                        'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
-                                        strtotime($anEvent['DTSTART'])
-                                    ) . (($initialStartTimeZoneName === 'Z') ? 'Z' : '');
+                        if (!empty($rrules['BYMONTHDAY'])) {
+                            $matching_days = $rrules['BYMONTHDAY'];
+                        } else if (!empty($rrules['BYDAY'])) {
+                            $matching_days = $this->getDaysOfMonthMatchingByDayRRule($rrules['BYDAY'], $monthlyRecurringDatetime);
+                        }
 
-                                    $anEvent['DTEND'] = gmdate(
-                                        'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
-                                        isset($anEvent['DURATION'])
-                                                ? $this->parseDuration($anEvent['DTSTART'], end($anEvent['DURATION_array']))
-                                                : strtotime($anEvent['DTEND'])
-                                    ) . (($initialEndTimeZoneName === 'Z') ? 'Z' : '');
+                        if (!empty($rrules['BYSETPOS'])) {
+                            $matching_days = $this->filterValuesUsingBySetPosRRule($rrules['BYSETPOS'], $matching_days);
+                        }
 
-                                    $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
-                                    $anEvent['DTSTART_array'][2] = $this->iCalDateToUnixTimestamp($anEvent['DTSTART']);
-                                    $anEvent['DTEND_array'][1]   = $anEvent['DTEND'];
-                                    $anEvent['DTEND_array'][2]   = $this->iCalDateToUnixTimestamp($anEvent['DTEND']);
+                        foreach ($matching_days as $day) {
 
-                                    // Ensure recurring timestamp confirms to BYMONTHDAY rule
-                                    $monthRecurringDateTime = new \DateTime('@' . $recurringTimestamp);
-                                    $monthRecurringDateTime->setDate(
-                                        $monthRecurringDateTime->format('Y'),
-                                        $monthRecurringDateTime->format('m'),
-                                        $monthday
-                                    );
-                                    $monthRecurringTimestamp = $monthRecurringDateTime->getTimestamp();
-                                }
+                            // Skip invalid dates (eg. 30th February)
+                            if ($day > $monthlyRecurringDatetime->format('t')) {
+                                continue;
+                            }
 
-                                if (($monthRecurringTimestamp > $startTimestamp) && ($monthRecurringTimestamp <= $until)) {
-                                    // Add event
-                                    $anEvent['DTSTART'] = date(
-                                        'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
-                                        $monthRecurringTimestamp
-                                    ) . (($initialStartTimeZoneName === 'Z') ? 'Z' : '');
-                                    $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
-                                    $anEvent['DTSTART_array'][2] = $monthRecurringTimestamp;
-                                    $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
-                                    $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
-                                    $anEvent['DTEND'] = date(
-                                        self::DATE_TIME_FORMAT,
-                                        $anEvent['DTEND_array'][2]
-                                    ) . (($initialEndTimeZoneName === 'Z') ? 'Z' : '');
-                                    $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
+                            $recurringDatetime = (clone $monthlyRecurringDatetime)->setDate(
+                                $monthlyRecurringDatetime->format('Y'),
+                                $monthlyRecurringDatetime->format('m'),
+                                $day
+                            );
 
-                                    // Exclusions
-                                    $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent) {
-                                        return self::isExdateMatch($exdate, $anEvent);
-                                    });
+                            $recurringTimestamp = $recurringDatetime->getTimestamp();
+                            if ($recurringTimestamp <= $initialImmutableDate->getTimestamp()) {
+                                continue;
+                            }
 
-                                    $searchDate = $anEvent['DTSTART'];
-                                    if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                        $timeZone = $this->escapeParamText($anEvent['DTSTART_array'][0]['TZID']);
-                                        $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $searchDate;
-                                    }
+                            if ($recurringTimestamp > $until) {
+                                break;
+                            }
 
-                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                        $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate);
-                                        if (in_array($searchDateUtc, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                            $isExcluded = true;
-                                        }
-                                    }
+                            $anEvent['DTSTART'] = $recurringDatetime->format(self::DATE_TIME_FORMAT) . ($initialDateWasUTC ? 'Z' : '');
+                            $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
+                            $anEvent['DTSTART_array'][2] = $recurringTimestamp;
+                            $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
+                            $anEvent['DTEND_array'][2]  += $eventLength;
+                            $anEvent['DTEND']            = date(self::DATE_TIME_FORMAT,$anEvent['DTEND_array'][2]) . ($initialDateWasUTC ? 'Z' : '');
+                            $anEvent['DTEND_array'][1]   = $anEvent['DTEND'];
 
-                                    if (!$isExcluded) {
-                                        $anEvent            = $this->processEventIcalDateTime($anEvent);
-                                        $recurrenceEvents[] = $anEvent;
-                                        $this->eventCount++;
+                            // Exclusions
+                            $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent) {
+                                return self::isExdateMatch($exdate, $anEvent);
+                            });
 
-                                        // If RRULE[COUNT] is reached then break
-                                        if (isset($rrules['COUNT'])) {
-                                            $count++;
-
-                                            if ($count >= $countLimit) {
-                                                break 2;
-                                            }
-                                        }
-                                    }
+                            if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                if (in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                    $isExcluded = true;
                                 }
                             }
 
-                            // Move forwards
-                            $recurringTimestamp = strtotime($offset, $recurringTimestamp);
-                        }
-                    } elseif (isset($rrules['BYDAY']) && $rrules['BYDAY'] !== '') {
-                        while ($recurringTimestamp <= $until) {
-                            $monthRecurringTimestamp = $recurringTimestamp;
+                            if (!$isExcluded) {
+                                $anEvent            = $this->processEventIcalDateTime($anEvent);
+                                $recurrenceEvents[] = $anEvent;
+                                $this->eventCount++;
 
-                            $eventStartDesc = "{$this->convertDayOrdinalToPositive($dayNumber, $weekday, $monthRecurringTimestamp)} {$this->weekdays[$weekday]} "
-                                . date(self::DATE_TIME_FORMAT_PRETTY, $monthRecurringTimestamp);
-                            $eventStartTimestamp = strtotime($eventStartDesc);
+                                if (isset($rrules['COUNT'])) {
+                                    $count++;
 
-                            if (intval($rrules['BYDAY'][0]) === 0) {
-                                $lastDayDesc = "last {$this->weekdays[$weekday]} "
-                                    . date(self::DATE_TIME_FORMAT_PRETTY, $monthRecurringTimestamp);
-                            } else {
-                                $lastDayDesc = "{$this->convertDayOrdinalToPositive($dayNumber, $weekday, $monthRecurringTimestamp)} {$this->weekdays[$weekday]} "
-                                    . date(self::DATE_TIME_FORMAT_PRETTY, $monthRecurringTimestamp);
+                                    if ($count >= $countLimit) {
+                                        break 2;
+                                    }
+                                }
                             }
-
-                            $lastDayTimestamp = strtotime($lastDayDesc);
-
-                            do {
-                                // Prevent 5th day of a month from showing up on the next month
-                                // If BYDAY and the event falls outside the current month, skip the event
-
-                                $compareCurrentMonth = date('F', $monthRecurringTimestamp);
-                                $compareEventMonth   = date('F', $eventStartTimestamp);
-
-                                if ($compareCurrentMonth !== $compareEventMonth) {
-                                    $monthRecurringTimestamp = strtotime($offset, $monthRecurringTimestamp);
-                                    continue;
-                                }
-
-                                if ($eventStartTimestamp > $startTimestamp && $eventStartTimestamp <= $until) {
-                                    $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $eventStartTimestamp) . (($initialStartTimeZoneName === 'Z') ? 'Z' : '');
-                                    $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
-                                    $anEvent['DTSTART_array'][2] = $eventStartTimestamp;
-                                    $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
-                                    $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
-                                    $anEvent['DTEND'] = date(
-                                        self::DATE_TIME_FORMAT,
-                                        $anEvent['DTEND_array'][2]
-                                    ) . (($initialEndTimeZoneName === 'Z') ? 'Z' : '');
-                                    $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
-
-                                    // Exclusions
-                                    $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent) {
-                                        return self::isExdateMatch($exdate, $anEvent);
-                                    });
-
-                                    $searchDate = $anEvent['DTSTART'];
-                                    if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                        $timeZone = $this->escapeParamText($anEvent['DTSTART_array'][0]['TZID']);
-                                        $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $searchDate;
-                                    }
-
-                                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                        $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate);
-                                        if (in_array($searchDateUtc, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                            $isExcluded = true;
-                                        }
-                                    }
-
-                                    if (!$isExcluded) {
-                                        $anEvent            = $this->processEventIcalDateTime($anEvent);
-                                        $recurrenceEvents[] = $anEvent;
-                                        $this->eventCount++;
-
-                                        // If RRULE[COUNT] is reached then break
-                                        if (isset($rrules['COUNT'])) {
-                                            $count++;
-
-                                            if ($count >= $countLimit) {
-                                                break 2;
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (isset($rrules['BYSETPOS'])) {
-                                    // BYSETPOS is defined so skip
-                                    // looping through each week
-                                    $lastDayTimestamp = $eventStartTimestamp;
-                                }
-
-                                $eventStartTimestamp += self::SECONDS_IN_A_WEEK;
-                            } while ($eventStartTimestamp <= $lastDayTimestamp);
-
-                            // Move forwards
-                            $recurringTimestamp = strtotime($offset, Carbon::createFromTimestamp($recurringTimestamp)->day(1)->timestamp);
                         }
+
+                        // Move forwards $interval month(s)
+                        $monthlyRecurringDatetime->modify("+{$interval} month");
                     }
                     break;
+                }
 
                 case 'YEARLY':
                     // Create offset
