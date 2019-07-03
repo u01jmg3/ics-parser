@@ -141,9 +141,6 @@ class Rfc5545Examples extends TestCase
         );
     }
 
-/*  BYDAY implementation within YEARLY is flawed [No ticket]
- *  (In this case, all dates generated are Saturdays. They shouldn't be.)
- *
     // Page 124, Test 3a :: Every January day, for 3 years (Variant A)
     public function test_page124_test3a()
     {
@@ -162,7 +159,6 @@ class Rfc5545Examples extends TestCase
             $checks
         );
     }
-*/
 
 /*  Requires support for BYMONTH under DAILY [No ticket]
  *
