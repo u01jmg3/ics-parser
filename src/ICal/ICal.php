@@ -1283,16 +1283,6 @@ class ICal
             // Immutable, so it doesn't get inadvertently altered below
             $initialImmutableDate = \DateTimeImmutable::createFromMutable($this->icalDateToDateTime($anEvent['DTSTART_array'][3]));
 
-            $initialStart             = new \DateTime($anEvent['DTSTART_array'][1]);
-            $initialStartTimeZoneName = $initialStart->getTimezone()->getName();
-
-            if (isset($anEvent['DTEND'])) {
-                $initialEnd             = new \DateTime($anEvent['DTEND_array'][1]);
-                $initialEndTimeZoneName = $initialEnd->getTimezone()->getName();
-            } else {
-                $initialEndTimeZoneName = $initialStartTimeZoneName;
-            }
-
             // Separate the RRULE stanzas, and explode the values that are lists.
             $rrules = array();
             foreach (explode(';', $anEvent['RRULE']) as $s) {
@@ -1321,50 +1311,8 @@ class ICal
                 );
             }
 
-            // Get Start timestamp
-            $startTimestamp = $initialStart->getTimestamp();
-
-            if (isset($anEvent['DTEND'])) {
-                $endTimestamp = $initialEnd->getTimestamp();
-            } elseif (isset($anEvent['DURATION'])) {
-                $duration = end($anEvent['DURATION_array']);
-                $endTimestamp = $this->parseDuration($anEvent['DTSTART'], $duration);
-            } else {
-                $endTimestamp = $anEvent['DTSTART_array'][2];
-            }
-
-            $eventTimestampOffset = $endTimestamp - $startTimestamp;
             // Get Interval
-            $interval = (isset($rrules['INTERVAL']) && $rrules['INTERVAL'] !== '') ? $rrules['INTERVAL'] : 1;
-
-            $dayNumber = null;
-            $weekday   = null;
-
-            if (in_array($frequency, array('MONTHLY', 'YEARLY')) && isset($rrules['BYDAY']) && $rrules['BYDAY'] !== '') {
-                // Deal with BYDAY
-                $byDay     = $rrules['BYDAY'];
-                $dayNumber = intval($byDay[0]); // intval() returns 0 when no number defined in $byDay
-
-                if (empty($dayNumber)) {
-                    if (!isset($rrules['BYSETPOS'])) {
-                        $dayNumber = 1; // Set first as default
-                    } elseif (is_numeric($rrules['BYSETPOS'])) {
-                        $dayNumber = $rrules['BYSETPOS'];
-
-                        $byDaysCounted = array_count_values($rrules['BYDAY']);
-
-                        if ($byDaysCounted == array_count_values($this->weeks['MO'])) {
-                            $weekday = 'day';
-                        } elseif ($byDaysCounted == array_count_values(array_slice($this->weeks['MO'], 0, 5))) {
-                            $weekday = 'weekday';
-                        }
-                    }
-                }
-
-                if (!isset($weekday)) {
-                    $weekday = substr($byDay[0], -2);
-                }
-            }
+            $interval = (!empty($rrules['INTERVAL'])) ? $rrules['INTERVAL'] : 1;
 
             // Throw an error if this isn't an integer.
             if (!is_int($this->defaultSpan)) {
