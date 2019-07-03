@@ -1450,91 +1450,99 @@ class ICal
                 }
 
                 case 'WEEKLY':
-                    // Create offset
-                    $offset = "+{$interval} week";
+                {
+                    $weeklyRecurringDatetime = \DateTime::createFromImmutable($initialImmutableDate);
 
-                    $wkst  = (isset($rrules['WKST']) && in_array($rrules['WKST'], array('SA', 'SU', 'MO'))) ? $rrules['WKST'] : $this->defaultWeekStart;
-                    $aWeek = $this->weeks[$wkst];
-                    $days  = array('SA' => 'Saturday', 'SU' => 'Sunday', 'MO' => 'Monday');
+                    $matching_days = array($weeklyRecurringDatetime->format('N'));
+                    if (!empty($rrules['BYDAY'])) {
 
-                    // Build list of days of week to add events
-                    $weekdays = $aWeek;
+                        // setISODate below uses the ISO-8601 specification of weeks: start on
+                        // a Monday, end on a Sunday. However, RRULEs may state an alternate
+                        // WeekStart. In this case, we need to determine the point where days
+                        // that ordinarily come after Monday now come before Monday.
+                        $wkstTransition = 7;
+                        if (!empty($rrules['WKST']) && $rrules['WKST'] != "MO") {
+                            $wkstTransition = array_search($rrules['WKST'], $this->weeks['MO']);
+                        }
 
-                    if (isset($rrules['BYDAY']) && $rrules['BYDAY'] !== '') {
-                        $byDays = $rrules['BYDAY'];
-                    } else {
-                        // A textual representation of a day, two letters (e.g. SU)
-                        $byDays = array(mb_substr(strtoupper($initialStart->format('D')), 0, 2));
+                        $matching_days = array_map(
+                            function ($weekday) use ($wkstTransition) {
+                                $day = array_search(substr($weekday, -2), $this->weeks['MO']);
+                                if ($day >= $wkstTransition) {
+                                    $day -= 7;
+                                }
+
+                                // Ignoring alternate week starts, $day at this point will have a
+                                // value between 0 and 6. But setISODate expects a value 1 to 7.
+                                // Even with alternate week starts, we still need to +1 to set the
+                                // correct weekday.
+                                return $day + 1;
+                            },
+                            $rrules['BYDAY']
+                        );
                     }
-
-                    // Get timestamp of first day of start week
-                    $weekRecurringTimestamp = (strcasecmp($initialStart->format('l'), explode(' ', $this->weekdays[$wkst])[0]) === 0)
-                        ? $startTimestamp
-                        : strtotime("last {$days[$wkst]} " . $initialStart->format('H:i:s'), $startTimestamp);
+                    sort($matching_days);
 
                     // Step through weeks
-                    while ($weekRecurringTimestamp <= $until) {
-                        $dayRecurringTimestamp = $weekRecurringTimestamp;
+                    while ($weeklyRecurringDatetime->getTimestamp() <= $until) {
 
-                        foreach ($weekdays as $day) {
-                            // Check if day should be added
-                            if (in_array($day, $byDays) && $dayRecurringTimestamp > $startTimestamp
-                                && $dayRecurringTimestamp <= $until
-                            ) {
-                                // Add event
-                                $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $dayRecurringTimestamp) . (($initialStartTimeZoneName === 'Z') ? 'Z' : '');
-                                $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
-                                $anEvent['DTSTART_array'][2] = $dayRecurringTimestamp;
-                                $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
-                                $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
-                                $anEvent['DTEND'] = date(
-                                    self::DATE_TIME_FORMAT,
-                                    $anEvent['DTEND_array'][2]
-                                ) . (($initialEndTimeZoneName === 'Z') ? 'Z' : '');
-                                $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
+                        foreach ($matching_days as $day) {
+                            $recurringDatetime = (clone $weeklyRecurringDatetime)->setISODate(
+                                $weeklyRecurringDatetime->format('Y'),
+                                $weeklyRecurringDatetime->format('W'),
+                                $day
+                            );
 
-                                // Exclusions
-                                $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent) {
-                                    return self::isExdateMatch($exdate, $anEvent);
-                                });
+                            $recurringTimestamp = $recurringDatetime->getTimestamp();
+                            if ($recurringTimestamp <= $initialImmutableDate->getTimestamp()) {
+                                continue;
+                            }
 
-                                $searchDate = $anEvent['DTSTART'];
-                                if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                    $timeZone = $this->escapeParamText($anEvent['DTSTART_array'][0]['TZID']);
-                                    $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $searchDate;
-                                }
+                            if ($recurringTimestamp > $until) {
+                                break;
+                            }
 
-                                if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                    $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate);
-                                    if (in_array($searchDateUtc, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                        $isExcluded = true;
-                                    }
-                                }
+                            // Add event
+                            $anEvent['DTSTART'] = $recurringDatetime->format(self::DATE_TIME_FORMAT) . ($initialDateWasUTC ? 'Z' : '');
+                            $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
+                            $anEvent['DTSTART_array'][2] = $recurringTimestamp;
+                            $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
+                            $anEvent['DTEND_array'][2]  += $eventLength;
+                            $anEvent['DTEND'] = date(self::DATE_TIME_FORMAT, $anEvent['DTEND_array'][2]) . ($initialDateWasUTC ? 'Z' : '');
+                            $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
-                                if (!$isExcluded) {
-                                    $anEvent            = $this->processEventIcalDateTime($anEvent);
-                                    $recurrenceEvents[] = $anEvent;
-                                    $this->eventCount++;
+                            // Exclusions
+                            $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent) {
+                                return self::isExdateMatch($exdate, $anEvent);
+                            });
 
-                                    // If RRULE[COUNT] is reached then break
-                                    if (isset($rrules['COUNT'])) {
-                                        $count++;
-
-                                        if ($count >= $countLimit) {
-                                            break 2;
-                                        }
-                                    }
+                            if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                if (in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                                    $isExcluded = true;
                                 }
                             }
 
-                            // Move forwards a day
-                            $dayRecurringTimestamp = strtotime('+1 day', $dayRecurringTimestamp);
+                            if (!$isExcluded) {
+                                $anEvent            = $this->processEventIcalDateTime($anEvent);
+                                $recurrenceEvents[] = $anEvent;
+                                $this->eventCount++;
+
+                                // If RRULE[COUNT] is reached then break
+                                if (isset($rrules['COUNT'])) {
+                                    $count++;
+
+                                    if ($count >= $countLimit) {
+                                        break 2;
+                                    }
+                                }
+                            }
                         }
 
-                        // Move forwards $interval weeks
-                        $weekRecurringTimestamp = strtotime($offset, $weekRecurringTimestamp);
+                        // Move forwards $interval week(s)
+                        $weeklyRecurringDatetime->modify("+{$interval} week");
                     }
                     break;
+                }
 
                 case 'MONTHLY':
                     // Create offset
