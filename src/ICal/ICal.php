@@ -1291,13 +1291,15 @@ class ICal
                 $initialEndTimeZoneName = $initialStartTimeZoneName;
             }
 
-            // Recurring event, parse RRULE and add appropriate duplicate events
+            // Separate the RRULE stanzas, and explode the values that are lists.
             $rrules = array();
-            $rruleStrings = explode(';', $anEvent['RRULE']);
-
-            foreach ($rruleStrings as $s) {
+            foreach (explode(';', $anEvent['RRULE']) as $s) {
                 list($k, $v) = explode('=', $s);
-                $rrules[$k] = $v;
+                if (in_array($k, array('BYSETPOS', 'BYDAY', 'BYMONTHDAY', 'BYMONTH'))) {
+                    $rrules[$k] = explode(',', $v);
+                } else {
+                    $rrules[$k] = $v;
+                }
             }
 
             // Get frequency
@@ -1324,15 +1326,15 @@ class ICal
             if (in_array($frequency, array('MONTHLY', 'YEARLY')) && isset($rrules['BYDAY']) && $rrules['BYDAY'] !== '') {
                 // Deal with BYDAY
                 $byDay     = $rrules['BYDAY'];
-                $dayNumber = intval($byDay);
+                $dayNumber = intval($byDay[0]); // intval() returns 0 when no number defined in $byDay
 
-                if (empty($dayNumber)) { // Returns 0 when no number defined in BYDAY
+                if (empty($dayNumber)) {
                     if (!isset($rrules['BYSETPOS'])) {
                         $dayNumber = 1; // Set first as default
                     } elseif (is_numeric($rrules['BYSETPOS'])) {
                         $dayNumber = $rrules['BYSETPOS'];
 
-                        $byDaysCounted = array_count_values(explode(',', $rrules['BYDAY']));
+                        $byDaysCounted = array_count_values($rrules['BYDAY']);
 
                         if ($byDaysCounted == array_count_values($this->weeks['MO'])) {
                             $weekday = 'day';
@@ -1343,7 +1345,7 @@ class ICal
                 }
 
                 if (!isset($weekday)) {
-                    $weekday = substr($byDay, -2);
+                    $weekday = substr($byDay[0], -2);
                 }
             }
 
@@ -1485,7 +1487,7 @@ class ICal
                     $weekdays = $aWeek;
 
                     if (isset($rrules['BYDAY']) && $rrules['BYDAY'] !== '') {
-                        $byDays = explode(',', $rrules['BYDAY']);
+                        $byDays = $rrules['BYDAY'];
                     } else {
                         // A textual representation of a day, two letters (e.g. SU)
                         $byDays = array(mb_substr(strtoupper($initialStart->format('D')), 0, 2));
@@ -1567,7 +1569,7 @@ class ICal
 
                     if (isset($rrules['BYMONTHDAY']) && $rrules['BYMONTHDAY'] !== '') {
                         // Deal with BYMONTHDAY
-                        $monthdays = explode(',', $rrules['BYMONTHDAY']);
+                        $monthdays = $rrules['BYMONTHDAY'];
 
                         while ($recurringTimestamp <= $until) {
                             foreach ($monthdays as $key => $monthday) {
@@ -1664,7 +1666,7 @@ class ICal
                                 . date(self::DATE_TIME_FORMAT_PRETTY, $monthRecurringTimestamp);
                             $eventStartTimestamp = strtotime($eventStartDesc);
 
-                            if (intval($rrules['BYDAY']) === 0) {
+                            if (intval($rrules['BYDAY'][0]) === 0) {
                                 $lastDayDesc = "last {$this->weekdays[$weekday]} "
                                     . date(self::DATE_TIME_FORMAT_PRETTY, $monthRecurringTimestamp);
                             } else {
@@ -1753,11 +1755,7 @@ class ICal
                     $offset = "+{$interval} year";
 
                     // Deal with BYMONTH
-                    if (isset($rrules['BYMONTH']) && $rrules['BYMONTH'] !== '') {
-                        $bymonths = explode(',', $rrules['BYMONTH']);
-                    } else {
-                        $bymonths = array();
-                    }
+                    $bymonths = (!empty($rrules['BYMONTH'])) ? $rrules['BYMONTH'] : array();
 
                     // Check if BYDAY rule exists
                     if (isset($rrules['BYDAY']) && $rrules['BYDAY'] !== '') {
@@ -1770,7 +1768,7 @@ class ICal
                                     . gmdate('Y H:i:s', $yearRecurringTimestamp);
                                 $eventStartTimestamp = strtotime($eventStartDesc);
 
-                                if (intval($rrules['BYDAY']) === 0) {
+                                if (intval($rrules['BYDAY'][0]) === 0) {
                                     $lastDayDesc = "last {$this->weekdays[$weekday]}"
                                         . " {$this->monthNames[$bymonth]} "
                                         . gmdate('Y H:i:s', $yearRecurringTimestamp);
