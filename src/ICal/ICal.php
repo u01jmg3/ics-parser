@@ -1268,7 +1268,6 @@ class ICal
             return;
         }
 
-        $recurrenceEvents    = array();
         $allRecurrenceEvents = array();
 
         foreach ($events as $anEvent) {
@@ -1282,18 +1281,6 @@ class ICal
             // Create new initial starting point.
             // Immutable, so it doesn't get inadvertently altered below
             $initialImmutableDate = \DateTimeImmutable::createFromMutable($this->icalDateToDateTime($anEvent['DTSTART_array'][3]));
-
-            // Whether or not the initial date was UTC
-            $initialDateWasUTC = substr($anEvent['DTSTART'], -1) == 'Z';
-
-            // Determine event length
-            $eventLength = 0;
-            if (isset($anEvent['DURATION'])) {
-                $endDate = $initialImmutableDate->add($anEvent['DURATION_array'][2]);
-                $eventLength = $endDate->getTimestamp() - $anEvent['DTSTART_array'][2];
-            } else if (isset($anEvent['DTEND_array'])) {
-                $eventLength = $anEvent['DTEND_array'][2] - $anEvent['DTSTART_array'][2];
-            }
 
             $initialStart             = new \DateTime($anEvent['DTSTART_array'][1]);
             $initialStartTimeZoneName = $initialStart->getTimezone()->getName();
@@ -1390,6 +1377,8 @@ class ICal
                 $until = min($until, $this->iCalDateToUnixTimestamp($rrules['UNTIL']));
             }
 
+            $eventRecurrences = array();
+
             // phpcs:ignore Squiz.ControlStructures.SwitchDeclaration.MissingDefault
             switch ($frequency) {
                 case 'DAILY':
@@ -1409,15 +1398,6 @@ class ICal
                             break;
                         }
 
-                        // Add event
-                        $anEvent['DTSTART'] = $dailyRecurringDatetime->format(self::DATE_TIME_FORMAT) . ($initialDateWasUTC ? 'Z' : '');
-                        $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
-                        $anEvent['DTSTART_array'][2] = $recurringTimestamp;
-                        $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
-                        $anEvent['DTEND_array'][2]  += $eventLength;
-                        $anEvent['DTEND'] = date(self::DATE_TIME_FORMAT, $anEvent['DTEND_array'][2]) . ($initialDateWasUTC ? 'Z' : '');
-                        $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
-
                         // Exclusions
                         $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent) {
                             return self::isExdateMatch($exdate, $anEvent);
@@ -1430,8 +1410,7 @@ class ICal
                         }
 
                         if (!$isExcluded) {
-                            $anEvent            = $this->processEventIcalDateTime($anEvent);
-                            $recurrenceEvents[] = $anEvent;
+                            $eventRecurrences[] = clone $dailyRecurringDatetime;
                             $this->eventCount++;
 
                             if (isset($rrules['COUNT'])) {
@@ -1502,15 +1481,6 @@ class ICal
                                 break;
                             }
 
-                            // Add event
-                            $anEvent['DTSTART'] = $recurringDatetime->format(self::DATE_TIME_FORMAT) . ($initialDateWasUTC ? 'Z' : '');
-                            $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
-                            $anEvent['DTSTART_array'][2] = $recurringTimestamp;
-                            $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
-                            $anEvent['DTEND_array'][2]  += $eventLength;
-                            $anEvent['DTEND'] = date(self::DATE_TIME_FORMAT, $anEvent['DTEND_array'][2]) . ($initialDateWasUTC ? 'Z' : '');
-                            $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
-
                             // Exclusions
                             $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent) {
                                 return self::isExdateMatch($exdate, $anEvent);
@@ -1523,8 +1493,7 @@ class ICal
                             }
 
                             if (!$isExcluded) {
-                                $anEvent            = $this->processEventIcalDateTime($anEvent);
-                                $recurrenceEvents[] = $anEvent;
+                                $eventRecurrences[] = $recurringDatetime;
                                 $this->eventCount++;
 
                                 // If RRULE[COUNT] is reached then break
@@ -1585,14 +1554,6 @@ class ICal
                                 break;
                             }
 
-                            $anEvent['DTSTART'] = $recurringDatetime->format(self::DATE_TIME_FORMAT) . ($initialDateWasUTC ? 'Z' : '');
-                            $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
-                            $anEvent['DTSTART_array'][2] = $recurringTimestamp;
-                            $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
-                            $anEvent['DTEND_array'][2]  += $eventLength;
-                            $anEvent['DTEND']            = date(self::DATE_TIME_FORMAT,$anEvent['DTEND_array'][2]) . ($initialDateWasUTC ? 'Z' : '');
-                            $anEvent['DTEND_array'][1]   = $anEvent['DTEND'];
-
                             // Exclusions
                             $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent) {
                                 return self::isExdateMatch($exdate, $anEvent);
@@ -1605,8 +1566,7 @@ class ICal
                             }
 
                             if (!$isExcluded) {
-                                $anEvent            = $this->processEventIcalDateTime($anEvent);
-                                $recurrenceEvents[] = $anEvent;
+                                $eventRecurrences[] = $recurringDatetime;
                                 $this->eventCount++;
 
                                 if (isset($rrules['COUNT'])) {
@@ -1636,11 +1596,10 @@ class ICal
                         if (!empty($rrules['BYMONTH'])) {
 
                             foreach ($rrules['BYMONTH'] as $bymonth) {
-                                $bymonthRecurringDatetime = clone($yearlyRecurringDatetime);
-                                $bymonthRecurringDatetime->setDate(
-                                    $bymonthRecurringDatetime->format('Y'),
+                                $bymonthRecurringDatetime = (clone $yearlyRecurringDatetime)->setDate(
+                                    $yearlyRecurringDatetime->format('Y'),
                                     $bymonth,
-                                    $bymonthRecurringDatetime->format('d')
+                                    $yearlyRecurringDatetime->format('d')
                                 );
 
                                 if (!empty($rrules['BYDAY'])) {
@@ -1650,18 +1609,18 @@ class ICal
 
                                     // And add each of them to the list of recurrences
                                     foreach ($matching_days as $day) {
-                                        $recurringDatetimes[] = clone($bymonthRecurringDatetime->setDate(
+                                        $recurringDatetimes[] = clone $bymonthRecurringDatetime->setDate(
                                             $yearlyRecurringDatetime->format('Y'),
                                             $bymonthRecurringDatetime->format('m'),
                                             $day
-                                        ));
+                                        );
                                     }
                                 } else {
-                                    $recurringDatetimes[] = clone($bymonthRecurringDatetime);
+                                    $recurringDatetimes[] = clone $bymonthRecurringDatetime;
                                 }
                             }
                         } else {
-                            $recurringDatetimes[] = clone($yearlyRecurringDatetime);
+                            $recurringDatetimes[] = clone $yearlyRecurringDatetime;
                         }
 
                         foreach ($recurringDatetimes as $recurringDatetime) {
@@ -1675,14 +1634,6 @@ class ICal
                                 break;
                             }
 
-                            $anEvent['DTSTART'] = $recurringDatetime->format(self::DATE_TIME_FORMAT) . ($initialDateWasUTC ? 'Z' : '');
-                            $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
-                            $anEvent['DTSTART_array'][2] = $recurringTimestamp;
-                            $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
-                            $anEvent['DTEND_array'][2]  += $eventLength;
-                            $anEvent['DTEND'] = date(self::DATE_TIME_FORMAT, $anEvent['DTEND_array'][2]) . ($initialDateWasUTC ? 'Z' : '');
-                            $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
-
                             // Exclusions
                             $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent) {
                                 return self::isExdateMatch($exdate, $anEvent);
@@ -1695,8 +1646,7 @@ class ICal
                             }
 
                             if (!$isExcluded) {
-                                $anEvent            = $this->processEventIcalDateTime($anEvent);
-                                $recurrenceEvents[] = $anEvent;
+                                $eventRecurrences[] = $recurringDatetime;
                                 $this->eventCount++;
 
                                 if (isset($rrules['COUNT'])) {
@@ -1717,8 +1667,35 @@ class ICal
                 }
             }
 
+            // Determine event length
+            $eventLength = 0;
+            if (isset($anEvent['DURATION'])) {
+                $endDate = $initialImmutableDate->add($anEvent['DURATION_array'][2]);
+                $eventLength = $endDate->getTimestamp() - $anEvent['DTSTART_array'][2];
+            } else if (isset($anEvent['DTEND_array'])) {
+                $eventLength = $anEvent['DTEND_array'][2] - $anEvent['DTSTART_array'][2];
+            }
+
+            // Whether or not the initial date was UTC
+            $initialDateWasUTC = substr($anEvent['DTSTART'], -1) == 'Z';
+
+            // Create the `DT{START|END}[_array]`s recurrence properties
+            $recurrenceEvents = array_map(
+                function($recurringDatetime) use ($anEvent, $eventLength, $initialDateWasUTC) {
+                    $anEvent['DTSTART'] = $recurringDatetime->format(self::DATE_TIME_FORMAT) . ($initialDateWasUTC ? 'Z' : '');
+                    $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
+                    $anEvent['DTSTART_array'][2] = $recurringDatetime->getTimestamp();
+                    $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
+                    $anEvent['DTEND_array'][2]  += $eventLength;
+                    $anEvent['DTEND'] = date(self::DATE_TIME_FORMAT, $anEvent['DTEND_array'][2]) . ($initialDateWasUTC ? 'Z' : '');
+                    $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
+
+                    return $this->processEventIcalDateTime($anEvent);
+                },
+                $eventRecurrences
+            );
+
             $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
-            $recurrenceEvents    = array(); // Reset
 
         }
 
