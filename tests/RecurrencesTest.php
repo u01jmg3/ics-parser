@@ -101,7 +101,7 @@ class RecurrencesTest extends TestCase
         $this->assertEventFile(
             'UTC',
             './tests/ical/issue-196.ics',
-            6,
+            7,
             $checks
         );
     }

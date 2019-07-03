@@ -1393,23 +1393,29 @@ class ICal
             // phpcs:ignore Squiz.ControlStructures.SwitchDeclaration.MissingDefault
             switch ($frequency) {
                 case 'DAILY':
-                    // Simply add a new event each interval of days until UNTIL is reached
+                {
+                    $dailyRecurringDatetime = \DateTime::createFromImmutable($initialImmutableDate);
                     $offset = "+{$interval} day";
-                    $recurringTimestamp = strtotime($offset, $startTimestamp);
 
-                    while ($recurringTimestamp <= $until) {
-                        $dayRecurringTimestamp = $recurringTimestamp;
+                    while ($dailyRecurringDatetime->getTimestamp() <= $until) {
+
+                        $recurringTimestamp = $dailyRecurringDatetime->getTimestamp();
+                        if ($recurringTimestamp <= $initialImmutableDate->getTimestamp()) {
+                            $dailyRecurringDatetime->modify($offset);
+                            continue;
+                        }
+
+                        if ($recurringTimestamp > $until) {
+                            break;
+                        }
 
                         // Add event
-                        $anEvent['DTSTART'] = date(self::DATE_TIME_FORMAT, $dayRecurringTimestamp) . (($initialStartTimeZoneName === 'Z') ? 'Z' : '');
+                        $anEvent['DTSTART'] = $dailyRecurringDatetime->format(self::DATE_TIME_FORMAT) . ($initialDateWasUTC ? 'Z' : '');
                         $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
-                        $anEvent['DTSTART_array'][2] = $dayRecurringTimestamp;
+                        $anEvent['DTSTART_array'][2] = $recurringTimestamp;
                         $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
-                        $anEvent['DTEND_array'][2]  += $eventTimestampOffset;
-                        $anEvent['DTEND'] = date(
-                            self::DATE_TIME_FORMAT,
-                            $anEvent['DTEND_array'][2]
-                        ) . (($initialEndTimeZoneName === 'Z') ? 'Z' : '');
+                        $anEvent['DTEND_array'][2]  += $eventLength;
+                        $anEvent['DTEND'] = date(self::DATE_TIME_FORMAT, $anEvent['DTEND_array'][2]) . ($initialDateWasUTC ? 'Z' : '');
                         $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
 
                         // Exclusions
@@ -1417,15 +1423,8 @@ class ICal
                             return self::isExdateMatch($exdate, $anEvent);
                         });
 
-                        $searchDate = $anEvent['DTSTART'];
-                        if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                            $timeZone = $this->escapeParamText($anEvent['DTSTART_array'][0]['TZID']);
-                            $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $searchDate;
-                        }
-
                         if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                            $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate);
-                            if (in_array($searchDateUtc, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                            if (in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                 $isExcluded = true;
                             }
                         }
@@ -1435,7 +1434,6 @@ class ICal
                             $recurrenceEvents[] = $anEvent;
                             $this->eventCount++;
 
-                            // If RRULE[COUNT] is reached then break
                             if (isset($rrules['COUNT'])) {
                                 $count++;
 
@@ -1445,10 +1443,11 @@ class ICal
                             }
                         }
 
-                        // Move forwards
-                        $recurringTimestamp = strtotime($offset, $recurringTimestamp);
+                        // Move forwards $interval day(s)
+                        $dailyRecurringDatetime->modify($offset);
                     }
                     break;
+                }
 
                 case 'WEEKLY':
                     // Create offset
