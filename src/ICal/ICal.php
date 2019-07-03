@@ -1877,6 +1877,68 @@ class ICal
     }
 
     /**
+     * Find all days of a month that match the BYDAY stanza of an RRULE.
+     *
+     * With no {ordwk}, then return the day number of every {weekday}
+     * within the month.
+     *
+     * With a +ve {ordwk}, then return the {ordwk} {weekday} within the
+     * month.
+     *
+     * With a -ve {ordwk}, then return the {ordwk}-to-last {weekday}
+     * within the month.
+     *
+     * RRule Syntax:
+     *   BYDAY={bywdaylist}
+     *
+     * Where:
+     *   bywdaylist = {weekdaynum}[,{weekdaynum}...]
+     *   weekdaynum = [[+]{ordwk} || -{ordwk}]{weekday}
+     *   ordwk      = 1 to 53
+     *   weekday    = SU || MO || TU || WE || TH || FR || SA
+     *
+     * @param  array     $bydays
+     * @param  \DateTime $initialDateTime
+     * @return array
+     */
+    protected function getDaysOfMonthMatchingByDayRRule($bydays, $initialDateTime)
+    {
+        $matching_days = array();
+
+        foreach ($bydays as $weekday) {
+            $bydayDateTime = clone $initialDateTime;
+
+            $ordwk = intval(substr($weekday, 0, 2));
+
+            // Quantise the date to the first instance of the requested day in a month
+            // (Or last if we have a -ve {ordwk})
+            $bydayDateTime->modify(
+                ($ordwk < 0 ? "Last " : "First ")       // "Last" or "First"
+                . $this->weekdays[substr($weekday, -2)] // eg. "Monday of"
+                . " " . $initialDateTime->format('F')   // eg. "June"
+            );
+
+            if ($ordwk < 0) { // -ve {ordwk}
+                $bydayDateTime->modify(++$ordwk . ' week');
+                $matching_days[] = $bydayDateTime->format('j');
+            } else if ($ordwk > 0) { // +ve {ordwk}
+                $bydayDateTime->modify(--$ordwk . ' week');
+                $matching_days[] = $bydayDateTime->format('j');
+            } else { // No {ordwk}
+                while ($bydayDateTime->format('n') == $initialDateTime->format('n')) {
+                    $matching_days[] = $bydayDateTime->format('j');
+                    $bydayDateTime->modify('+1 week');
+                }
+            }
+        }
+
+        // Sort into ascending order.
+        sort($matching_days);
+
+        return $matching_days;
+    }
+
+    /**
      * Processes date conversions using the time zone
      *
      * Add keys `DTSTART_tz` and `DTEND_tz` to each Event
