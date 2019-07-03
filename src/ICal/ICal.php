@@ -1349,11 +1349,8 @@ class ICal
                 }
             }
 
-            if (is_int($this->defaultSpan)) {
-                $untilDefault = date_create('now');
-                $untilDefault->modify($this->defaultSpan . ' year');
-                $untilDefault->setTime(23, 59, 59); // End of the day
-            } else {
+            // Throw an error if this isn't an integer.
+            if (!is_int($this->defaultSpan)) {
                 trigger_error('ICal::defaultSpan: User defined value is not an integer', E_USER_NOTICE);
             }
 
@@ -1409,7 +1406,10 @@ class ICal
                 }
 
                 unset($offset);
-            } elseif (isset($untilDefault)) {
+            } else {
+                $untilDefault = date_create('now');
+                $untilDefault->modify('+' . $this->defaultSpan . ' years');
+                $untilDefault->setTime(23, 59, 59); // End of the day
                 $until = $untilDefault->getTimestamp();
             }
 
