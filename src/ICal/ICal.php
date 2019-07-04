@@ -1939,6 +1939,42 @@ class ICal
     }
 
     /**
+     * Filters a provided values-list by applying a BYSETPOS RRule.
+     *
+     * Where a +ve {daynum} is provided, the {ordday} position'd value as
+     * measured from the start of the list of values should be retained.
+     *
+     * Where a -ve {daynum} is provided, the {ordday} position'd value as
+     * measured from the end of the list of values should be retained.
+     *
+     * RRule Syntax:
+     *   BYSETPOS={bysplist}
+     *
+     * Where:
+     *   bysplist  = {setposday}[,{setposday}...]
+     *   setposday = {daynum}
+     *   daynum    = [+ || -] {ordday}
+     *   ordday    = 1 to 366
+     *
+     * @param  array $bysetpos
+     * @param  array $valueslist
+     * @return array
+     */
+    protected function filterValuesUsingBySetPosRRule($bysetpos, $valueslist)
+    {
+        $filtered_matches = array();
+        foreach ($bysetpos as $setposition) {
+            if ($setposition < 0) {
+                $setposition = count($valueslist) + ++$setposition;
+            }
+
+            // positioning start at 1, array indexes starts at 0
+            $filtered_matches[] = $valueslist[$setposition - 1];
+        }
+        return $filtered_matches;
+    }
+
+    /**
      * Processes date conversions using the time zone
      *
      * Add keys `DTSTART_tz` and `DTEND_tz` to each Event
