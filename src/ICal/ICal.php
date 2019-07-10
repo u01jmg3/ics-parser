@@ -1007,12 +1007,10 @@ class ICal
      * Returns a `DateTime` object from an iCal date time format
      *
      * @param  string  $icalDate
-     * @param  boolean $forceTimeZone
-     * @param  boolean $forceUtc
      * @return \DateTime
      * @throws \Exception
      */
-    public function iCalDateToDateTime($icalDate, $forceTimeZone = false, $forceUtc = false)
+    public function iCalDateToDateTime($icalDate)
     {
         /**
          * iCal times may be in 3 formats, (https://www.kanzaki.com/docs/ical/dateTime.html)
@@ -1024,15 +1022,12 @@ class ICal
          * Use DateTime class objects to get around limitations with `mktime` and `gmmktime`.
          * Must have a local time zone set to process floating times.
          */
-        $pattern  = '/\AT?Z?I?D?=?(.*):?'; // [1]: Time zone
-        $pattern .= '([0-9]{4})';          // [2]: YYYY
-        $pattern .= '([0-9]{2})';          // [3]: MM
-        $pattern .= '([0-9]{2})';          // [4]: DD
-        $pattern .= 'T?';                  //      Time delimiter
-        $pattern .= '([0-9]{0,2})';        // [5]: HH
-        $pattern .= '([0-9]{0,2})';        // [6]: MM
-        $pattern .= '([0-9]{0,2})';        // [7]: SS
-        $pattern .= '(Z?)/';               // [8]: UTC flag
+        $pattern  = '/^(?:TZID=)?([^:]*|".*")'; // [1]: Time zone
+        $pattern .= ':?';                       //      Time zone delimiter
+        $pattern .= '([0-9]{8})';               // [2]: YYYYMMDD
+        $pattern .= 'T?';                       //      Time delimiter
+        $pattern .= '(?(?<=T)([0-9]{6}))';      // [3]: HHMMSS (filled if delimiter present)
+        $pattern .= '(Z?)/';                    // [4]: UTC flag
 
         preg_match($pattern, $icalDate, $date);
 
@@ -1040,69 +1035,46 @@ class ICal
             throw new \Exception('Invalid iCal date format.');
         }
 
-        // A Unix timestamp cannot represent a date prior to 1 Jan 1970
-        $year  = $date[2];
-        $isUtc = false;
+        if (!empty($date[1])) {
+            $date[1] = trim($date[1], "\"");
+        }
 
-        if ($year <= self::UNIX_MIN_YEAR) {
-            $eventTimeZone = ltrim(strstr($icalDate, ':', true), 'TZID=');
+        // A Unix timestamp usually cannot represent a date prior to 1 Jan 1970.
+        // PHP, on the other hand, uses negative numbers for that. Thus we don't
+        // need to special case them.
 
-            if (empty($eventTimeZone)) {
-                $dateTime = new \DateTime($icalDate, new \DateTimeZone($this->defaultTimeZone));
-            } else {
-                $icalDate = ltrim(strstr($icalDate, ':'), ':');
-                $dateTime = new \DateTime($icalDate, new \DateTimeZone($eventTimeZone));
-            }
+        if ($date[4] === 'Z') {
+            $dateTimeZone = new \DateTimeZone(self::TIME_ZONE_UTC);
+        } elseif (!empty($date[1]) && $this->isValidIanaTimeZoneId($date[1])) {
+            $dateTimeZone = new \DateTimeZone($date[1]);
+        } elseif (!empty($date[1]) && $this->isValidCldrTimeZoneId($date[1])) {
+            $dateTimeZone = new \DateTimeZone($this->isValidCldrTimeZoneId($date[1], true));
         } else {
-            if ($forceTimeZone) {
-                // TZID={Time Zone}:
-                if (isset($date[1])) {
-                    $eventTimeZone = rtrim($date[1], ':');
-                }
-
-                if ($date[8] === 'Z') {
-                    $isUtc    = true;
-                    $dateTime = new \DateTime('now', new \DateTimeZone(self::TIME_ZONE_UTC));
-                } elseif (isset($eventTimeZone) && $this->isValidIanaTimeZoneId($eventTimeZone)) {
-                    $dateTime = new \DateTime('now', new \DateTimeZone($eventTimeZone));
-                } elseif (isset($eventTimeZone) && $this->isValidCldrTimeZoneId($eventTimeZone)) {
-                    $dateTime = new \DateTime('now', new \DateTimeZone($this->isValidCldrTimeZoneId($eventTimeZone, true)));
-                } else {
-                    $dateTime = new \DateTime('now', new \DateTimeZone($this->defaultTimeZone));
-                }
-            } else {
-                if ($forceUtc) {
-                    $dateTime = new \DateTime('now', new \DateTimeZone(self::TIME_ZONE_UTC));
-                } else {
-                    $dateTime = new \DateTime('now');
-                }
-            }
-
-            $dateTime->setDate((int) $date[2], (int) $date[3], (int) $date[4]);
-            $dateTime->setTime((int) $date[5], (int) $date[6], (int) $date[7]);
+            $dateTimeZone = new \DateTimeZone($this->defaultTimeZone);
         }
 
-        if ($forceTimeZone && $isUtc) {
-            $dateTime->setTimezone(new \DateTimeZone($this->defaultTimeZone));
-        } elseif ($forceUtc) {
-            $dateTime->setTimezone(new \DateTimeZone(self::TIME_ZONE_UTC));
+        // The exclamation mark at the start of the format string indicates that if a
+        // time portion is not included, the time in the returned DateTime should be
+        // set to 00:00:00. Without it, the time would be set to the current system time.
+        $dateFormat = '!Ymd';
+        $dateBasic = $date[2];
+        if (!empty($date[3])) {
+            $dateBasic .= 'T' . $date[3];
+            $dateFormat .= '\THis';
         }
 
-        return $dateTime;
+        return \DateTime::createFromFormat($dateFormat, $dateBasic, $dateTimeZone);
     }
 
     /**
      * Returns a Unix timestamp from an iCal date time format
      *
      * @param  string  $icalDate
-     * @param  boolean $forceTimeZone
-     * @param  boolean $forceUtc
      * @return integer
      */
-    public function iCalDateToUnixTimestamp($icalDate, $forceTimeZone = false, $forceUtc = false)
+    public function iCalDateToUnixTimestamp($icalDate)
     {
-        $dateTime = $this->iCalDateToDateTime($icalDate, $forceTimeZone, $forceUtc);
-        return $dateTime->getTimestamp();
+        return $this->iCalDateToDateTime($icalDate)->getTimestamp();
     }
 
     /**
@@ -1171,10 +1143,11 @@ class ICal
                         $date = $anEvent[$type . '_array'][1];
 
                         if (isset($anEvent[$type . '_array'][0]['TZID'])) {
-                            $date = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent[$type . '_array'][0]['TZID']) . $date;
+                            $timeZone = $this->escapeParamText($anEvent[$type . '_array'][0]['TZID']);
+                            $date = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $date;
                         }
 
-                        $anEvent[$type . '_array'][2] = $this->iCalDateToUnixTimestamp($date, true, true);
+                        $anEvent[$type . '_array'][2] = $this->iCalDateToUnixTimestamp($date);
                         $anEvent[$type . '_array'][3] = $date;
                     }
                 }
@@ -1186,7 +1159,7 @@ class ICal
                         $this->alteredRecurrenceInstances[$uid] = array();
                     }
 
-                    $recurrenceDateUtc = $this->iCalDateToUnixTimestamp($anEvent['RECURRENCE-ID_array'][3], true, true);
+                    $recurrenceDateUtc = $this->iCalDateToUnixTimestamp($anEvent['RECURRENCE-ID_array'][3]);
                     $this->alteredRecurrenceInstances[$uid][$key] = $recurrenceDateUtc;
                 }
 
@@ -1201,7 +1174,7 @@ class ICal
                 $checks[] = isset($event['UID']) && isset($this->alteredRecurrenceInstances[$event['UID']]);
 
                 if ((bool) array_product($checks)) {
-                    $eventDtstartUnix = $this->iCalDateToUnixTimestamp($event['DTSTART_array'][3], true, true);
+                    $eventDtstartUnix = $this->iCalDateToUnixTimestamp($event['DTSTART_array'][3]);
 
                     if (false !== $alteredEventKey = array_search($eventDtstartUnix, $this->alteredRecurrenceInstances[$event['UID']])) {
                         $eventKeysToRemove[] = $alteredEventKey;
@@ -1415,11 +1388,12 @@ class ICal
                                 if (isset($anEvent['UID'])) {
                                     $searchDate = $anEvent['DTSTART'];
                                     if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                        $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                        $timeZone = $this->escapeParamText($anEvent['DTSTART_array'][0]['TZID']);
+                                        $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $searchDate;
                                     }
 
                                     if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                        $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate, true, true);
+                                        $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate);
                                         if (in_array($searchDateUtc, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                             $isExcluded = true;
                                         }
@@ -1511,11 +1485,12 @@ class ICal
                                         if (isset($anEvent['UID'])) {
                                             $searchDate = $anEvent['DTSTART'];
                                             if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                                $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                                $timeZone = $this->escapeParamText($anEvent['DTSTART_array'][0]['TZID']);
+                                                $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $searchDate;
                                             }
 
                                             if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                                $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate, true, true);
+                                                $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate);
                                                 if (in_array($searchDateUtc, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                                     $isExcluded = true;
                                                 }
@@ -1584,12 +1559,13 @@ class ICal
                                             $anEvent['DTEND_array'][2]   = $this->iCalDateToUnixTimestamp($anEvent['DTEND']);
 
                                             // Ensure recurring timestamp confirms to BYMONTHDAY rule
-                                            $monthRecurringTimestamp = $this->iCalDateToUnixTimestamp(
-                                                gmdate(
-                                                    'Ym' . sprintf('%02d', $monthday) . '\T' . self::TIME_FORMAT,
-                                                    $recurringTimestamp
-                                                ) . (($initialStartTimeZoneName === 'Z') ? 'Z' : '')
+                                            $monthRecurringDateTime = new \DateTime('@' . $recurringTimestamp);
+                                            $monthRecurringDateTime->setDate(
+                                                $monthRecurringDateTime->format('Y'),
+                                                $monthRecurringDateTime->format('m'),
+                                                $monthday
                                             );
+                                            $monthRecurringTimestamp = $monthRecurringDateTime->getTimestamp();
                                         }
 
                                         // Adjust time zone from initial event
@@ -1625,11 +1601,12 @@ class ICal
                                             if (isset($anEvent['UID'])) {
                                                 $searchDate = $anEvent['DTSTART'];
                                                 if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                                    $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                                    $timeZone = $this->escapeParamText($anEvent['DTSTART_array'][0]['TZID']);
+                                                    $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $searchDate;
                                                 }
 
                                                 if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                                    $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate, true, true);
+                                                    $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate);
                                                     if (in_array($searchDateUtc, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                                         $isExcluded = true;
                                                     }
@@ -1716,11 +1693,12 @@ class ICal
                                             if (isset($anEvent['UID'])) {
                                                 $searchDate = $anEvent['DTSTART'];
                                                 if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                                    $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                                    $timeZone = $this->escapeParamText($anEvent['DTSTART_array'][0]['TZID']);
+                                                    $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $searchDate;
                                                 }
 
                                                 if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                                    $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate, true, true);
+                                                    $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate);
                                                     if (in_array($searchDateUtc, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                                         $isExcluded = true;
                                                     }
@@ -1828,11 +1806,12 @@ class ICal
                                                 if (isset($anEvent['UID'])) {
                                                     $searchDate = $anEvent['DTSTART'];
                                                     if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                                        $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                                        $timeZone = $this->escapeParamText($anEvent['DTSTART_array'][0]['TZID']);
+                                                        $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $searchDate;
                                                     }
 
                                                     if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                                        $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate, true, true);
+                                                        $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate);
                                                         if (in_array($searchDateUtc, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                                             $isExcluded = true;
                                                         }
@@ -1910,11 +1889,12 @@ class ICal
                                             if (isset($anEvent['UID'])) {
                                                 $searchDate = $anEvent['DTSTART'];
                                                 if (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-                                                    $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $anEvent['DTSTART_array'][0]['TZID']) . $searchDate;
+                                                    $timeZone = $this->escapeParamText($anEvent['DTSTART_array'][0]['TZID']);
+                                                    $searchDate = sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone) . $searchDate;
                                                 }
 
                                                 if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                                    $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate, true, true);
+                                                    $searchDateUtc = $this->iCalDateToUnixTimestamp($searchDate);
                                                     if (in_array($searchDateUtc, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
                                                         $isExcluded = true;
                                                     }
@@ -2015,8 +1995,9 @@ class ICal
         foreach (array('DTSTART', 'DTEND', 'RECURRENCE-ID') as $type) {
             if (isset($event["{$type}_array"])) {
                 $timeZone = (isset($event["{$type}_array"][0]['TZID'])) ? $event["{$type}_array"][0]['TZID'] : $calendarTimeZone;
+                $timeZone = $this->escapeParamText($timeZone);
                 $event["{$type}_array"][$index] = ((is_null($timeZone)) ? '' : sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone)) . $event["{$type}_array"][1];
-                $event["{$type}_array"][2] = $this->iCalDateToUnixTimestamp($event["{$type}_array"][3], true, true);
+                $event["{$type}_array"][2] = $this->iCalDateToUnixTimestamp($event["{$type}_array"][3]);
             }
         }
 
@@ -2603,6 +2584,21 @@ class ICal
         }
 
         return $subject;
+    }
+
+    /**
+     * Places double-quotes around texts that have characters not permitted
+     * in parameter-texts, but are permitted in quoted-texts.
+     *
+     * @param  string $candidateText
+     * @return string
+     */
+    protected function escapeParamText($candidateText)
+    {
+        if (strpbrk($candidateText, ':;,') !== false) {
+            return '"' . $candidateText . '"';
+        }
+        return $candidateText;
     }
 
     /**
