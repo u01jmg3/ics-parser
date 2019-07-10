@@ -1006,7 +1006,7 @@ class ICal
     /**
      * Returns a `DateTime` object from an iCal date time format
      *
-     * @param  string  $icalDate
+     * @param  string $icalDate
      * @return \DateTime
      * @throws \Exception
      */
@@ -1036,7 +1036,7 @@ class ICal
         }
 
         if (!empty($date[1])) {
-            $date[1] = trim($date[1], "\"");
+            $date[1] = trim($date[1], '"');
         }
 
         // A Unix timestamp usually cannot represent a date prior to 1 Jan 1970.
@@ -1069,7 +1069,7 @@ class ICal
     /**
      * Returns a Unix timestamp from an iCal date time format
      *
-     * @param  string  $icalDate
+     * @param  string $icalDate
      * @return integer
      */
     public function iCalDateToUnixTimestamp($icalDate)
@@ -1299,8 +1299,8 @@ class ICal
                     if (isset($rrules['UNTIL'])) {
                         // Get Until
                         $until = strtotime($rrules['UNTIL']);
-                        if ($until > strtotime('+' . $this->defaultSpan  . ' years')) {
-                            $until = strtotime('+' . $this->defaultSpan  . ' years');
+                        if ($until > strtotime('+' . $this->defaultSpan . ' years')) {
+                            $until = strtotime('+' . $this->defaultSpan . ' years');
                         }
                     } elseif (isset($rrules['COUNT'])) {
                         $countOrig = (is_numeric($rrules['COUNT']) && $rrules['COUNT'] > 1) ? $rrules['COUNT'] : 0;
@@ -2598,6 +2598,7 @@ class ICal
         if (strpbrk($candidateText, ':;,') !== false) {
             return '"' . $candidateText . '"';
         }
+
         return $candidateText;
     }
 
