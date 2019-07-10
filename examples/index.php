@@ -22,8 +22,6 @@ try {
 } catch (\Exception $e) {
     die($e);
 }
-
-$forceTimeZone = false;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -81,7 +79,7 @@ $forceTimeZone = false;
             <div class="thumbnail">
                 <div class="caption">
                     <h3><?php
-                        $dtstart = $ical->iCalDateToDateTime($event->dtstart_array[3], $forceTimeZone);
+                        $dtstart = $ical->iCalDateToDateTime($event->dtstart_array[3]);
                         echo $event->summary . ' (' . $dtstart->format('d-m-Y H:i') . ')';
                     ?></h3>
                     <?php echo $event->printData() ?>
@@ -118,7 +116,7 @@ $forceTimeZone = false;
             <div class="thumbnail">
                 <div class="caption">
                     <h3><?php
-                        $dtstart = $ical->iCalDateToDateTime($event->dtstart_array[3], $forceTimeZone);
+                        $dtstart = $ical->iCalDateToDateTime($event->dtstart_array[3]);
                         echo $event->summary . ' (' . $dtstart->format('d-m-Y H:i') . ')';
                     ?></h3>
                     <?php echo $event->printData() ?>
@@ -154,7 +152,7 @@ $forceTimeZone = false;
             <div class="thumbnail">
                 <div class="caption">
                     <h3><?php
-                        $dtstart = $ical->iCalDateToDateTime($event->dtstart_array[3], $forceTimeZone);
+                        $dtstart = $ical->iCalDateToDateTime($event->dtstart_array[3]);
                         echo $event->summary . ' (' . $dtstart->format('d-m-Y H:i') . ')';
                     ?></h3>
                     <?php echo $event->printData() ?>
