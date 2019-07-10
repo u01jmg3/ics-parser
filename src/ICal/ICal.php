@@ -1176,6 +1176,7 @@ class ICal
                 if ((bool) array_product($checks)) {
                     $eventDtstartUnix = $this->iCalDateToUnixTimestamp($event['DTSTART_array'][3]);
 
+                    // phpcs:ignore CustomPHPCS.ControlStructures.AssignmentInCondition
                     if (false !== $alteredEventKey = array_search($eventDtstartUnix, $this->alteredRecurrenceInstances[$event['UID']])) {
                         $eventKeysToRemove[] = $alteredEventKey;
 
@@ -2475,7 +2476,7 @@ class ICal
         $dayOrdinals = $this->dayOrdinals;
 
         if ($dayNumber >= -1) {
-            $dayOrdinal = $dayNumber === -1 ? 'last' : $dayOrdinals[$dayNumber];
+            $dayOrdinal = ($dayNumber === -1) ? 'last' : $dayOrdinals[$dayNumber];
 
             if ($weekday === 'weekday') {
                 $dayOrdinal = "-1 day {$dayOrdinal}";
@@ -2752,6 +2753,7 @@ class ICal
 
         $context = stream_context_create($options);
 
+        // phpcs:ignore CustomPHPCS.ControlStructures.AssignmentInCondition
         if (($lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES, $context)) === false) {
             throw new \Exception("The file path or URL '{$filename}' does not exist.");
         }
