@@ -1444,7 +1444,7 @@ class ICal
                             }
 
                             // Get timestamp of first day of start week
-                            $weekRecurringTimestamp = (strcasecmp($initialStart->format('l'), $this->weekdays[$wkst]) === 0)
+                            $weekRecurringTimestamp = (strcasecmp($initialStart->format('l'), explode(' ', $this->weekdays[$wkst])[0]) === 0)
                                 ? $startTimestamp
                                 : strtotime("last {$days[$wkst]} " . $initialStart->format('H:i:s'), $startTimestamp);
 
