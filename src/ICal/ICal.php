@@ -2376,28 +2376,4 @@ class ICal
 
         return new \DateTimeZone($this->defaultTimeZone);
     }
-
-    /**
-     * Checks if an excluded date matches a given date by reconciling time zones.
-     *
-     * @param  Carbon  $exdate
-     * @param  array   $anEvent
-     * @return boolean
-     */
-    protected function isExdateMatch($exdate, array $anEvent) // phpcs:ignore Squiz.Commenting.FunctionComment.TypeHintMissing
-    {
-        $searchDate = $anEvent['DTSTART'];
-
-        if (substr($searchDate, -1) === 'Z') {
-            $timeZone = self::TIME_ZONE_UTC;
-        } elseif (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-            $timeZone = $this->timeZoneStringToDateTimeZone($anEvent['DTSTART_array'][0]['TZID']);
-        } else {
-            $timeZone = $this->defaultTimeZone;
-        }
-
-        $a = new Carbon($searchDate, $timeZone);
-
-        return $a->eq($exdate);
-    }
 }
