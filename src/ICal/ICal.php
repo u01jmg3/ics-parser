@@ -134,11 +134,11 @@ class ICal
     protected $lastKeyword;
 
     /**
-     * Cache valid time zones to avoid unnecessary lookups
+     * Cache valid IANA timezone IDs to avoid unnecessary lookups
      *
      * @var array
      */
-    protected $validTimeZones = array();
+    protected $validIanaTimeZones = array();
 
     /**
      * Event recurrence instances that have been altered
@@ -2320,7 +2320,7 @@ class ICal
      */
     protected function isValidIanaTimeZoneId($timeZone)
     {
-        if (in_array($timeZone, $this->validTimeZones)) {
+        if (in_array($timeZone, $this->validIanaTimeZones)) {
             return true;
         }
 
@@ -2336,7 +2336,7 @@ class ICal
         unset($valid['']);
 
         if (isset($valid[$timeZone]) || in_array($timeZone, timezone_identifiers_list(\DateTimeZone::ALL_WITH_BC))) {
-            $this->validTimeZones[] = $timeZone;
+            $this->validIanaTimeZones[] = $timeZone;
 
             return true;
         }
