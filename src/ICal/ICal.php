@@ -1268,7 +1268,7 @@ class ICal
             return;
         }
 
-        $allRecurrenceEvents = array();
+        $allEventRecurrences = array();
 
         foreach ($events as $anEvent) {
             if (!isset($anEvent['RRULE']) || $anEvent['RRULE'] === '') {
@@ -1379,153 +1379,69 @@ class ICal
 
             $eventRecurrences = array();
 
-            // phpcs:ignore Squiz.ControlStructures.SwitchDeclaration.MissingDefault
-            switch ($frequency) {
-                case 'DAILY':
-                {
-                    $dailyRecurringDatetime = \DateTime::createFromImmutable($initialImmutableDate);
-                    $offset = "+{$interval} day";
+            $frequencyRecurringDateTime = \DateTime::createFromImmutable($initialImmutableDate);
+            while ($frequencyRecurringDateTime->getTimestamp() <= $until) {
+                $candidateDateTimes = [];
 
-                    while ($dailyRecurringDatetime->getTimestamp() <= $until) {
-
-                        $recurringTimestamp = $dailyRecurringDatetime->getTimestamp();
-                        if ($recurringTimestamp <= $initialImmutableDate->getTimestamp()) {
-                            $dailyRecurringDatetime->modify($offset);
-                            continue;
-                        }
-
-                        if ($recurringTimestamp > $until) {
-                            break;
-                        }
-
-                        // Exclusions
-                        $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent) {
-                            return self::isExdateMatch($exdate, $anEvent);
-                        });
-
-                        if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                            if (in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                $isExcluded = true;
-                            }
-                        }
-
-                        if (!$isExcluded) {
-                            $eventRecurrences[] = clone $dailyRecurringDatetime;
-                            $this->eventCount++;
-
-                            if (isset($rrules['COUNT'])) {
-                                $count++;
-
-                                if ($count >= $countLimit) {
-                                    break;
-                                }
-                            }
-                        }
-
-                        // Move forwards $interval day(s)
-                        $dailyRecurringDatetime->modify($offset);
+                // phpcs:ignore Squiz.ControlStructures.SwitchDeclaration.MissingDefault
+                switch ($frequency) {
+                    case 'DAILY':
+                    {
+                        $candidateDateTimes[] = clone $frequencyRecurringDateTime;
+                        break;
                     }
-                    break;
-                }
 
-                case 'WEEKLY':
-                {
-                    $weeklyRecurringDatetime = \DateTime::createFromImmutable($initialImmutableDate);
+                    case 'WEEKLY':
+                    {
+                        $matching_days = array($frequencyRecurringDateTime->format('N'));
+                        if (!empty($rrules['BYDAY'])) {
 
-                    $matching_days = array($weeklyRecurringDatetime->format('N'));
-                    if (!empty($rrules['BYDAY'])) {
+                            // setISODate below uses the ISO-8601 specification of weeks: start on
+                            // a Monday, end on a Sunday. However, RRULEs may state an alternate
+                            // WeekStart. In this case, we need to determine the point where days
+                            // that ordinarily come after Monday now come before Monday.
+                            $wkstTransition = 7;
+                            if (!empty($rrules['WKST']) && $rrules['WKST'] != "MO") {
+                                $wkstTransition = array_search($rrules['WKST'], $this->weeks['MO']);
+                            }
 
-                        // setISODate below uses the ISO-8601 specification of weeks: start on
-                        // a Monday, end on a Sunday. However, RRULEs may state an alternate
-                        // WeekStart. In this case, we need to determine the point where days
-                        // that ordinarily come after Monday now come before Monday.
-                        $wkstTransition = 7;
-                        if (!empty($rrules['WKST']) && $rrules['WKST'] != "MO") {
-                            $wkstTransition = array_search($rrules['WKST'], $this->weeks['MO']);
+                            $matching_days = array_map(
+                                function ($weekday) use ($wkstTransition) {
+                                    $day = array_search(substr($weekday, -2), $this->weeks['MO']);
+                                    if ($day >= $wkstTransition) {
+                                        $day -= 7;
+                                    }
+
+                                    // Ignoring alternate week starts, $day at this point will have a
+                                    // value between 0 and 6. But setISODate expects a value 1 to 7.
+                                    // Even with alternate week starts, we still need to +1 to set the
+                                    // correct weekday.
+                                    return $day + 1;
+                                },
+                                $rrules['BYDAY']
+                            );
                         }
-
-                        $matching_days = array_map(
-                            function ($weekday) use ($wkstTransition) {
-                                $day = array_search(substr($weekday, -2), $this->weeks['MO']);
-                                if ($day >= $wkstTransition) {
-                                    $day -= 7;
-                                }
-
-                                // Ignoring alternate week starts, $day at this point will have a
-                                // value between 0 and 6. But setISODate expects a value 1 to 7.
-                                // Even with alternate week starts, we still need to +1 to set the
-                                // correct weekday.
-                                return $day + 1;
-                            },
-                            $rrules['BYDAY']
-                        );
-                    }
-                    sort($matching_days);
-
-                    // Step through weeks
-                    while ($weeklyRecurringDatetime->getTimestamp() <= $until) {
+                        sort($matching_days);
 
                         foreach ($matching_days as $day) {
-                            $recurringDatetime = (clone $weeklyRecurringDatetime)->setISODate(
-                                $weeklyRecurringDatetime->format('Y'),
-                                $weeklyRecurringDatetime->format('W'),
+                            $candidateDateTimes[] = (clone $frequencyRecurringDateTime)->setISODate(
+                                $frequencyRecurringDateTime->format('Y'),
+                                $frequencyRecurringDateTime->format('W'),
                                 $day
                             );
-
-                            $recurringTimestamp = $recurringDatetime->getTimestamp();
-                            if ($recurringTimestamp <= $initialImmutableDate->getTimestamp()) {
-                                continue;
-                            }
-
-                            if ($recurringTimestamp > $until) {
-                                break;
-                            }
-
-                            // Exclusions
-                            $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent) {
-                                return self::isExdateMatch($exdate, $anEvent);
-                            });
-
-                            if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                if (in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                    $isExcluded = true;
-                                }
-                            }
-
-                            if (!$isExcluded) {
-                                $eventRecurrences[] = $recurringDatetime;
-                                $this->eventCount++;
-
-                                // If RRULE[COUNT] is reached then break
-                                if (isset($rrules['COUNT'])) {
-                                    $count++;
-
-                                    if ($count >= $countLimit) {
-                                        break 2;
-                                    }
-                                }
-                            }
                         }
 
-                        // Move forwards $interval week(s)
-                        $weeklyRecurringDatetime->modify("+{$interval} week");
+                        break;
                     }
-                    break;
-                }
 
-                case 'MONTHLY':
-                {
-                    $monthlyRecurringDatetime = \DateTime::createFromImmutable($initialImmutableDate);
-
-                    while ($monthlyRecurringDatetime->getTimestamp() <= $until) {
-                        $recurringDatetimes = array();
-
+                    case 'MONTHLY':
+                    {
                         $matching_days = array();
 
                         if (!empty($rrules['BYMONTHDAY'])) {
                             $matching_days = $rrules['BYMONTHDAY'];
                         } else if (!empty($rrules['BYDAY'])) {
-                            $matching_days = $this->getDaysOfMonthMatchingByDayRRule($rrules['BYDAY'], $monthlyRecurringDatetime);
+                            $matching_days = $this->getDaysOfMonthMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime);
                         }
 
                         if (!empty($rrules['BYSETPOS'])) {
@@ -1535,71 +1451,27 @@ class ICal
                         foreach ($matching_days as $day) {
 
                             // Skip invalid dates (eg. 30th February)
-                            if ($day > $monthlyRecurringDatetime->format('t')) {
+                            if ($day > $frequencyRecurringDateTime->format('t')) {
                                 continue;
                             }
 
-                            $recurringDatetime = (clone $monthlyRecurringDatetime)->setDate(
-                                $monthlyRecurringDatetime->format('Y'),
-                                $monthlyRecurringDatetime->format('m'),
+                            $candidateDateTimes[] = (clone $frequencyRecurringDateTime)->setDate(
+                                $frequencyRecurringDateTime->format('Y'),
+                                $frequencyRecurringDateTime->format('m'),
                                 $day
                             );
-
-                            $recurringTimestamp = $recurringDatetime->getTimestamp();
-                            if ($recurringTimestamp <= $initialImmutableDate->getTimestamp()) {
-                                continue;
-                            }
-
-                            if ($recurringTimestamp > $until) {
-                                break;
-                            }
-
-                            // Exclusions
-                            $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent) {
-                                return self::isExdateMatch($exdate, $anEvent);
-                            });
-
-                            if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                if (in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                    $isExcluded = true;
-                                }
-                            }
-
-                            if (!$isExcluded) {
-                                $eventRecurrences[] = $recurringDatetime;
-                                $this->eventCount++;
-
-                                if (isset($rrules['COUNT'])) {
-                                    $count++;
-
-                                    if ($count >= $countLimit) {
-                                        break 2;
-                                    }
-                                }
-                            }
                         }
-
-                        // Move forwards $interval month(s)
-                        $monthlyRecurringDatetime->modify("+{$interval} month");
+                        break;
                     }
-                    break;
-                }
 
-                case 'YEARLY':
-                {
-                    $yearlyRecurringDatetime = \DateTime::createFromImmutable($initialImmutableDate);
-
-                    // Step through years
-                    while ($yearlyRecurringDatetime->getTimestamp() <= $until) {
-
-                        $recurringDatetimes = array();
+                    case 'YEARLY':
+                    {
                         if (!empty($rrules['BYMONTH'])) {
-
                             foreach ($rrules['BYMONTH'] as $bymonth) {
-                                $bymonthRecurringDatetime = (clone $yearlyRecurringDatetime)->setDate(
-                                    $yearlyRecurringDatetime->format('Y'),
+                                $bymonthRecurringDatetime = (clone $frequencyRecurringDateTime)->setDate(
+                                    $frequencyRecurringDateTime->format('Y'),
                                     $bymonth,
-                                    $yearlyRecurringDatetime->format('d')
+                                    $frequencyRecurringDateTime->format('d')
                                 );
 
                                 if (!empty($rrules['BYDAY'])) {
@@ -1609,61 +1481,75 @@ class ICal
 
                                     // And add each of them to the list of recurrences
                                     foreach ($matching_days as $day) {
-                                        $recurringDatetimes[] = clone $bymonthRecurringDatetime->setDate(
-                                            $yearlyRecurringDatetime->format('Y'),
+                                        $candidateDateTimes[] = clone $bymonthRecurringDatetime->setDate(
+                                            $frequencyRecurringDateTime->format('Y'),
                                             $bymonthRecurringDatetime->format('m'),
                                             $day
                                         );
                                     }
                                 } else {
-                                    $recurringDatetimes[] = clone $bymonthRecurringDatetime;
+                                    $candidateDateTimes[] = clone $bymonthRecurringDatetime;
                                 }
                             }
                         } else {
-                            $recurringDatetimes[] = clone $yearlyRecurringDatetime;
+                            $candidateDateTimes[] = clone $frequencyRecurringDateTime;
                         }
-
-                        foreach ($recurringDatetimes as $recurringDatetime) {
-
-                            $recurringTimestamp = $recurringDatetime->getTimestamp();
-                            if ($recurringTimestamp <= $initialImmutableDate->getTimestamp()) {
-                                continue;
-                            }
-
-                            if ($recurringTimestamp > $until) {
-                                break;
-                            }
-
-                            // Exclusions
-                            $isExcluded = array_filter($exdates, function ($exdate) use ($anEvent) {
-                                return self::isExdateMatch($exdate, $anEvent);
-                            });
-
-                            if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                if (in_array($recurringTimestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
-                                    $isExcluded = true;
-                                }
-                            }
-
-                            if (!$isExcluded) {
-                                $eventRecurrences[] = $recurringDatetime;
-                                $this->eventCount++;
-
-                                if (isset($rrules['COUNT'])) {
-                                    $count++;
-
-                                    // If RRULE[COUNT] is reached then break
-                                    if ($count >= $countLimit) {
-                                        break 2;
-                                    }
-                                }
-                            }
-                        }
-
-                        // Move forwards $interval year(s).
-                        $yearlyRecurringDatetime->modify("+{$interval} year");
+                        break;
                     }
-                    break;
+                }
+
+                foreach ($candidateDateTimes as $candidate) {
+
+                    $timestamp = $candidate->getTimestamp();
+                    if ($timestamp <= $initialImmutableDate->getTimestamp()) {
+                        continue;
+                    }
+
+                    if ($timestamp > $until) {
+                        break;
+                    }
+
+                    // Exclusions
+                    $isExcluded = array_filter($exdates, function ($exdate) use ($timestamp) {
+                        return $exdate->getTimestamp() == $timestamp;
+                    });
+
+                    if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                        if (in_array($timestamp, $this->alteredRecurrenceInstances[$anEvent['UID']])) {
+                            $isExcluded = true;
+                        }
+                    }
+
+                    if (!$isExcluded) {
+                        $eventRecurrences[] = $candidate;
+                        $this->eventCount++;
+
+                        if (isset($rrules['COUNT'])) {
+                            $count++;
+
+                            // If RRULE[COUNT] is reached then break
+                            if ($count >= $countLimit) {
+                                break 2;
+                            }
+                        }
+                    }
+                }
+
+                // Move forwards $interval $frequency.
+                $monthPreMove = $frequencyRecurringDateTime->format("m");
+                $frequencyRecurringDateTime->modify($interval . ' ' . $this->frequencyConversion[$frequency]);
+
+                // As noted in Example #2 on https://www.php.net/manual/en/datetime.modify.php,
+                // there are some occasions where adding months doesn't give the month you might
+                // expect. For instance: January 31st + 1 month == March 3rd (March 2nd on a leap
+                // year.) The following code crudely rectifies this.
+                if ($frequency == "MONTHLY") {
+                    $monthDiff = $frequencyRecurringDateTime->format("m") - $monthPreMove;
+
+                    if (($monthDiff > 0 && $monthDiff > $interval)
+                        || ($monthDiff < 0 && $monthDiff > $interval - 12)) {
+                        $frequencyRecurringDateTime->modify("-1 month");
+                    }
                 }
             }
 
@@ -1689,7 +1575,7 @@ class ICal
             }
 
             // Populate the `DT{START|END}[_array]`s
-            $recurrenceEvents = array_map(
+            $eventRecurrences = array_map(
                 function($recurringDatetime) use ($anEvent, $eventLength, $initialDateWasUTC, $dateParamArray) {
                     $tzidPrefix = (isset($dateParamArray['TZID'])) ? 'TZID=' . $this->escapeParamText($dateParamArray['TZID']) . ':' : '';
 
@@ -1713,11 +1599,10 @@ class ICal
                 $eventRecurrences
             );
 
-            $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
-
+            $allEventRecurrences = array_merge($allEventRecurrences, $eventRecurrences);
         }
 
-        $events = array_merge($events, $allRecurrenceEvents);
+        $events = array_merge($events, $allEventRecurrences);
 
         $this->cal['VEVENT'] = $events;
     }
