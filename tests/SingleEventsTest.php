@@ -115,7 +115,6 @@ class SingleEventsTest extends TestCase
             'disableCharacterReplacement' => false,            // Default value
             'filterDaysAfter'             => null,             // Default value
             'filterDaysBefore'            => null,             // Default value
-            'replaceWindowsTimeZoneIds'   => false,            // Default value
             'skipRecurrence'              => false,            // Default value
             'useTimeZoneWithRRules'       => false,            // Default value
         );
