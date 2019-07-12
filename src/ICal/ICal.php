@@ -134,7 +134,7 @@ class ICal
     protected $lastKeyword;
 
     /**
-     * Cache valid IANA timezone IDs to avoid unnecessary lookups
+     * Cache valid IANA time zone IDs to avoid unnecessary lookups
      *
      * @var array
      */
@@ -252,7 +252,7 @@ class ICal
     );
 
     /**
-     * CLDR timezones mapped to IANA timezones.
+     * CLDR time zones mapped to IANA time zones.
      *
      * @var array
      */
@@ -1127,7 +1127,7 @@ class ICal
         if ($date[4] === 'Z') {
             $dateTimeZone = new \DateTimeZone(self::TIME_ZONE_UTC);
         } elseif (!empty($date[1])) {
-            $dateTimeZone = $this->timezoneStringToDateTimeZone($date[1]);
+            $dateTimeZone = $this->timeZoneStringToDateTimeZone($date[1]);
         } else {
             $dateTimeZone = new \DateTimeZone($this->defaultTimeZone);
         }
@@ -1182,7 +1182,7 @@ class ICal
 
         // Force time zone
         if (isset($dateArray[0]['TZID'])) {
-            $dateTime->setTimezone($this->timezoneStringToDateTimeZone($dateArray[0]['TZID']));
+            $dateTime->setTimezone($this->timeZoneStringToDateTimeZone($dateArray[0]['TZID']));
         }
 
         if (is_null($format)) {
@@ -2136,8 +2136,8 @@ class ICal
             $timeZone = $this->defaultTimeZone;
         }
 
-        // Validate the timezone, falling back to the timezone set in the php environment.
-        $timeZone = $this->timezoneStringToDateTimeZone($timeZone)->getName();
+        // Validate the time zone, falling back to the time zone set in the PHP environment.
+        $timeZone = $this->timeZoneStringToDateTimeZone($timeZone)->getName();
 
         if ($ignoreUtc && strtoupper($timeZone) === self::TIME_ZONE_UTC) {
             return null;
@@ -2347,7 +2347,7 @@ class ICal
     /**
      * Checks if a time zone is a valid CLDR time zone
      *
-     * @param  string  $timeZone
+     * @param  string $timeZone
      * @return boolean
      */
     public function isValidCldrTimeZoneId($timeZone)
@@ -2358,7 +2358,7 @@ class ICal
     /**
      * Checks if a time zone is a recognised Windows (non-CLDR) time zone
      *
-     * @param  string  $timeZone
+     * @param  string $timeZone
      * @return boolean
      */
     public function isValidWindowsTimeZoneId($timeZone)
@@ -2623,7 +2623,7 @@ class ICal
 
             foreach ($subArray as $key => $value) {
                 if ($key === 'TZID') {
-                    $currentTimeZone = $this->timezoneStringToDateTimeZone($subArray[$key]);
+                    $currentTimeZone = $this->timeZoneStringToDateTimeZone($subArray[$key]);
                 } elseif (is_numeric($key)) {
                     $icalDate = $subArray[$key];
 
@@ -2715,31 +2715,31 @@ class ICal
     }
 
     /**
-     * Returns a `DateTimeZone` object based on a string containing a timezone name.
+     * Returns a `DateTimeZone` object based on a string containing a time zone name.
      *
-     * Falls back to the default timezone if string passed not a recognised timezone.
+     * Falls back to the default time zone if string passed not a recognised time zone.
      *
-     * @param  string  $timezoneString
+     * @param  string $timeZoneString
      * @return \DateTimeZone
      */
-    public function timezoneStringToDateTimeZone($timezoneString)
+    public function timeZoneStringToDateTimeZone($timeZoneString)
     {
-        // Some timezones contain characters that are not permitted in param-texts,
+        // Some time zones contain characters that are not permitted in param-texts,
         // but are within quoted texts. We need to remove the quotes as they're not
-        // actually part of the timezone.
-        $timezoneString = trim($timezoneString, '"');
-        $timezoneString = html_entity_decode($timezoneString);
+        // actually part of the time zone.
+        $timeZoneString = trim($timeZoneString, '"');
+        $timeZoneString = html_entity_decode($timeZoneString);
 
-        if ($this->isValidIanaTimeZoneId($timezoneString)) {
-            return new \DateTimeZone($timezoneString);
+        if ($this->isValidIanaTimeZoneId($timeZoneString)) {
+            return new \DateTimeZone($timeZoneString);
         }
 
-        if ($this->isValidCldrTimeZoneId($timezoneString)) {
-            return new \DateTimeZone(self::$cldrTimeZonesMap[$timezoneString]);
+        if ($this->isValidCldrTimeZoneId($timeZoneString)) {
+            return new \DateTimeZone(self::$cldrTimeZonesMap[$timeZoneString]);
         }
 
-        if ($this->isValidWindowsTimeZoneId($timezoneString)) {
-            return new \DateTimeZone(self::$windowsTimeZonesMap[$timezoneString]);
+        if ($this->isValidWindowsTimeZoneId($timeZoneString)) {
+            return new \DateTimeZone(self::$windowsTimeZonesMap[$timeZoneString]);
         }
 
         return new \DateTimeZone($this->defaultTimeZone);
@@ -2782,7 +2782,7 @@ class ICal
         if (substr($searchDate, -1) === 'Z') {
             $timeZone = self::TIME_ZONE_UTC;
         } elseif (isset($anEvent['DTSTART_array'][0]['TZID'])) {
-            $timeZone = $this->timezoneStringToDateTimeZone($anEvent['DTSTART_array'][0]['TZID']);
+            $timeZone = $this->timeZoneStringToDateTimeZone($anEvent['DTSTART_array'][0]['TZID']);
         } else {
             $timeZone = $this->defaultTimeZone;
         }
