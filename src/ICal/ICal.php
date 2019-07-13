@@ -2054,50 +2054,6 @@ class ICal
     }
 
     /**
-     * Converts a negative day ordinal to
-     * its equivalent positive form
-     *
-     * @param  integer           $dayNumber
-     * @param  integer           $weekday
-     * @param  integer|\DateTime $timestamp
-     * @return string
-     */
-    protected function convertDayOrdinalToPositive($dayNumber, $weekday, $timestamp)
-    {
-        // 0 when no number is defined for BYDAY
-        $dayNumber = empty($dayNumber) ? 1 : intval($dayNumber);
-
-        $dayOrdinals = $this->dayOrdinals;
-
-        if ($dayNumber >= -1) {
-            $dayOrdinal = ($dayNumber === -1) ? 'last' : $dayOrdinals[$dayNumber];
-
-            if ($weekday === 'weekday') {
-                $dayOrdinal = "-1 day {$dayOrdinal}";
-            }
-
-            return $dayOrdinal;
-        }
-
-        $timestamp = (is_object($timestamp)) ? $timestamp : \DateTime::createFromFormat(self::UNIX_FORMAT, $timestamp);
-        $start     = strtotime('first day of ' . $timestamp->format(self::DATE_TIME_FORMAT_PRETTY));
-        $end       = strtotime('last day of ' . $timestamp->format(self::DATE_TIME_FORMAT_PRETTY));
-
-        // Used with pow(2, X) so pow(2, 4) is THURSDAY
-        $weekdays = array_flip(array_keys($this->weekdays));
-
-        $numberOfDays = $this->numberOfDays(pow(2, $weekdays[$weekday]), $start, $end);
-
-        // Create subset
-        $dayOrdinals = array_slice($dayOrdinals, 0, $numberOfDays, true);
-
-        // Reverse only the values
-        $dayOrdinals = array_combine(array_keys($dayOrdinals), array_reverse(array_values($dayOrdinals)));
-
-        return $dayOrdinals[$dayNumber * -1];
-    }
-
-    /**
      * Removes unprintable ASCII and UTF-8 characters
      *
      * @param  string $data
