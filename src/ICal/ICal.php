@@ -142,19 +142,6 @@ class ICal
     protected $alteredRecurrenceInstances = array();
 
     /**
-     * An associative array containing ordinal data
-     *
-     * @var array
-     */
-    protected $dayOrdinals = array(
-        1 => 'first',
-        2 => 'second',
-        3 => 'third',
-        4 => 'fourth',
-        5 => 'fifth',
-    );
-
-    /**
      * An associative array containing weekday conversion data
      *
      * @var array
@@ -181,26 +168,6 @@ class ICal
         'SA' => array('SA', 'SU', 'MO', 'TU', 'WE', 'TH', 'FR'),
         'SU' => array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'),
         'MO' => array('MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'),
-    );
-
-    /**
-     * An associative array containing month names
-     *
-     * @var array
-     */
-    protected $monthNames = array(
-        1  => 'January',
-        2  => 'February',
-        3  => 'March',
-        4  => 'April',
-        5  => 'May',
-        6  => 'June',
-        7  => 'July',
-        8  => 'August',
-        9  => 'September',
-        10 => 'October',
-        11 => 'November',
-        12 => 'December',
     );
 
     /**
