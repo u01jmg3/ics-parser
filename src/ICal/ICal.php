@@ -2031,29 +2031,6 @@ class ICal
     }
 
     /**
-     * Gets the number of days between a start and end date
-     *
-     * @param  integer $days
-     * @param  integer $start
-     * @param  integer $end
-     * @return integer
-     */
-    protected function numberOfDays($days, $start, $end)
-    {
-        $w    = array(date('w', $start), date('w', $end));
-        $base = floor(($end - $start) / self::SECONDS_IN_A_WEEK);
-        $sum  = 0;
-
-        for ($day = 0; $day < 7; ++$day) {
-            if ($days & pow(2, $day)) {
-                $sum += $base + (($w[0] > $w[1]) ? $w[0] <= $day || $day <= $w[1] : $w[0] <= $day && $day <= $w[1]);
-            }
-        }
-
-        return $sum;
-    }
-
-    /**
      * Removes unprintable ASCII and UTF-8 characters
      *
      * @param  string $data
