@@ -144,30 +144,18 @@ class ICal
     /**
      * An associative array containing weekday conversion data
      *
-     * @var array
-     */
-    protected $weekdays = array(
-        'SU'      => 'sunday of',
-        'MO'      => 'monday of',
-        'TU'      => 'tuesday of',
-        'WE'      => 'wednesday of',
-        'TH'      => 'thursday of',
-        'FR'      => 'friday of',
-        'SA'      => 'saturday of',
-        'day'     => 'day of',
-        'weekday' => 'weekday',
-    );
-
-    /**
-     * An associative array containing week conversion data
-     * (UK = SU, Europe = MO)
+     * The order of the days in the array follow the ISO-8601 specification of a week.
      *
      * @var array
      */
-    protected $weeks = array(
-        'SA' => array('SA', 'SU', 'MO', 'TU', 'WE', 'TH', 'FR'),
-        'SU' => array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'),
-        'MO' => array('MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'),
+    protected $weekdays = array(
+        'MO'      => 'monday',
+        'TU'      => 'tuesday',
+        'WE'      => 'wednesday',
+        'TH'      => 'thursday',
+        'FR'      => 'friday',
+        'SA'      => 'saturday',
+        'SU'      => 'sunday',
     );
 
     /**
@@ -1335,15 +1323,15 @@ class ICal
                             $wkstTransition = 7;
                             if (empty($rrules['WKST'])) {
                                 if ($this->defaultWeekStart != self::ISO_8601_WEEK_START) {
-                                    $wkstTransition = array_search($this->defaultWeekStart, $this->weeks[self::ISO_8601_WEEK_START]);
+                                    $wkstTransition = array_search($this->defaultWeekStart, array_keys($this->weekdays));
                                 }
                             } else if ($rrules['WKST'] != self::ISO_8601_WEEK_START) {
-                                $wkstTransition = array_search($rrules['WKST'], $this->weeks[self::ISO_8601_WEEK_START]);
+                                $wkstTransition = array_search($rrules['WKST'], array_keys($this->weekdays));
                             }
 
                             $matching_days = array_map(
                                 function ($weekday) use ($wkstTransition) {
-                                    $day = array_search($weekday, $this->weeks[self::ISO_8601_WEEK_START]);
+                                    $day = array_search($weekday, array_keys($this->weekdays));
                                     if ($day >= $wkstTransition) {
                                         $day -= 7;
                                     }
@@ -1580,9 +1568,9 @@ class ICal
             // Quantise the date to the first instance of the requested day in a month
             // (Or last if we have a -ve {ordwk})
             $bydayDateTime->modify(
-                ($ordwk < 0 ? "Last " : "First ")       // "Last" or "First"
-                . $this->weekdays[substr($weekday, -2)] // eg. "Monday of"
-                . " " . $initialDateTime->format('F')   // eg. "June"
+                ($ordwk < 0 ? "Last " : "First ")        // "Last" or "First"
+                . $this->weekdays[substr($weekday, -2)]  // eg. "Monday"
+                . " of " . $initialDateTime->format('F') // eg. "June"
             );
 
             if ($ordwk < 0) { // -ve {ordwk}
