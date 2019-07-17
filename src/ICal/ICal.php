@@ -1175,16 +1175,17 @@ class ICal
         if ($key === 'DURATION') {
             $dateTime = $this->parseDuration($event['DTSTART'], $dateArray[2], null);
         } else {
-            // When constructing from a Unix Timestamp, no timezone needs passing.
+            // When constructing from a Unix Timestamp, no time zone needs passing.
             $dateTime = new \DateTime('@' . $dateArray[2]);
         }
 
-        // Set the timezone we wish to use when running `$dateTime->format`.
+        // Set the time zone we wish to use when running `$dateTime->format`.
         $dateTime->setTimezone(new \DateTimeZone($this->calendarTimeZone()));
 
         if (is_null($format)) {
             return $dateTime;
         }
+
         return $dateTime->format($format);
     }
 
@@ -2706,7 +2707,6 @@ class ICal
 
     /**
      * Returns a `DateTimeZone` object based on a string containing a time zone name.
-     *
      * Falls back to the default time zone if string passed not a recognised time zone.
      *
      * @param  string $timeZoneString
