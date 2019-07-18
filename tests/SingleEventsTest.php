@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 
 class SingleEventsTest extends TestCase
 {
-    // phpcs:disable Generic.Arrays.DisallowLongArraySyntax.Found
+    // phpcs:disable Generic.Arrays.DisallowLongArraySyntax
 
     private $originalTimeZone = null;
 

@@ -16,7 +16,7 @@ use Carbon\Carbon;
 
 class ICal
 {
-    // phpcs:disable Generic.Arrays.DisallowLongArraySyntax.Found
+    // phpcs:disable Generic.Arrays.DisallowLongArraySyntax
 
     const DATE_TIME_FORMAT        = 'Ymd\THis';
     const DATE_TIME_FORMAT_PRETTY = 'F Y H:i:s';
@@ -1414,7 +1414,7 @@ class ICal
 
                     $until = intval($until);
 
-                    // Decide how often to add events and do so
+                    // phpcs:ignore Squiz.ControlStructures.SwitchDeclaration.MissingDefault
                     switch ($frequency) {
                         case 'DAILY':
                             // Simply add a new event each interval of days until UNTIL is reached

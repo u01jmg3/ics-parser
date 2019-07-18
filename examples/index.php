@@ -1,5 +1,5 @@
 <?php
-// phpcs:disable Generic.Arrays.DisallowLongArraySyntax.Found
+// phpcs:disable Generic.Arrays.DisallowLongArraySyntax
 
 require_once '../vendor/autoload.php';
 
