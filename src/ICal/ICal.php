@@ -1679,7 +1679,7 @@ class ICal
                                             }
 
                                             if (!$isExcluded) {
-                                                $anEvent = $this->processEventIcalDateTime($anEvent);
+                                                $anEvent            = $this->processEventIcalDateTime($anEvent);
                                                 $recurrenceEvents[] = $anEvent;
                                                 $this->eventCount++;
 
@@ -2148,7 +2148,7 @@ class ICal
     {
         $array = $this->cal;
 
-        return isset($array['VFREEBUSY']) ? $array['VFREEBUSY'] : [];
+        return isset($array['VFREEBUSY']) ? $array['VFREEBUSY'] : array();
     }
 
     /**
@@ -2512,8 +2512,8 @@ class ICal
             }
         } else {
             // Normalize $search and $replace so they are both arrays of the same length
-            $searches     = is_array($search) ? array_values($search) : [$search];
-            $replacements = is_array($replace) ? array_values($replace) : [$replace];
+            $searches     = is_array($search) ? array_values($search) : array($search);
+            $replacements = is_array($replace) ? array_values($replace) : array($replace);
             $replacements = array_pad($replacements, count($searches), '');
 
             foreach ($searches as $key => $search) {
@@ -2524,7 +2524,7 @@ class ICal
                 $replace   = $replacements[$key];
                 $searchLen = mb_strlen($search, $encoding);
 
-                $sb = [];
+                $sb = array();
                 while (($offset = mb_strpos($subject, $search, 0, $encoding)) !== false) {
                     $sb[]    = mb_substr($subject, 0, $offset, $encoding);
                     $subject = mb_substr($subject, $offset + $searchLen, null, $encoding);
