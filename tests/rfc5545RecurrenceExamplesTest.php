@@ -44,8 +44,7 @@ use PHPUnit\Framework\TestCase;
  *   have been similarly commented out and annotated with a ticket number
  *   (if one exists).
  */
-
-class rfc5545Examples extends TestCase
+class Rfc5545Examples extends TestCase
 {
     // phpcs:disable Generic.Arrays.DisallowLongArraySyntax
 
@@ -993,7 +992,7 @@ class rfc5545Examples extends TestCase
     }
 */
 
-    function assertVEVENT($defaultTimezone, $veventParts, $count, $checks)
+    public function assertVEVENT($defaultTimezone, $veventParts, $count, $checks)
     {
         $options = $this->getOptions($defaultTimezone);
 
@@ -1015,10 +1014,10 @@ class rfc5545Examples extends TestCase
         }
     }
 
-    function assertEvent($event, $expectedDateString, $message, $timezone = null)
+    public function assertEvent($event, $expectedDateString, $message, $timeZone = null)
     {
-        if ($timezone !== null) {
-            date_default_timezone_set($timezone);
+        if (!is_null($timeZone)) {
+            date_default_timezone_set($timeZone);
         }
 
         $expectedTimeStamp = strtotime($expectedDateString);
@@ -1027,22 +1026,23 @@ class rfc5545Examples extends TestCase
         $this->assertAttributeEquals($expectedDateString, 'dtstart', $event, $message . 'dtstart mismatch (timestamp is okay)');
     }
 
-    function getOptions($defaultTimezone)
+    public function getOptions($defaultTimezone)
     {
         $options = array(
-            'defaultSpan'                 => 2,                   // Default value: 2
-            'defaultTimeZone'             => $defaultTimezone,    // Default value: UTC
-            'defaultWeekStart'            => 'MO',                // Default value
-            'disableCharacterReplacement' => false,               // Default value
-            'filterDaysAfter'             => null,                // Default value
-            'filterDaysBefore'            => null,                // Default value
-            'replaceWindowsTimeZoneIds'   => false,               // Default value
-            'skipRecurrence'              => false,               // Default value
+            'defaultSpan'                 => 2,                // Default value: 2
+            'defaultTimeZone'             => $defaultTimezone, // Default value: UTC
+            'defaultWeekStart'            => 'MO',             // Default value
+            'disableCharacterReplacement' => false,            // Default value
+            'filterDaysAfter'             => null,             // Default value
+            'filterDaysBefore'            => null,             // Default value
+            'replaceWindowsTimeZoneIds'   => false,            // Default value
+            'skipRecurrence'              => false,            // Default value
         );
+
         return $options;
     }
 
-    function formatIcalEvent($veventParts)
+    public function formatIcalEvent($veventParts)
     {
         return array_merge(
             array(
@@ -1059,7 +1059,7 @@ class rfc5545Examples extends TestCase
         );
     }
 
-    function getIcalHeader()
+    public function getIcalHeader()
     {
         return array(
             'BEGIN:VCALENDAR',
@@ -1071,7 +1071,7 @@ class rfc5545Examples extends TestCase
         );
     }
 
-    function getIcalFooter()
+    public function getIcalFooter()
     {
         return array('END:VCALENDAR');
     }
