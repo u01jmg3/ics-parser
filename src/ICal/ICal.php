@@ -21,6 +21,7 @@ class ICal
     const DATE_TIME_FORMAT        = 'Ymd\THis';
     const DATE_TIME_FORMAT_PRETTY = 'F Y H:i:s';
     const ICAL_DATE_TIME_TEMPLATE = 'TZID=%s:';
+    const ISO_8601_WEEK_START     = 'MO';
     const RECURRENCE_EVENT        = 'Generated recurrence event';
     const SECONDS_IN_A_WEEK       = 604800;
     const TIME_FORMAT             = 'His';
@@ -75,7 +76,7 @@ class ICal
      *
      * @var string
      */
-    public $defaultWeekStart = 'MO';
+    public $defaultWeekStart = self::ISO_8601_WEEK_START;
 
     /**
      * Toggles whether to skip the parsing of recurrence rules
@@ -1397,17 +1398,22 @@ class ICal
                         if (!empty($rrules['BYDAY'])) {
 
                             // setISODate below uses the ISO-8601 specification of weeks: start on
-                            // a Monday, end on a Sunday. However, RRULEs may state an alternate
-                            // WeekStart. In this case, we need to determine the point where days
-                            // that ordinarily come after Monday now come before Monday.
+                            // a Monday, end on a Sunday. However, RRULEs (or the caller of the
+                            // parser) may state an alternate WeeKSTart. In this case, we need to
+                            // determine the point where days that ordinarily come after Monday now
+                            // come before Monday.
                             $wkstTransition = 7;
-                            if (!empty($rrules['WKST']) && $rrules['WKST'] != "MO") {
-                                $wkstTransition = array_search($rrules['WKST'], $this->weeks['MO']);
+                            if (empty($rrules['WKST'])) {
+                                if ($this->defaultWeekStart != self::ISO_8601_WEEK_START) {
+                                    $wkstTransition = array_search($this->defaultWeekStart, $this->weeks[self::ISO_8601_WEEK_START]);
+                                }
+                            } else if ($rrules['WKST'] != self::ISO_8601_WEEK_START) {
+                                $wkstTransition = array_search($rrules['WKST'], $this->weeks[self::ISO_8601_WEEK_START]);
                             }
 
                             $matching_days = array_map(
                                 function ($weekday) use ($wkstTransition) {
-                                    $day = array_search(substr($weekday, -2), $this->weeks['MO']);
+                                    $day = array_search(substr($weekday, -2), $this->weeks[self::ISO_8601_WEEK_START]);
                                     if ($day >= $wkstTransition) {
                                         $day -= 7;
                                     }

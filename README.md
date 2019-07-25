@@ -197,6 +197,7 @@ need to be evaluated before non-fitting events can be dropped.
 | `DATE_TIME_FORMAT_PRETTY` | Default pretty date time format to use        |
 | `DATE_TIME_FORMAT`        | Default date time format to use               |
 | `ICAL_DATE_TIME_TEMPLATE` | String template to generate an iCal date time |
+| `ISO_8601_WEEK_START`     | First day of the week, as defined by ISO-8601 |
 | `RECURRENCE_EVENT`        | Used to isolate generated recurrence events   |
 | `SECONDS_IN_A_WEEK`       | The number of seconds in a week               |
 | `TIME_FORMAT`             | Default time format to use                    |
