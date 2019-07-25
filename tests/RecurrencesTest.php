@@ -6,6 +6,9 @@ use PHPUnit\Framework\TestCase;
 class RecurrencesTest extends TestCase
 {
     // phpcs:disable Generic.Arrays.DisallowLongArraySyntax
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    // phpcs:disable Squiz.Commenting.FunctionComment
+    // phpcs:disable Squiz.Commenting.VariableComment
 
     private $useTimeZoneWithRRules = false;
     private $originalTimeZone = null;

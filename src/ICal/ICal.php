@@ -2473,7 +2473,7 @@ class ICal
      * @param  integer $code
      * @return string
      */
-    protected function mb_chr($code)
+    protected function mb_chr($code) // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     {
         if (function_exists('mb_chr')) {
             return mb_chr($code);
@@ -2503,7 +2503,7 @@ class ICal
      * @param  integer      $count
      * @return array|string
      */
-    protected static function mb_str_replace($search, $replace, $subject, $encoding = null, &$count = 0)
+    protected static function mb_str_replace($search, $replace, $subject, $encoding = null, &$count = 0) // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     {
         if (is_array($subject)) {
             // Call `mb_str_replace()` for each subject in the array, recursively
@@ -2765,7 +2765,7 @@ class ICal
      * @param  integer $recurringOffset
      * @return boolean
      */
-    protected function isExdateMatch($exdate, array $anEvent, $recurringOffset)
+    protected function isExdateMatch($exdate, array $anEvent, $recurringOffset) // phpcs:ignore Squiz.Commenting.FunctionComment.TypeHintMissing
     {
         $searchDate = $anEvent['DTSTART'];
 
