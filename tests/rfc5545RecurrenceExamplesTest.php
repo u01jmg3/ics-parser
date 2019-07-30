@@ -367,7 +367,8 @@ class Rfc5545Examples extends TestCase
         );
     }
 
-/*  Requires support for negative BYDAYs under MONTHLY [No ticket]
+/* 1. Requires support for multiple BYDAY rules under MONTHLY [#15]
+ * 2. Requires support for negative BYDAYs under MONTHLY [No ticket]
  *
     // Page 126, Test 4 :: First and last Sunday, every other Month, for 10 occurrences
     public function test_page126_test4()
@@ -438,7 +439,7 @@ class Rfc5545Examples extends TestCase
     }
 */
 
-/*  Requires support for multiple BYMONTHDAYs [#15]
+/*  Requires support for multiple BYMONTHDAYs [No ticket]
  *
     // Page 127, Test 2 :: 2nd and 15th of each Month, for 10 occurrences
     public function test_page127_test2()
@@ -462,7 +463,7 @@ class Rfc5545Examples extends TestCase
 */
 
 /*  1. Requires support for negative BYMONTHDAY rules [No ticket]
- *  2. Requires support for multiple BYMONTHDAYs [#15]
+ *  2. Requires support for multiple BYMONTHDAY rules [No ticket]
  *
     // Page 127, Test 3 :: First and last day of the month, for 10 occurrences
     public function test_page127_test3()
@@ -486,7 +487,7 @@ class Rfc5545Examples extends TestCase
     }
 */
 
-/*  Requires support for multiple BYMONTHDAY rules [#15]
+/*  Requires support for multiple BYMONTHDAY rules [No ticket]
  *
     // Page 127, Test 4 :: 10th through 15th, every 18 months, for 10 occurrences
     public function test_page127_test4()
@@ -756,7 +757,8 @@ class Rfc5545Examples extends TestCase
     }
 */
 
-/*  Support for BYSETPOS for BYDAY under MONTHLY is flawed [No ticket]
+/* 1. Requires support for multiple BYDAY rules under MONTHLY [#15]
+ * 2. Support for BYSETPOS for BYDAY under MONTHLY is flawed [No ticket]
  * (In this case, the parser is adding the 3rd Thursday of each month.)
  * (What's being asked for amounts to collating a list of all the Tuesdays, Wednesdays, and Thursdays in a month, sorted by date, and discarding all but the 3rd entry.)
  *
@@ -780,7 +782,8 @@ class Rfc5545Examples extends TestCase
     }
 */
 
-/*  Requires support for negative BYSETPOS under MONTHLY [No ticket]
+/*  1. Requires support for negative BYSETPOS under MONTHLY [No ticket]
+ *  2. Requires support for multiple BYDAY rules under MONTHLY [#15]
  *
     // Page 130, Test 4 :: Second-to-last weekday of the month, indefinitely
     //
@@ -880,7 +883,7 @@ class Rfc5545Examples extends TestCase
     // Page 131, Test 4a :: Every 20 minutes from 9:00 to 16:40 every day, using DAILY
     //
     // UNTIL rule does not exist in original example
-    public function test_page131_test3()
+    public function test_page131_test4a()
     {
         $checks = array(
             array('index' => 0, 'dateString' => '19970902T090000', 'message' => '1st occurrence, Day 1: '),
@@ -908,7 +911,7 @@ class Rfc5545Examples extends TestCase
     // Page 131, Test 4b :: Every 20 minutes from 9:00 to 16:40 every day, using MINUTELY
     //
     // UNTIL rule does not exist in original example
-    public function test_page131_test3()
+    public function test_page131_test4b()
     {
         $checks = array(
             array('index' => 0, 'dateString' => '19970902T090000', 'message' => '1st occurrence, Day 1: '),
@@ -971,7 +974,7 @@ class Rfc5545Examples extends TestCase
         );
     }
 
-/*  Requires support for multiple BYMONTHDAYs [#15]
+/*  Requires support for multiple BYMONTHDAYs [No ticket]
  *
     // Page 132, Test 1 :: Automatically ignoring an invalid date (30 February)
     public function test_page132_test1()
