@@ -1866,7 +1866,6 @@ class ICal
                     break;
             }
 
-            $recurrenceEvents    = $this->trimToRecurrenceCount($rrules, $recurrenceEvents);
             $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
             $recurrenceEvents    = array(); // Reset
 
@@ -2603,28 +2602,6 @@ class ICal
         }
 
         return new \DateTimeZone($this->defaultTimeZone);
-    }
-
-    /**
-     * Ensures the recurrence count is enforced against generated recurrence events.
-     *
-     * @param  array $rrules
-     * @param  array $recurrenceEvents
-     * @return array
-     */
-    protected function trimToRecurrenceCount(array $rrules, array $recurrenceEvents)
-    {
-        if (isset($rrules['COUNT'])) {
-            $recurrenceCount = (intval($rrules['COUNT']) - 1);
-            $surplusCount    = (sizeof($recurrenceEvents) - $recurrenceCount);
-
-            if ($surplusCount > 0) {
-                $recurrenceEvents  = array_slice($recurrenceEvents, 0, $recurrenceCount);
-                $this->eventCount -= $surplusCount;
-            }
-        }
-
-        return $recurrenceEvents;
     }
 
     /**

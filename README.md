@@ -186,7 +186,6 @@ need to be evaluated before non-fitting events can be dropped.
 | `removeUnprintableChars`                        | `$data`                                                             | `protected` | Removes unprintable ASCII and UTF-8 characters                                                                                                      |
 | `sortEventsWithOrder`                           | `$events`, `$sortOrder = SORT_ASC`                                  | `public`    | Sorts events based on a given sort order                                                                                                            |
 | `timeZoneStringToDateTimeZone`                  | `$timeZoneString`                                                   | `public`    | Returns a `DateTimeZone` object based on a string containing a time zone name.                                                                       |
-| `trimToRecurrenceCount`                         | `$rrules`, `$recurrenceEvents`                                      | `protected` | Ensures the recurrence count is enforced against generated recurrence events                                                                        |
 | `unfold`                                        | `$lines`                                                            | `protected` | Unfolds an iCal file in preparation for parsing                                                                                                     |
 
 #### Constants
