@@ -13,8 +13,6 @@
 
 namespace ICal;
 
-use Carbon\Carbon;
-
 class ICal
 {
     // phpcs:disable Generic.Arrays.DisallowLongArraySyntax
@@ -2199,7 +2197,7 @@ class ICal
         }
 
         $output          = array();
-        $currentTimeZone = $this->defaultTimeZone;
+        $currentTimeZone = new \DateTimeZone($this->defaultTimeZone);
 
         foreach ($exdates as $subArray) {
             end($subArray);
@@ -2212,14 +2210,14 @@ class ICal
                     $icalDate = $subArray[$key];
 
                     if (substr($icalDate, -1) === 'Z') {
-                        $currentTimeZone = self::TIME_ZONE_UTC;
+                        $currentTimeZone = new \DateTimeZone(self::TIME_ZONE_UTC);
                     }
 
-                    $output[] = new Carbon($icalDate, $currentTimeZone);
+                    $output[] = new \DateTime($icalDate, $currentTimeZone);
 
                     if ($key === $finalKey) {
                         // Reset to default
-                        $currentTimeZone = $this->defaultTimeZone;
+                        $currentTimeZone = new \DateTimeZone($this->defaultTimeZone);
                     }
                 }
             }
