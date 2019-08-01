@@ -1712,31 +1712,6 @@ class ICal
     }
 
     /**
-     * Extends the `{DTSTART|DTEND|RECURRENCE-ID}_array`
-     * array to include an iCal date time for each event
-     * (`TZID=Timezone:YYYYMMDD[T]HHMMSS`)
-     *
-     * @param  array   $event
-     * @param  integer $index
-     * @return array
-     */
-    protected function processEventIcalDateTime(array $event, $index = 3)
-    {
-        $calendarTimeZone = $this->calendarTimeZone(true);
-
-        foreach (array('DTSTART', 'DTEND', 'RECURRENCE-ID') as $type) {
-            if (isset($event["{$type}_array"])) {
-                $timeZone = (isset($event["{$type}_array"][0]['TZID'])) ? $event["{$type}_array"][0]['TZID'] : $calendarTimeZone;
-                $timeZone = $this->escapeParamText($timeZone);
-                $event["{$type}_array"][$index] = ((is_null($timeZone)) ? '' : sprintf(self::ICAL_DATE_TIME_TEMPLATE, $timeZone)) . $event["{$type}_array"][1];
-                $event["{$type}_array"][2] = $this->iCalDateToUnixTimestamp($event["{$type}_array"][3]);
-            }
-        }
-
-        return $event;
-    }
-
-    /**
      * Returns an array of Events.
      * Every event is a class with the event
      * details being properties within it.
