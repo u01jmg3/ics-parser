@@ -1679,18 +1679,36 @@ class ICal
             // Whether or not the initial date was UTC
             $initialDateWasUTC = substr($anEvent['DTSTART'], -1) == 'Z';
 
-            // Create the `DT{START|END}[_array]`s recurrence properties
-            $recurrenceEvents = array_map(
-                function($recurringDatetime) use ($anEvent, $eventLength, $initialDateWasUTC) {
-                    $anEvent['DTSTART'] = $recurringDatetime->format(self::DATE_TIME_FORMAT) . ($initialDateWasUTC ? 'Z' : '');
-                    $anEvent['DTSTART_array'][1] = $anEvent['DTSTART'];
-                    $anEvent['DTSTART_array'][2] = $recurringDatetime->getTimestamp();
-                    $anEvent['DTEND_array']      = $anEvent['DTSTART_array'];
-                    $anEvent['DTEND_array'][2]  += $eventLength;
-                    $anEvent['DTEND'] = date(self::DATE_TIME_FORMAT, $anEvent['DTEND_array'][2]) . ($initialDateWasUTC ? 'Z' : '');
-                    $anEvent['DTEND_array'][1] = $anEvent['DTEND'];
+            // Build the param array
+            $dateParamArray = array();
+            if (!$initialDateWasUTC
+                && isset($anEvent['DTSTART_array'][0]['TZID'])
+                && $this->isValidTimeZoneId($anEvent['DTSTART_array'][0]['TZID'])
+            ) {
+                $dateParamArray['TZID'] = $anEvent['DTSTART_array'][0]['TZID'];
+            }
 
-                    return $this->processEventIcalDateTime($anEvent);
+            // Populate the `DT{START|END}[_array]`s
+            $recurrenceEvents = array_map(
+                function($recurringDatetime) use ($anEvent, $eventLength, $initialDateWasUTC, $dateParamArray) {
+                    $tzidPrefix = (isset($dateParamArray['TZID'])) ? 'TZID=' . $this->escapeParamText($dateParamArray['TZID']) . ':' : '';
+
+                    foreach (array('DTSTART', 'DTEND') as $dtkey) {
+                        $anEvent[$dtkey] = $recurringDatetime->format(self::DATE_TIME_FORMAT) . ($initialDateWasUTC ? 'Z' : '');
+
+                        $anEvent[$dtkey . '_array'] = array(
+                            $dateParamArray,                    // [0] Array of params (incl. TZID)
+                            $anEvent[$dtkey],                   // [1] ICalDateTime string w/o TZID
+                            $recurringDatetime->getTimestamp(), // [2] Unix Timestamp
+                            $tzidPrefix . $anEvent[$dtkey],     // [3] Full ICalDateTime string
+                        );
+
+                        if ($dtkey != 'DTEND') {
+                            $recurringDatetime->modify($eventLength . ' seconds');
+                        }
+                    }
+
+                    return $anEvent;
                 },
                 $eventRecurrences
             );
