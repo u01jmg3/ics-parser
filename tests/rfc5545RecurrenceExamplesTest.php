@@ -1033,7 +1033,7 @@ class Rfc5545Examples extends TestCase
                 'SUMMARY:test',
                 'LAST-MODIFIED:' . gmdate('Ymd\THis\Z', filemtime(__FILE__)),
                 'END:VEVENT',
-            ),
+            )
         );
     }
 

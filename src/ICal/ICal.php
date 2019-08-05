@@ -1235,8 +1235,7 @@ class ICal
             $anEvent['RRULE_array'][2] = self::RECURRENCE_EVENT;
 
             // Create new initial starting point.
-            // Immutable, so it doesn't get inadvertently altered below
-            $initialImmutableDate = \DateTimeImmutable::createFromMutable($this->icalDateToDateTime($anEvent['DTSTART_array'][3]));
+            $initialEventDate = $this->icalDateToDateTime($anEvent['DTSTART_array'][3]);
 
             // Separate the RRULE stanzas, and explode the values that are lists.
             $rrules = array();
@@ -1298,7 +1297,7 @@ class ICal
 
             $eventRecurrences = array();
 
-            $frequencyRecurringDateTime = \DateTime::createFromImmutable($initialImmutableDate);
+            $frequencyRecurringDateTime = clone $initialEventDate;
             while ($frequencyRecurringDateTime->getTimestamp() <= $until) {
                 $candidateDateTimes = [];
 
@@ -1348,7 +1347,8 @@ class ICal
                         sort($matching_days);
 
                         foreach ($matching_days as $day) {
-                            $candidateDateTimes[] = (clone $frequencyRecurringDateTime)->setISODate(
+                            $clonedDateTime = clone $frequencyRecurringDateTime;
+                            $candidateDateTimes[] = $clonedDateTime->setISODate(
                                 $frequencyRecurringDateTime->format('Y'),
                                 $frequencyRecurringDateTime->format('W'),
                                 $day
@@ -1379,7 +1379,8 @@ class ICal
                                 continue;
                             }
 
-                            $candidateDateTimes[] = (clone $frequencyRecurringDateTime)->setDate(
+                            $clonedDateTime = clone $frequencyRecurringDateTime;
+                            $candidateDateTimes[] = $clonedDateTime->setDate(
                                 $frequencyRecurringDateTime->format('Y'),
                                 $frequencyRecurringDateTime->format('m'),
                                 $day
@@ -1392,7 +1393,8 @@ class ICal
                     {
                         if (!empty($rrules['BYMONTH'])) {
                             foreach ($rrules['BYMONTH'] as $bymonth) {
-                                $bymonthRecurringDatetime = (clone $frequencyRecurringDateTime)->setDate(
+                                $clonedDateTime = clone $frequencyRecurringDateTime;
+                                $bymonthRecurringDatetime = $clonedDateTime->setDate(
                                     $frequencyRecurringDateTime->format('Y'),
                                     $bymonth,
                                     $frequencyRecurringDateTime->format('d')
@@ -1405,7 +1407,8 @@ class ICal
 
                                     // And add each of them to the list of recurrences
                                     foreach ($matching_days as $day) {
-                                        $candidateDateTimes[] = clone $bymonthRecurringDatetime->setDate(
+                                        $clonedDateTime = clone $bymonthRecurringDatetime;
+                                        $candidateDateTimes[] = $clonedDateTime->setDate(
                                             $frequencyRecurringDateTime->format('Y'),
                                             $bymonthRecurringDatetime->format('m'),
                                             $day
@@ -1425,7 +1428,7 @@ class ICal
                 foreach ($candidateDateTimes as $candidate) {
 
                     $timestamp = $candidate->getTimestamp();
-                    if ($timestamp <= $initialImmutableDate->getTimestamp()) {
+                    if ($timestamp <= $initialEventDate->getTimestamp()) {
                         continue;
                     }
 
@@ -1480,7 +1483,8 @@ class ICal
             // Determine event length
             $eventLength = 0;
             if (isset($anEvent['DURATION'])) {
-                $endDate = $initialImmutableDate->add($anEvent['DURATION_array'][2]);
+                $clonedDateTime = clone $initialEventDate;
+                $endDate = $clonedDateTime->add($anEvent['DURATION_array'][2]);
                 $eventLength = $endDate->getTimestamp() - $anEvent['DTSTART_array'][2];
             } else if (isset($anEvent['DTEND_array'])) {
                 $eventLength = $anEvent['DTEND_array'][2] - $anEvent['DTSTART_array'][2];
