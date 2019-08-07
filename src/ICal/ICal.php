@@ -1868,7 +1868,6 @@ class ICal
 
             $allRecurrenceEvents = array_merge($allRecurrenceEvents, $recurrenceEvents);
             $recurrenceEvents    = array(); // Reset
-
         }
 
         $events = array_merge($events, $allRecurrenceEvents);
@@ -2607,8 +2606,8 @@ class ICal
     /**
      * Checks if an excluded date matches a given date by reconciling time zones.
      *
-     * @param  Carbon  $exdate
-     * @param  array   $anEvent
+     * @param  Carbon $exdate
+     * @param  array  $anEvent
      * @return boolean
      */
     protected function isExdateMatch($exdate, array $anEvent) // phpcs:ignore Squiz.Commenting.FunctionComment.TypeHintMissing
