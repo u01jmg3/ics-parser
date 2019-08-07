@@ -1306,6 +1306,21 @@ class ICal
 
             // Get frequency
             $frequency = $rrules['FREQ'];
+
+            // Sanitise BYDAY stanza
+            if (isset($rrules['BYDAY']) && !in_array($frequency, array('MONTHLY', 'YEARLY'))) {
+                $rrules['BYDAY'] = array_map(
+                    function ($weekday) use ($frequency) {
+                        $sanitised_weekday = substr($weekday, -2);
+                        if ($sanitised_weekday != $weekday) {
+                            error_log('ICal::ProcessRecurrences: A "' . $frequency . '" rrule may not have BYDAY values with numeric prefixes.');
+                        }
+                        return $sanitised_weekday;
+                    },
+                    $rrules['BYDAY']
+                );
+            }
+
             // Get Start timestamp
             $startTimestamp = $initialStart->getTimestamp();
 
@@ -1413,7 +1428,7 @@ class ICal
 
                             $matching_days = array_map(
                                 function ($weekday) use ($wkstTransition) {
-                                    $day = array_search(substr($weekday, -2), $this->weeks[self::ISO_8601_WEEK_START]);
+                                    $day = array_search($weekday, $this->weeks[self::ISO_8601_WEEK_START]);
                                     if ($day >= $wkstTransition) {
                                         $day -= 7;
                                     }
@@ -1645,7 +1660,7 @@ class ICal
         foreach ($bydays as $weekday) {
             $bydayDateTime = clone $initialDateTime;
 
-            $ordwk = intval(substr($weekday, 0, 2));
+            $ordwk = intval(substr($weekday, 0, -2));
 
             // Quantise the date to the first instance of the requested day in a month
             // (Or last if we have a -ve {ordwk})
