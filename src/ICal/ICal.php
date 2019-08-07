@@ -1329,8 +1329,8 @@ class ICal
                 if (empty($dayNumber)) {
                     if (!isset($rrules['BYSETPOS'])) {
                         $dayNumber = 1; // Set first as default
-                    } elseif (is_numeric($rrules['BYSETPOS'])) {
-                        $dayNumber = $rrules['BYSETPOS'];
+                    } elseif (is_numeric($rrules['BYSETPOS'][0])) {
+                        $dayNumber = $rrules['BYSETPOS'][0];
 
                         $byDaysCounted = array_count_values($rrules['BYDAY']);
 
