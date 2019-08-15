@@ -1251,18 +1251,18 @@ class ICal
             // Get frequency
             $frequency = $rrules['FREQ'];
 
-            // Sanitise BYDAY stanza
+            // Reject RRULE if BYDAY stanza is invalid:
+            // > The BYDAY rule part MUST NOT be specified with a numeric value
+            // > when the FREQ rule part is not set to MONTHLY or YEARLY.
             if (isset($rrules['BYDAY']) && !in_array($frequency, array('MONTHLY', 'YEARLY'))) {
-                $rrules['BYDAY'] = array_map(
-                    function ($weekday) use ($frequency) {
-                        $sanitised_weekday = substr($weekday, -2);
-                        if ($sanitised_weekday != $weekday) {
-                            error_log('ICal::ProcessRecurrences: A "' . $frequency . '" rrule may not have BYDAY values with numeric prefixes.');
-                        }
-                        return $sanitised_weekday;
-                    },
-                    $rrules['BYDAY']
-                );
+                $allBydayStanzasValid = array_reduce($rrules['BYDAY'], function ($carry, $weekday) {
+                    return $carry && substr($weekday, -2) == $weekday;
+                }, True);
+
+                if (!$allBydayStanzasValid) {
+                    error_log('ICal::ProcessRecurrences: A "' . $frequency . '" rrule may not have BYDAY values with numeric prefixes.');
+                    continue;
+                }
             }
 
             // Get Interval
