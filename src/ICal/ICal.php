@@ -1313,11 +1313,8 @@ class ICal
                         if (!empty($rrules['BYDAY'])) {
                             // setISODate below uses the ISO-8601 specification of weeks: start on
                             // a Monday, end on a Sunday. However, RRULEs (or the caller of the
-                            // parser) may state an alternate WeeKSTart. In this case, we need to
-                            // determine the point where days that ordinarily come after Monday now
-                            // come before Monday.
+                            // parser) may state an alternate WeeKSTart.
                             $wkstTransition = 7;
-
                             if (empty($rrules['WKST'])) {
                                 if ($this->defaultWeekStart !== self::ISO_8601_WEEK_START) {
                                     $wkstTransition = array_search($this->defaultWeekStart, array_keys($this->weekdays));
@@ -1326,11 +1323,16 @@ class ICal
                                 $wkstTransition = array_search($rrules['WKST'], array_keys($this->weekdays));
                             }
 
+                            $initialDayOfWeek = $frequencyRecurringDateTime->format('N');
                             $matchingDays = array_map(
-                                function ($weekday) use ($wkstTransition) {
+                                function ($weekday) use ($interval, $wkstTransition, $initialDayOfWeek) {
                                     $day = array_search($weekday, array_keys($this->weekdays));
+                                    if ($day < $initialDayOfWeek) {
+                                        $day += 7;
+                                    }
+
                                     if ($day >= $wkstTransition) {
-                                        $day -= 7;
+                                        $day += 7 * ($interval - 1);
                                     }
 
                                     // Ignoring alternate week starts, $day at this point will have a
