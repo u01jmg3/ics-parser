@@ -1,3 +1,12 @@
+---
+name: Bug report
+about: Create a report to help us improve
+title: ''
+labels: ''
+assignees: u01jmg3
+
+---
+
 > :information_source:
 > - Firstly, check you are using the latest version (`dev-master`) as the problem may already have been fixed.
 > - It is **essential** to be provided with the offending iCal causing the parser to behave incorrectly.
