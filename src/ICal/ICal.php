@@ -1363,7 +1363,10 @@ class ICal
                 switch ($frequency) {
                     case 'DAILY':
                         if (!empty($rrules['BYMONTHDAY'])) {
-                            $monthdays = $this->getDaysOfMonthMatchingByMonthDayRRule($rrules['BYMONTHDAY'], $frequencyRecurringDateTime);
+                            if (!isset($monthdays)) {
+                                // This variable is unset when we change months (see below)
+                                $monthdays = $this->getDaysOfMonthMatchingByMonthDayRRule($rrules['BYMONTHDAY'], $frequencyRecurringDateTime);
+                            }
                             if (!in_array($frequencyRecurringDateTime->format('j'), $monthdays)) {
                                 break;
                             }
@@ -1580,7 +1583,15 @@ class ICal
                         $frequencyRecurringDateTime->modify('-1 month');
                     }
                 }
+
+                // $monthdays is set in the DAILY frequency if the BYMONTHDAY stanza is present in
+                // the RRULE. The variable only needs to be updated when we change months, so we
+                // unset it here, prompting a recreation next iteration.
+                if (isset($monthdays) && $frequencyRecurringDateTime->format('m') != $monthPreMove) {
+                    unset($monthdays);
+                }
             }
+            unset($monthdays); // Unset it here as well, so it doesn't bleed into the calculation of the next recurring event.
 
             // Determine event length
             $eventLength = 0;
