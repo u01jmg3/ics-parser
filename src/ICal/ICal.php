@@ -1362,6 +1362,12 @@ class ICal
                 // phpcs:ignore Squiz.ControlStructures.SwitchDeclaration.MissingDefault
                 switch ($frequency) {
                     case 'DAILY':
+                        if (!empty($rrules['BYMONTHDAY'])) {
+                            $monthdays = $this->getDaysOfMonthMatchingByMonthDayRRule($rrules['BYMONTHDAY'], $frequencyRecurringDateTime);
+                            if (!in_array($frequencyRecurringDateTime->format('j'), $monthdays)) {
+                                break;
+                            }
+                        }
                         $candidateDateTimes[] = clone $frequencyRecurringDateTime;
 
                         break;

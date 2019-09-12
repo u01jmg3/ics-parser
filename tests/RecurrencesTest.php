@@ -343,6 +343,29 @@ class RecurrencesTest extends TestCase
         );
     }
 
+    public function testDailyWithByMonthDay()
+    {
+        $checks = array(
+            array('index' => 0, 'dateString' => '20000206T120000', 'message' => '1st event: '),
+            array('index' => 1, 'dateString' => '20000211T120000', 'message' => '2nd event: '),
+            array('index' => 2, 'dateString' => '20000216T120000', 'message' => '3rd event: '),
+            array('index' => 4, 'dateString' => '20000226T120000', 'message' => '5th event, transition from February to March: '),
+            array('index' => 5, 'dateString' => '20000301T120000', 'message' => '6th event, transition to March from February: '),
+            array('index' => 11, 'dateString' => '20000331T120000', 'message' => '12th event, transition from March to April: '),
+            array('index' => 12, 'dateString' => '20000401T120000', 'message' => '13th event, transition to April from March: '),
+        );
+        $this->assertVEVENT(
+            'Europe/Berlin',
+            array(
+                'DTSTART:20000206T120000',
+                'DTEND:20000206T130000',
+                'RRULE:FREQ=DAILY;BYMONTHDAY=1,6,11,16,21,26,31;COUNT=16',
+            ),
+            16,
+            $checks
+        );
+    }
+
     public function assertVEVENT($defaultTimezone, $veventParts, $count, $checks)
     {
         $options = $this->getOptions($defaultTimezone);
