@@ -404,8 +404,6 @@ class Rfc5545Examples extends TestCase
         );
     }
 
-/* Requires support for negative BYMONTHDAY rules [No ticket]
- *
     // Page 127, Test 1 :: Third-to-last day of the month, forever
     //
     // UNTIL rule does not exist in original example.
@@ -425,11 +423,10 @@ class Rfc5545Examples extends TestCase
                 'DTSTART;TZID=America/New_York:19970928T090000',
                 'RRULE:FREQ=MONTHLY;BYMONTHDAY=-3;UNTIL=19980401',
             ),
-            6,
+            7,
             $checks
         );
     }
-*/
 
     // Page 127, Test 2 :: 2nd and 15th of each Month, for 10 occurrences
     public function test_page127_test2()
@@ -451,8 +448,6 @@ class Rfc5545Examples extends TestCase
         );
     }
 
-/*  Requires support for negative BYMONTHDAY rules [No ticket]
- *
     // Page 127, Test 3 :: First and last day of the month, for 10 occurrences
     public function test_page127_test3()
     {
@@ -473,7 +468,6 @@ class Rfc5545Examples extends TestCase
             $checks
         );
     }
-*/
 
     // Page 127, Test 4 :: 10th through 15th, every 18 months, for 10 occurrences
     public function test_page127_test4()

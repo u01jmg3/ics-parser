@@ -1424,7 +1424,7 @@ class ICal
                         $matchingDays = array();
 
                         if (!empty($rrules['BYMONTHDAY'])) {
-                            $matchingDays = $rrules['BYMONTHDAY'];
+                            $matchingDays = $this->getDaysOfMonthMatchingByMonthDayRRule($rrules['BYMONTHDAY'], $frequencyRecurringDateTime);
                         } elseif (!empty($rrules['BYDAY'])) {
                             $matchingDays = $this->getDaysOfMonthMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime);
                         }
@@ -1718,6 +1718,26 @@ class ICal
         sort($matchingDays);
 
         return $matchingDays;
+    }
+
+    /**
+     * Find all days of a month that match the BYMONTHDAY stanza of an RRULE.
+     *
+     * RRUle Syntax:
+     *   BYMONTHDAY={bymodaylist}
+     *
+     * Where:
+     *   bymodaylist = {monthdaynum}[,{monthdaynum}...]
+     *   monthdaynum = ([+] || -) {ordmoday}
+     *   ordmoday    = 1 to 31
+     *
+     * @param  array     $byMonthDays
+     * @param  \DateTime $initialDateTime
+     * @return array
+     */
+    protected function getDaysOfMonthMatchingByMonthDayRRule($byMonthDays, $initialDateTime)
+    {
+        return $this->resolveIndicesOfRange($byMonthDays, $initialDateTime->format('t'));
     }
 
     /**
