@@ -678,8 +678,6 @@ class Rfc5545Examples extends TestCase
     }
 */
 
-/*  Requires support for BYMONTHDAY and BYDAY in the same MONTHLY RRULE [No ticket]
- *
     // Page 130, Test 1 :: The first Saturday that follows the first Sunday of the month, forever:
     //
     // COUNT rule does not exist in original example.
@@ -700,7 +698,6 @@ class Rfc5545Examples extends TestCase
             $checks
         );
     }
-*/
 
 /*  Requires support for BYMONTHDAY under YEARLY [#11]
  *

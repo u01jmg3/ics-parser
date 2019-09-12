@@ -1425,6 +1425,12 @@ class ICal
 
                         if (!empty($rrules['BYMONTHDAY'])) {
                             $matchingDays = $this->getDaysOfMonthMatchingByMonthDayRRule($rrules['BYMONTHDAY'], $frequencyRecurringDateTime);
+                            if (!empty($rrules['BYDAY'])) {
+                                $matchingDays = array_filter(
+                                    $this->getDaysOfMonthMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime),
+                                    function ($monthDay) use ($matchingDays) { return in_array($monthDay, $matchingDays); }
+                                );
+                            }
                         } elseif (!empty($rrules['BYDAY'])) {
                             $matchingDays = $this->getDaysOfMonthMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime);
                         }
