@@ -1288,15 +1288,23 @@ class ICal
             // Reject RRULE if BYDAY stanza is invalid:
             // > The BYDAY rule part MUST NOT be specified with a numeric value
             // > when the FREQ rule part is not set to MONTHLY or YEARLY.
-            if (isset($rrules['BYDAY']) && !in_array($frequency, array('MONTHLY', 'YEARLY'))) {
-                $allByDayStanzasValid = array_reduce($rrules['BYDAY'], function ($carry, $weekday) {
+            // > Furthermore, the BYDAY rule part MUST NOT be specified with a
+            // > numeric value with the FREQ rule part set to YEARLY when the
+            // > BYWEEKNO rule part is specified.
+            if (isset($rrules['BYDAY'])) {
+                $checkByDays = function ($carry, $weekday) {
                     return $carry && substr($weekday, -2) === $weekday;
-                }, true);
-
-                if (!$allByDayStanzasValid) {
-                    error_log("ICal::ProcessRecurrences: A \"{$frequency}\" RRULE should not contain BYDAY values with numeric prefixes");
-
-                    continue;
+                };
+                if (!in_array($frequency, array('MONTHLY', 'YEARLY'))) {
+                    if (!array_reduce($rrules['BYDAY'], $checkByDays, true)) {
+                        error_log("ICal::ProcessRecurrences: A {$frequency} RRULE may not contain BYDAY values with numeric prefixes");
+                        continue;
+                    }
+                } else if ($frequency == 'YEARLY' and !empty($rrules['BYWEEKNO'])) {
+                    if (!array_reduce($rrules['BYDAY'], $checkByDays, true)) {
+                        error_log("ICal::ProcessRecurrences: A YEARLY RRULE with a BYWEEKNO part may not contain BYDAY values with numeric prefixes");
+                        continue;
+                    }
                 }
             }
 
