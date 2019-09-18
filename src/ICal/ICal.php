@@ -1439,10 +1439,12 @@ class ICal
                         break;
 
                     case 'YEARLY':
+                        $matchingDays = array();
+
                         if (!empty($rrules['BYMONTH'])) {
+                            $bymonthRecurringDatetime = clone $frequencyRecurringDateTime;
                             foreach ($rrules['BYMONTH'] as $byMonth) {
-                                $clonedDateTime = clone $frequencyRecurringDateTime;
-                                $bymonthRecurringDatetime = $clonedDateTime->setDate(
+                                $bymonthRecurringDatetime->setDate(
                                     $frequencyRecurringDateTime->format('Y'),
                                     $byMonth,
                                     $frequencyRecurringDateTime->format('d')
@@ -1450,23 +1452,35 @@ class ICal
 
                                 if (!empty($rrules['BYDAY'])) {
                                     // Get all days of the month that match the BYDAY rule.
-                                    $matchingDays = $this->getDaysOfMonthMatchingByDayRRule($rrules['BYDAY'], $bymonthRecurringDatetime);
+                                    $monthDays = $this->getDaysOfMonthMatchingByDayRRule($rrules['BYDAY'], $bymonthRecurringDatetime);
 
                                     // And add each of them to the list of recurrences
-                                    foreach ($matchingDays as $day) {
-                                        $clonedDateTime = clone $bymonthRecurringDatetime;
-                                        $candidateDateTimes[] = $clonedDateTime->setDate(
+                                    foreach ($monthDays as $day) {
+                                        $matchingDays[] = $bymonthRecurringDatetime->setDate(
                                             $frequencyRecurringDateTime->format('Y'),
                                             $bymonthRecurringDatetime->format('m'),
                                             $day
-                                        );
+                                        )->format('z') + 1;
                                     }
                                 } else {
-                                    $candidateDateTimes[] = clone $bymonthRecurringDatetime;
+                                    $matchingDays[] = $bymonthRecurringDatetime->format('z') + 1;
                                 }
                             }
+                        }
+
+                        if (count($matchingDays) == 0) {
+                            $matchingDays = array($frequencyRecurringDateTime->format('z') + 1);
                         } else {
-                            $candidateDateTimes[] = clone $frequencyRecurringDateTime;
+                            sort($matchingDays);
+                        }
+
+                        foreach ($matchingDays as $day) {
+                            $clonedDateTime = clone $frequencyRecurringDateTime;
+                            $candidateDateTimes[] = $clonedDateTime->setDate(
+                                $frequencyRecurringDateTime->format('Y'),
+                                1,
+                                $day
+                            );
                         }
                         break;
                 }
