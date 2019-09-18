@@ -1650,6 +1650,70 @@ class ICal
     }
 
     /**
+     * Find all days of a year that match the BYDAY stanza of an RRULE.
+     *
+     * With no {ordwk}, then return the day number of every {weekday}
+     * within the year.
+     *
+     * With a +ve {ordwk}, then return the {ordwk} {weekday} within the
+     * year.
+     *
+     * With a -ve {ordwk}, then return the {ordwk}-to-last {weekday}
+     * within the year.
+     *
+     * RRule Syntax:
+     *   BYDAY={bywdaylist}
+     *
+     * Where:
+     *   bywdaylist = {weekdaynum}[,{weekdaynum}...]
+     *   weekdaynum = [[+]{ordwk} || -{ordwk}]{weekday}
+     *   ordwk      = 1 to 53
+     *   weekday    = SU || MO || TU || WE || TH || FR || SA
+     *
+     * @param  array     $byDays
+     * @param  \DateTime $initialDateTime
+     * @return array
+     */
+    protected function getDaysOfYearMatchingByDayRRule($byDays, $initialDateTime)
+    {
+        $matchingDays = array();
+
+        foreach ($byDays as $weekday) {
+            $bydayDateTime = clone $initialDateTime;
+
+            $ordwk = intval(substr($weekday, 0, -2));
+
+            // Quantise the date to the first instance of the requested day in a year
+            // (Or last if we have a -ve {ordwk})
+            $bydayDateTime->modify(
+                (($ordwk < 0) ? 'Last' : 'First')
+                . ' '
+                . $this->weekdays[substr($weekday, -2)]  // e.g. "Monday"
+                . ' of '. (($ordwk < 0) ? 'December' : 'January')
+                . ' ' . $initialDateTime->format('Y') // e.g. "2018"
+            );
+
+            if ($ordwk < 0) { // -ve {ordwk}
+                $bydayDateTime->modify((++$ordwk) . ' week');
+                $matchingDays[] = $bydayDateTime->format('z') + 1;
+            } elseif ($ordwk > 0) { // +ve {ordwk}
+                $bydayDateTime->modify((--$ordwk) . ' week');
+                $matchingDays[] = $bydayDateTime->format('z') + 1;
+            } else { // No {ordwk}
+                while ($bydayDateTime->format('Y') === $initialDateTime->format('Y')) {
+                    $matchingDays[] = $bydayDateTime->format('z') + 1;
+                    $bydayDateTime->modify('+1 week');
+                }
+            }
+        }
+
+        // Sort into ascending order.
+        sort($matchingDays);
+
+        return $matchingDays;
+    }
+
+    /**
      * Filters a provided values-list by applying a BYSETPOS RRule.
      *
      * Where a +ve {daynum} is provided, the {ordday} position'd value as
