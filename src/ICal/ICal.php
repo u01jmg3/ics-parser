@@ -1468,6 +1468,12 @@ class ICal
                             }
                         }
 
+                        if (!empty($rrules['BYDAY'])) {
+                            if (count($matchingDays) == 0) {
+                                $matchingDays = $this->getDaysOfYearMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime);
+                            }
+                        }
+
                         if (count($matchingDays) == 0) {
                             $matchingDays = array($frequencyRecurringDateTime->format('z') + 1);
                         } else {

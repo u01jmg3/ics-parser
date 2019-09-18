@@ -576,8 +576,6 @@ class Rfc5545Examples extends TestCase
     }
 */
 
-/*  Requires support for BYDAY *without* BYMONTH under YEARLY [No ticket]
- *
     // Page 128, Test 4 :: 20th Monday of a Year, forever
     //
     // COUNT rule does not exist in original example.
@@ -598,7 +596,6 @@ class Rfc5545Examples extends TestCase
             $checks
         );
     }
-*/
 
 /*  Requires support for BYWEEKNO under YEARLY [#11]
  *
