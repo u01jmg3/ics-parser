@@ -554,8 +554,6 @@ class Rfc5545Examples extends TestCase
         );
     }
 
-/*  Requires support for BYYEARDAY under YEARLY [#11]
- *
     // Page 128, Test 3 :: Every third Year on the 1st, 100th, & 200th day for 10 occurrences
     public function test_page128_test3()
     {
@@ -574,7 +572,6 @@ class Rfc5545Examples extends TestCase
             $checks
         );
     }
-*/
 
     // Page 128, Test 4 :: 20th Monday of a Year, forever
     //

@@ -1275,7 +1275,7 @@ class ICal
             $rrules = array();
             foreach (explode(';', $anEvent['RRULE']) as $s) {
                 list($k, $v) = explode('=', $s);
-                if (in_array($k, array('BYSETPOS', 'BYDAY', 'BYMONTHDAY', 'BYMONTH'))) {
+                if (in_array($k, array('BYSETPOS', 'BYDAY', 'BYMONTHDAY', 'BYMONTH', 'BYYEARDAY'))) {
                     $rrules[$k] = explode(',', $v);
                 } else {
                     $rrules[$k] = $v;
@@ -1466,10 +1466,17 @@ class ICal
                                     $matchingDays[] = $bymonthRecurringDatetime->format('z') + 1;
                                 }
                             }
+                        } else if (!empty($rrules['BYYEARDAY'])) {
+                            $matchingDays = $this->getDaysOfYearMatchingByYearDayRRule($rrules['BYYEARDAY'], $frequencyRecurringDateTime);
                         }
 
                         if (!empty($rrules['BYDAY'])) {
-                            if (count($matchingDays) == 0) {
+                            if (!empty($rrules['BYYEARDAY'])) {
+                                $matchingDays = array_filter(
+                                    $this->getDaysOfYearMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime),
+                                    function ($yearDay) use ($matchingDays) { return in_array($yearDay, $matchingDays); }
+                                );
+                            } else if (count($matchingDays) == 0) {
                                 $matchingDays = $this->getDaysOfYearMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime);
                             }
                         }
