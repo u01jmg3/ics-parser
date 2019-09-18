@@ -1714,6 +1714,37 @@ class ICal
     }
 
     /**
+     * Find all days of a year that match the BYYEARDAY stanza of an RRULE.
+     *
+     * RRUle Syntax:
+     *   BYYEARDAY={byyrdaylist}
+     *
+     * Where:
+     *   byyrdaylist = {yeardaynum}[,{yeardaynum}...]
+     *   yeardaynum  = ([+] || -) {ordyrday}
+     *   ordyrday    = 1 to 366
+     *
+     * @param  array     $byYearDays
+     * @param  \DateTime $initialDateTime
+     * @return array
+     */
+    protected function getDaysOfYearMatchingByYearDayRRule($byYearDays, $initialDateTime)
+    {
+        $matchingDays = array();
+        // `\DateTime::format('L')` returns 1 if leap year, 0 if not.
+        $daysInThisYear = $initialDateTime->format('L') ? 366 : 365;
+        foreach ($byYearDays as $yearDay) {
+            if ($yearDay > 0 && $yearDay <= $daysInThisYear) {
+                $matchingDays[] = $yearDay;
+            } else if ($yearDay < 0 && -$yearDay <= $daysInThisYear) {
+                $matchingDays[] = $daysInThisYear + $yearDay + 1;
+            }
+        }
+        sort($matchingDays);
+        return $matchingDays;
+    }
+
+    /**
      * Filters a provided values-list by applying a BYSETPOS RRule.
      *
      * Where a +ve {daynum} is provided, the {ordday} position'd value as
