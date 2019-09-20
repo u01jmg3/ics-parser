@@ -1745,6 +1745,64 @@ class ICal
     }
 
     /**
+     * Find all days of a year that match the BYWEEKNO stanza of an RRULE.
+     *
+     * Unfortunately, the RFC5545 specification does not specify exactly
+     * how BYWEEKNO should expand on the initial DTSTART when provided
+     * without any other stanzas.
+     *
+     * A comparison of expansions used by other ics parsers may be found
+     * at https://github.com/s0600204/ics-parser-1/wiki/byweekno
+     *
+     * This method uses the same expansion as the python-dateutil module.
+     *
+     * RRUle Syntax:
+     *   BYWEEKNO={bywknolist}
+     *
+     * Where:
+     *   bywknolist = {weeknum}[,{weeknum}...]
+     *   weeknum    = ([+] || -) {ordwk}
+     *   ordwk      = 1 to 53
+     *
+     * @param  array     $byWeekNums
+     * @param  \DateTime $initialDateTime
+     * @return array
+     */
+    protected function getDaysOfYearMatchingByWeekNoRRule($byWeekNums, $initialDateTime)
+    {
+        // `\DateTime::format('L')` returns 1 if leap year, 0 if not.
+        $isLeapYear = $initialDateTime->format('L');
+        $firstDayOfTheYear = date_create("first day of January {$initialDateTime->format('Y')}")->format("D");
+        $weeksInThisYear = ($firstDayOfTheYear == "Thu" || $isLeapYear && $firstDayOfTheYear == "Wed") ? 53 : 52;
+
+        $matchingWeeks = array();
+        foreach ($byWeekNums as $weekNum) {
+            if ($weekNum > 0 && $weekNum <= $weeksInThisYear) {
+                $matchingWeeks[] = $weekNum;
+            } else if ($weekNum < 0 && -$weekNum <= $weeksInThisYear) {
+                $matchingWeeks[] = $weeksInThisYear + $weekNum + 1;
+            }
+        }
+        sort($matchingWeeks);
+
+        $matchingDays = array();
+        $byweekDateTime = clone $initialDateTime;
+        foreach ($matchingWeeks as $weekNum) {
+            $dayNum = $byweekDateTime->setISODate(
+                $initialDateTime->format('Y'),
+                $weekNum,
+                1
+            )->format('z') + 1;
+            for ($x = 0; $x < 7; ++$x) {
+                $matchingDays[] = $x + $dayNum;
+            }
+        }
+        sort($matchingDays);
+
+        return $matchingDays;
+    }
+
+    /**
      * Filters a provided values-list by applying a BYSETPOS RRule.
      *
      * Where a +ve {daynum} is provided, the {ordday} position'd value as
