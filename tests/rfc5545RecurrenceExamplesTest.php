@@ -699,8 +699,6 @@ class Rfc5545Examples extends TestCase
         );
     }
 
-/*  Requires support for BYMONTHDAY under YEARLY [#11]
- *
     // Page 130, Test 2 :: The first Tuesday after a Monday in November, every 4 Years (U.S. Presidential Election Day), forever
     //
     // COUNT rule does not exist in original example.
@@ -721,7 +719,6 @@ class Rfc5545Examples extends TestCase
             $checks
         );
     }
-*/
 
     // Page 130, Test 3 :: Third instance of either a Tuesday, Wednesday, or Thursday of a Month, for 3 months.
     public function test_page130_test3()

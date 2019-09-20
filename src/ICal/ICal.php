@@ -1475,30 +1475,36 @@ class ICal
                                     $frequencyRecurringDateTime->format('d')
                                 );
 
-                                if (!empty($rrules['BYDAY'])) {
-                                    // Get all days of the month that match the BYDAY rule.
+                                // Determine the days of the month affected
+                                // (The interaction between BYMONTHDAY and BYDAY is resolved later.)
+                                $monthDays = array();
+                                if (!empty($rrules['BYMONTHDAY'])) {
+                                    $monthDays = $this->getDaysOfMonthMatchingByMonthDayRRule($rrules['BYMONTHDAY'], $bymonthRecurringDatetime);
+                                } else if (!empty($rrules['BYDAY'])) {
                                     $monthDays = $this->getDaysOfMonthMatchingByDayRRule($rrules['BYDAY'], $bymonthRecurringDatetime);
-
-                                    // And add each of them to the list of recurrences
-                                    foreach ($monthDays as $day) {
-                                        $matchingDays[] = $bymonthRecurringDatetime->setDate(
-                                            $frequencyRecurringDateTime->format('Y'),
-                                            $bymonthRecurringDatetime->format('m'),
-                                            $day
-                                        )->format('z') + 1;
-                                    }
                                 } else {
-                                    $matchingDays[] = $bymonthRecurringDatetime->format('z') + 1;
+                                    $monthDays[] = $bymonthRecurringDatetime->format('d');
+                                }
+
+                                // And add each of them to the list of recurrences
+                                foreach ($monthDays as $day) {
+                                    $matchingDays[] = $bymonthRecurringDatetime->setDate(
+                                        $frequencyRecurringDateTime->format('Y'),
+                                        $bymonthRecurringDatetime->format('m'),
+                                        $day
+                                    )->format('z') + 1;
                                 }
                             }
                         } elseif (!empty($rrules['BYWEEKNO'])) {
                             $matchingDays = $this->getDaysOfYearMatchingByWeekNoRRule($rrules['BYWEEKNO'], $frequencyRecurringDateTime);
                         } elseif (!empty($rrules['BYYEARDAY'])) {
                             $matchingDays = $this->getDaysOfYearMatchingByYearDayRRule($rrules['BYYEARDAY'], $frequencyRecurringDateTime);
+                        } else if (!empty($rrules['BYMONTHDAY'])) {
+                            $matchingDays = $this->getDaysOfYearMatchingByMonthDayRRule($rrules['BYMONTHDAY'], $frequencyRecurringDateTime);
                         }
 
                         if (!empty($rrules['BYDAY'])) {
-                            if (!empty($rrules['BYYEARDAY']) || !empty($rrules['BYWEEKNO'])) {
+                            if (!empty($rrules['BYYEARDAY']) || !empty($rrules['BYMONTHDAY']) || !empty($rrules['BYWEEKNO'])) {
                                 $matchingDays = array_filter(
                                     $this->getDaysOfYearMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime),
                                     function ($yearDay) use ($matchingDays) {
@@ -1897,6 +1903,44 @@ class ICal
 
         sort($matchingDays);
 
+        return $matchingDays;
+    }
+
+    /**
+     * Find all days of a year that match the BYMONTHDAY stanza of an RRULE.
+     *
+     * RRule Syntax:
+     *   BYMONTHDAY={bymodaylist}
+     *
+     * Where:
+     *   bymodaylist = {monthdaynum}[,{monthdaynum}...]
+     *   monthdaynum = ([+] || -) {ordmoday}
+     *   ordmoday    = 1 to 31
+     *
+     * @param  array     $byMonthDays
+     * @param  \DateTime $initialDateTime
+     * @return array
+     */
+    protected function getDaysOfYearMatchingByMonthDayRRule($byMonthDays, $initialDateTime)
+    {
+        $matchingDays = array();
+        $monthDateTime = clone $initialDateTime;
+        for ($month = 1; $month < 13; $month++) {
+            $monthDateTime->setDate(
+                $initialDateTime->format('Y'),
+                $month,
+                1
+            );
+
+            $monthDays = $this->getDaysOfMonthMatchingByMonthDayRRule($byMonthDays, $monthDateTime);
+            foreach ($monthDays as $day) {
+                $matchingDays[] = $monthDateTime->setDate(
+                    $initialDateTime->format('Y'),
+                    $monthDateTime->format('m'),
+                    $day
+                )->format('z') + 1;
+            }
+        }
         return $matchingDays;
     }
 

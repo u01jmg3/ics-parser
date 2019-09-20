@@ -366,6 +366,69 @@ class RecurrencesTest extends TestCase
         );
     }
 
+    public function testYearlyWithByMonthDay()
+    {
+        $checks = array(
+            array('index' => 0, 'dateString' => '20001214T120000', 'message' => '1st event: '),
+            array('index' => 1, 'dateString' => '20001221T120000', 'message' => '2nd event: '),
+            array('index' => 2, 'dateString' => '20010107T120000', 'message' => '3rd event: '),
+            array('index' => 3, 'dateString' => '20010114T120000', 'message' => '4th event: '),
+            array('index' => 6, 'dateString' => '20010214T120000', 'message' => '7th event: '),
+        );
+        $this->assertVEVENT(
+            'Europe/Berlin',
+            array(
+                'DTSTART:20001214T120000',
+                'DTEND:20001214T130000',
+                'RRULE:FREQ=YEARLY;BYMONTHDAY=7,14,21;COUNT=8',
+            ),
+            8,
+            $checks
+        );
+    }
+
+    public function testYearlyWithByMonthDayAndByDay()
+    {
+        $checks = array(
+            array('index' => 0, 'dateString' => '20001214T120000', 'message' => '1st event: '),
+            array('index' => 1, 'dateString' => '20001221T120000', 'message' => '2nd event: '),
+            array('index' => 2, 'dateString' => '20010607T120000', 'message' => '3rd event: '),
+            array('index' => 3, 'dateString' => '20010614T120000', 'message' => '4th event: '),
+            array('index' => 6, 'dateString' => '20020214T120000', 'message' => '7th event: '),
+        );
+        $this->assertVEVENT(
+            'Europe/Berlin',
+            array(
+                'DTSTART:20001214T120000',
+                'DTEND:20001214T130000',
+                'RRULE:FREQ=YEARLY;BYMONTHDAY=7,14,21;BYDAY=TH;COUNT=8',
+            ),
+            8,
+            $checks
+        );
+    }
+
+    public function testYearlyWithByMonthAndByMonthDay()
+    {
+        $checks = array(
+            array('index' => 0, 'dateString' => '20001214T120000', 'message' => '1st event: '),
+            array('index' => 1, 'dateString' => '20001221T120000', 'message' => '2nd event: '),
+            array('index' => 2, 'dateString' => '20010607T120000', 'message' => '3rd event: '),
+            array('index' => 3, 'dateString' => '20010614T120000', 'message' => '4th event: '),
+            array('index' => 6, 'dateString' => '20011214T120000', 'message' => '7th event: '),
+        );
+        $this->assertVEVENT(
+            'Europe/Berlin',
+            array(
+                'DTSTART:20001214T120000',
+                'DTEND:20001214T130000',
+                'RRULE:FREQ=YEARLY;BYMONTH=12,6;BYMONTHDAY=7,14,21;COUNT=8',
+            ),
+            8,
+            $checks
+        );
+    }
+
     public function assertVEVENT($defaultTimezone, $veventParts, $count, $checks)
     {
         $options = $this->getOptions($defaultTimezone);
