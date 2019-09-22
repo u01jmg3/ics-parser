@@ -1624,6 +1624,29 @@ class ICal
     }
 
     /**
+     * Resolves values from indices of the range 1 -> $limit.
+     *
+     * For instance, if passed [1, 4, -16] and 28, this will return [1, 4, 13].
+     *
+     * @param  array   $indexes
+     * @param  integer $limit
+     * @return array
+     */
+    private function resolveIndicesOfRange($indexes, $limit)
+    {
+        $matching = array();
+        foreach ($indexes as $index) {
+            if ($index > 0 && $index <= $limit) {
+                $matching[] = $index;
+            } else if ($index < 0 && -$index <= $limit) {
+                $matching[] = $index + $limit + 1;
+            }
+        }
+        sort($matching);
+        return $matching;
+    }
+
+    /**
      * Find all days of a month that match the BYDAY stanza of an RRULE.
      *
      * With no {ordwk}, then return the day number of every {weekday}
@@ -1767,18 +1790,9 @@ class ICal
      */
     protected function getDaysOfYearMatchingByYearDayRRule($byYearDays, $initialDateTime)
     {
-        $matchingDays = array();
         // `\DateTime::format('L')` returns 1 if leap year, 0 if not.
         $daysInThisYear = $initialDateTime->format('L') ? 366 : 365;
-        foreach ($byYearDays as $yearDay) {
-            if ($yearDay > 0 && $yearDay <= $daysInThisYear) {
-                $matchingDays[] = $yearDay;
-            } else if ($yearDay < 0 && -$yearDay <= $daysInThisYear) {
-                $matchingDays[] = $daysInThisYear + $yearDay + 1;
-            }
-        }
-        sort($matchingDays);
-        return $matchingDays;
+        return $this->resolveIndicesOfRange($byYearDays, $daysInThisYear);
     }
 
     /**
@@ -1812,16 +1826,7 @@ class ICal
         $firstDayOfTheYear = date_create("first day of January {$initialDateTime->format('Y')}")->format("D");
         $weeksInThisYear = ($firstDayOfTheYear == "Thu" || $isLeapYear && $firstDayOfTheYear == "Wed") ? 53 : 52;
 
-        $matchingWeeks = array();
-        foreach ($byWeekNums as $weekNum) {
-            if ($weekNum > 0 && $weekNum <= $weeksInThisYear) {
-                $matchingWeeks[] = $weekNum;
-            } else if ($weekNum < 0 && -$weekNum <= $weeksInThisYear) {
-                $matchingWeeks[] = $weeksInThisYear + $weekNum + 1;
-            }
-        }
-        sort($matchingWeeks);
-
+        $matchingWeeks = $this->resolveIndicesOfRange($byWeekNums, $weeksInThisYear);
         $matchingDays = array();
         $byweekDateTime = clone $initialDateTime;
         foreach ($matchingWeeks as $weekNum) {
