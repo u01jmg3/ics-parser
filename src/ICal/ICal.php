@@ -1224,10 +1224,11 @@ class ICal
             return;
         }
 
-        $allEventRecurrences = array();
+        $allEventOccurrences = array();
 
         foreach ($events as $anEvent) {
             if (!isset($anEvent['RRULE']) || $anEvent['RRULE'] === '') {
+                $allEventOccurrences[] = $anEvent;
                 continue;
             }
 
@@ -1276,10 +1277,22 @@ class ICal
             // Compute EXDATEs
             $exdates = $this->parseExdates($anEvent);
 
+            // Determine if the initial date is also an EXDATE
+            $initialDateIsExdate = array_reduce($exdates, function ($carry, $exdate) use ($initialEventDate) {
+                return $carry || $exdate->getTimestamp() == $initialEventDate->getTimestamp();
+            }, false);
+
+            if (!$initialDateIsExdate) {
+                $allEventOccurrences[] = $anEvent;
+            }
+
             /**
              * Determine at what point we should stop calculating recurrences
              * by looking at the UNTIL or COUNT rrule stanza, or, if neither
              * if set, using a fallback.
+             *
+             * If the initial date is also an EXDATE, it shouldn't be included
+             * in the count.
              *
              * Syntax:
              *   UNTIL={enddate}
@@ -1288,7 +1301,7 @@ class ICal
              * Where:
              *   enddate = <icalDate> || <icalDateTime>
              */
-            $count      = 1;
+            $count      = (int) !$initialDateIsExdate;
             $countLimit = (isset($rrules['COUNT'])) ? intval($rrules['COUNT']) : 0;
             $until      = date_create()->modify("{$this->defaultSpan} years")->setTime(23, 59, 59)->getTimestamp();
 
@@ -1523,12 +1536,10 @@ class ICal
                 $eventRecurrences
             );
 
-            $allEventRecurrences = array_merge($allEventRecurrences, $eventRecurrences);
+            $allEventOccurrences = array_merge($allEventOccurrences, $eventRecurrences);
         }
 
-        $events = array_merge($events, $allEventRecurrences);
-
-        $this->cal['VEVENT'] = $events;
+        $this->cal['VEVENT'] = $allEventOccurrences;
     }
 
     /**
