@@ -31,9 +31,11 @@ class RecurrencesTest extends TestCase
         );
         $this->assertVEVENT(
             'Europe/Berlin',
-            'DTSTART;VALUE=DATE:20000301',
-            'DTEND;VALUE=DATE:20000302',
-            'RRULE:FREQ=YEARLY;WKST=SU;COUNT=3',
+            array(
+                'DTSTART;VALUE=DATE:20000301',
+                'DTEND;VALUE=DATE:20000302',
+                'RRULE:FREQ=YEARLY;WKST=SU;COUNT=3',
+            ),
             3,
             $checks
         );
@@ -48,9 +50,11 @@ class RecurrencesTest extends TestCase
         );
         $this->assertVEVENT(
             'Europe/Berlin',
-            'DTSTART;VALUE=DATE:20000301',
-            'DTEND;VALUE=DATE:20000302',
-            'RRULE:FREQ=MONTHLY;BYMONTHDAY=1;WKST=SU;COUNT=3',
+            array(
+                'DTSTART;VALUE=DATE:20000301',
+                'DTEND;VALUE=DATE:20000302',
+                'RRULE:FREQ=MONTHLY;BYMONTHDAY=1;WKST=SU;COUNT=3',
+            ),
             3,
             $checks
         );
@@ -65,9 +69,11 @@ class RecurrencesTest extends TestCase
         );
         $this->assertVEVENT(
             'Europe/Berlin',
-            'DTSTART;VALUE=DATE:20180701',
-            'DTEND;VALUE=DATE:20180702',
-            'RRULE:FREQ=MONTHLY;BYMONTHDAY=1;WKST=SU;COUNT=3',
+            array(
+                'DTSTART;VALUE=DATE:20180701',
+                'DTEND;VALUE=DATE:20180702',
+                'RRULE:FREQ=MONTHLY;BYMONTHDAY=1;WKST=SU;COUNT=3',
+            ),
             3,
             $checks
         );
@@ -118,9 +124,11 @@ class RecurrencesTest extends TestCase
         );
         $this->assertVEVENT(
             'Europe/Berlin',
-            'DTSTART;VALUE=DATE:20000301',
-            'DTEND;VALUE=DATE:20000302',
-            'RRULE:FREQ=WEEKLY;WKST=SU;COUNT=6',
+            array(
+                'DTSTART;VALUE=DATE:20000301',
+                'DTEND;VALUE=DATE:20000302',
+                'RRULE:FREQ=WEEKLY;WKST=SU;COUNT=6',
+            ),
             6,
             $checks
         );
@@ -135,9 +143,11 @@ class RecurrencesTest extends TestCase
         );
         $this->assertVEVENT(
             'Europe/Berlin',
-            'DTSTART;VALUE=DATE:20000301',
-            'DTEND;VALUE=DATE:20000302',
-            'RRULE:FREQ=DAILY;WKST=SU;COUNT=31',
+            array(
+                'DTSTART;VALUE=DATE:20000301',
+                'DTEND;VALUE=DATE:20000302',
+                'RRULE:FREQ=DAILY;WKST=SU;COUNT=31',
+            ),
             31,
             $checks
         );
@@ -155,9 +165,11 @@ class RecurrencesTest extends TestCase
         );
         $this->assertVEVENT(
             'Europe/Berlin',
-            'DTSTART;TZID=Europe/Berlin:20000301T000000',
-            'DTEND;TZID=Europe/Berlin:20000302T000000',
-            'RRULE:FREQ=WEEKLY;WKST=SU;COUNT=6',
+            array(
+                'DTSTART;TZID=Europe/Berlin:20000301T000000',
+                'DTEND;TZID=Europe/Berlin:20000302T000000',
+                'RRULE:FREQ=WEEKLY;WKST=SU;COUNT=6',
+            ),
             6,
             $checks
         );
@@ -172,9 +184,10 @@ class RecurrencesTest extends TestCase
         );
         $this->assertVEVENT(
             'Europe/Berlin',
-            'DTSTART;TZID=America/New_York:19970902T090000',
-            '',
-            'RRULE:FREQ=DAILY;COUNT=10',
+            array(
+                'DTSTART;TZID=America/New_York:19970902T090000',
+                'RRULE:FREQ=DAILY;COUNT=10',
+            ),
             10,
             $checks
         );
@@ -189,9 +202,10 @@ class RecurrencesTest extends TestCase
         );
         $this->assertVEVENT(
             'Europe/Berlin',
-            'DTSTART;TZID=Europe/Berlin:19970902T090000',
-            '',
-            'RRULE:FREQ=DAILY;COUNT=10',
+            array(
+                'DTSTART;TZID=Europe/Berlin:19970902T090000',
+                'RRULE:FREQ=DAILY;COUNT=10',
+            ),
             10,
             $checks
         );
@@ -206,21 +220,22 @@ class RecurrencesTest extends TestCase
         );
         $this->assertVEVENT(
             'America/New_York',
-            'DTSTART;TZID=Europe/Berlin:19970902T090000',
-            '',
-            'RRULE:FREQ=DAILY;COUNT=10',
+            array(
+                'DTSTART;TZID=Europe/Berlin:19970902T090000',
+                'RRULE:FREQ=DAILY;COUNT=10',
+            ),
             10,
             $checks
         );
     }
 
-    public function assertVEVENT($defaultTimezone, $dtstart, $dtend, $rrule, $count, $checks)
+    public function assertVEVENT($defaultTimezone, $veventParts, $count, $checks)
     {
         $options = $this->getOptions($defaultTimezone);
 
         $testIcal  = implode(PHP_EOL, $this->getIcalHeader());
         $testIcal .= PHP_EOL;
-        $testIcal .= implode(PHP_EOL, $this->formatIcalEvent($dtstart, $dtend, $rrule));
+        $testIcal .= implode(PHP_EOL, $this->formatIcalEvent($veventParts));
         $testIcal .= PHP_EOL;
         $testIcal .= implode(PHP_EOL, $this->getIcalFooter());
 
@@ -280,20 +295,20 @@ class RecurrencesTest extends TestCase
         return $options;
     }
 
-    public function formatIcalEvent($dtstart, $dtend, $rrule)
+    public function formatIcalEvent($veventParts)
     {
-        return array(
-            'BEGIN:VEVENT',
-            'CREATED:20090213T195947Z',
-            'UID:M2CD-1-1-5FB000FB-BBE4-4F3F-9E7E-217F1FF97209',
-            $rrule,
-            $dtstart,
-            $dtend,
-            'SUMMARY:test',
-            'LAST-MODIFIED:20110429T222101Z',
-            'DTSTAMP:20170630T105724Z',
-            'SEQUENCE:0',
-            'END:VEVENT',
+        return array_merge(
+            array(
+                'BEGIN:VEVENT',
+                'CREATED:' . gmdate('Ymd\THis\Z'),
+                'UID:M2CD-1-1-5FB000FB-BBE4-4F3F-9E7E-217F1FF97209',
+            ),
+            $veventParts,
+            array(
+                'SUMMARY:test',
+                'LAST-MODIFIED:' . gmdate('Ymd\THis\Z', filemtime(__FILE__)),
+                'END:VEVENT',
+            )
         );
     }
 
