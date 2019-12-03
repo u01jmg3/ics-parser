@@ -1224,11 +1224,11 @@ class ICal
             return;
         }
 
-        $allEventOccurrences = array();
+        $allEventRecurrences = array();
+        $eventKeysToRemove = array();
 
-        foreach ($events as $anEvent) {
+        foreach ($events as $key => $anEvent) {
             if (!isset($anEvent['RRULE']) || $anEvent['RRULE'] === '') {
-                $allEventOccurrences[] = $anEvent;
                 continue;
             }
 
@@ -1282,8 +1282,8 @@ class ICal
                 return $carry || $exdate->getTimestamp() == $initialEventDate->getTimestamp();
             }, false);
 
-            if (!$initialDateIsExdate) {
-                $allEventOccurrences[] = $anEvent;
+            if ($initialDateIsExdate) {
+                $eventKeysToRemove[] = $key;
             }
 
             /**
@@ -1536,10 +1536,19 @@ class ICal
                 $eventRecurrences
             );
 
-            $allEventOccurrences = array_merge($allEventOccurrences, $eventRecurrences);
+            $allEventRecurrences = array_merge($allEventRecurrences, $eventRecurrences);
         }
 
-        $this->cal['VEVENT'] = $allEventOccurrences;
+        // Nullify the initial events that are also EXDATEs
+        if (!empty($eventKeysToRemove)) {
+            foreach ($eventKeysToRemove as $eventKeyToRemove) {
+                $events[$eventKeyToRemove] = null;
+            }
+        }
+
+        $events = array_merge($events, $allEventRecurrences);
+
+        $this->cal['VEVENT'] = $events;
     }
 
     /**
