@@ -666,8 +666,7 @@ class Rfc5545Examples extends TestCase
         );
     }
 
-/*  1. Requires support for BYMONTHDAY and BYDAY in the same MONTHLY RRULE [No ticket]
- *  2. Parser not excluding the date under EXDATE (which is the date of the initial event) [No ticket]
+/*  Requires support for BYMONTHDAY and BYDAY in the same MONTHLY RRULE [No ticket]
  *
     // Page 129, Test 4 :: Every Friday 13th, forever
     //

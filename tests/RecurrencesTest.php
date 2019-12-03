@@ -211,6 +211,50 @@ class RecurrencesTest extends TestCase
         );
     }
 
+    public function testStartDateIsExdateUsingUntil()
+    {
+        $checks = array(
+            array('index' => 0, 'dateString' => '20190918T095000', 'timezone' => 'Europe/London', 'message' => '1st event: '),
+            array('index' => 1, 'dateString' => '20191002T095000', 'timezone' => 'Europe/London', 'message' => '2nd event: '),
+            array('index' => 2, 'dateString' => '20191016T095000', 'timezone' => 'Europe/London', 'message' => '3rd event: '),
+        );
+        $this->assertVEVENT(
+            'Europe/London',
+            array(
+                'DTSTART;TZID=Europe/London:20190911T095000',
+                'RRULE:FREQ=WEEKLY;WKST=SU;UNTIL=20191027T235959Z;BYDAY=WE',
+                'EXDATE;TZID=Europe/London:20191023T095000',
+                'EXDATE;TZID=Europe/London:20191009T095000',
+                'EXDATE;TZID=Europe/London:20190925T095000',
+                'EXDATE;TZID=Europe/London:20190911T095000',
+            ),
+            3,
+            $checks
+        );
+    }
+
+    public function testStartDateIsExdateUsingCount()
+    {
+        $checks = array(
+            array('index' => 0, 'dateString' => '20190918T095000', 'timezone' => 'Europe/London', 'message' => '1st event: '),
+            array('index' => 1, 'dateString' => '20191002T095000', 'timezone' => 'Europe/London', 'message' => '2nd event: '),
+            array('index' => 2, 'dateString' => '20191016T095000', 'timezone' => 'Europe/London', 'message' => '3rd event: '),
+        );
+        $this->assertVEVENT(
+            'Europe/London',
+            array(
+                'DTSTART;TZID=Europe/London:20190911T095000',
+                'RRULE:FREQ=WEEKLY;WKST=SU;COUNT=3;BYDAY=WE',
+                'EXDATE;TZID=Europe/London:20191023T095000',
+                'EXDATE;TZID=Europe/London:20191009T095000',
+                'EXDATE;TZID=Europe/London:20190925T095000',
+                'EXDATE;TZID=Europe/London:20190911T095000',
+            ),
+            3,
+            $checks
+        );
+    }
+
     public function testRFCDaily10BerlinFromNewYork()
     {
         $checks = array(
