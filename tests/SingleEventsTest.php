@@ -22,6 +22,29 @@ class SingleEventsTest extends TestCase
         date_default_timezone_set($this->originalTimeZone);
     }
 
+    public function testLastModified() 
+    {
+        $defaultTimezone = 'Europe/Berlin';
+        $dtstart = 'DTSTART;VALUE=DATE:20000301';
+        $dtend = 'DTEND;VALUE=DATE:20000302';
+        $options = $this->getOptions($defaultTimezone);
+
+        $testIcal  = implode(PHP_EOL, $this->getIcalHeader());
+        $testIcal .= PHP_EOL;
+        $testIcal .= implode(PHP_EOL, $this->formatIcalEvent($dtstart, $dtend));
+        $testIcal .= PHP_EOL;
+        $testIcal .= implode(PHP_EOL, $this->getIcalTimezones());
+        $testIcal .= PHP_EOL;
+        $testIcal .= implode(PHP_EOL, $this->getIcalFooter());
+
+        $ical = new ICal(false, $options);
+        $ical->initString($testIcal);
+
+        $events = $ical->events();
+        $event = array_shift($events);
+        $this->assertEquals('20110429T222101Z', $event->last_modified);
+    }
+
     public function testFullDayTimeZoneBerlin()
     {
         $checks = array(

@@ -60,9 +60,9 @@ class Event
     /**
      * https://www.kanzaki.com/docs/ical/lastModified.html
      *
-     * @var $lastmodified
+     * @var $last_modified
      */
-    public $lastmodified;
+    public $last_modified;
 
     /**
      * https://www.kanzaki.com/docs/ical/description.html
@@ -165,7 +165,7 @@ class Event
             'DTSTAMP'       => $this->dtstamp,
             'UID'           => $this->uid,
             'CREATED'       => $this->created,
-            'LAST-MODIFIED' => $this->lastmodified,
+            'LAST-MODIFIED' => $this->last_modified,
             'DESCRIPTION'   => $this->description,
             'LOCATION'      => $this->location,
             'SEQUENCE'      => $this->sequence,
