@@ -185,6 +185,13 @@ class ICal
     protected $httpUserAgent = null;
 
     /**
+     * Holds the custom Accept Language string header
+     *
+     * @var string
+     */
+    protected $httpAcceptLanguage = null;
+
+    /**
      * Define which variables can be configured
      *
      * @var array
@@ -574,7 +581,7 @@ class ICal
      * @param  string $userAgent
      * @return ICal
      */
-    public function initUrl($url, $username = null, $password = null, $userAgent = null)
+    public function initUrl($url, $username = null, $password = null, $userAgent = null, $acceptLanguage = null)
     {
         if (!is_null($username) && !is_null($password)) {
             $this->httpBasicAuth['username'] = $username;
@@ -583,6 +590,10 @@ class ICal
 
         if (!is_null($userAgent)) {
             $this->httpUserAgent = $userAgent;
+        }
+
+        if (!is_null($acceptLanguage)) {
+            $this->httpAcceptLanguage = $acceptLanguage;
         }
 
         $this->initFile($url);
@@ -2231,7 +2242,7 @@ class ICal
     protected function fileOrUrl($filename)
     {
         $options = array();
-        if (!empty($this->httpBasicAuth) || !empty($this->httpUserAgent)) {
+        if (!empty($this->httpBasicAuth) || !empty($this->httpUserAgent) || !empty($this->httpAcceptLanguage)) {
             $options['http'] = array();
             $options['http']['header'] = array();
 
@@ -2245,6 +2256,10 @@ class ICal
 
             if (!empty($this->httpUserAgent)) {
                 array_push($options['http']['header'], "User-Agent: {$this->httpUserAgent}");
+            }
+
+            if (!empty($this->httpAcceptLanguage)) {
+                array_push($options['http']['header'], "Accept-language: {$this->httpAcceptLanguage}");
             }
         }
 
