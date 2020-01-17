@@ -1397,7 +1397,7 @@ class ICal
                         foreach ($matchingDays as $day) {
                             $clonedDateTime = clone $frequencyRecurringDateTime;
                             $candidateDateTimes[] = $clonedDateTime->setISODate(
-                                $frequencyRecurringDateTime->format('Y'),
+                                $frequencyRecurringDateTime->format('o'),
                                 $frequencyRecurringDateTime->format('W'),
                                 $day
                             );
