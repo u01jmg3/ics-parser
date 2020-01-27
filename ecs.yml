@@ -1,4 +1,4 @@
-# ecs check -q --fix .
+# ecs check --fix .
 parameters:
     line_ending: "\n"
     sets:
