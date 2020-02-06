@@ -1229,7 +1229,7 @@ class ICal
 
             if (!empty($eventKeysToRemove)) {
                 foreach ($eventKeysToRemove as $eventKeyToRemove) {
-                    $events[$eventKeyToRemove] = null;
+                    unset($events[$eventKeyToRemove]);
                 }
             }
 
