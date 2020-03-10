@@ -624,6 +624,8 @@ class ICal
 
                 $add = $this->keyValueFromString($line);
 
+                if ($add === false) { continue; }
+
                 $keyword = $add[0];
                 $values  = $add[1]; // May be an array containing multiple values
 
