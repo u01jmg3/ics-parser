@@ -621,6 +621,10 @@ class ICal
                 if (!$this->disableCharacterReplacement) {
                     $line = $this->cleanData($line);
                 }
+                
+                if (empty($line)) {
+                    continue;
+                }
 
                 $add = $this->keyValueFromString($line);
 
