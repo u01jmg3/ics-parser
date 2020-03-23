@@ -7,7 +7,7 @@
  *
  * @author  Jonathan Goode <https://github.com/u01jmg3>
  * @license https://opensource.org/licenses/mit-license.php MIT License
- * @version 2.1.16
+ * @version 2.1.18
  */
 
 namespace ICal;
@@ -1502,7 +1502,7 @@ class ICal
                         $this->eventCount++;
                     }
 
-                    // count all evaluated candidates, also excluded ones
+                    // Count all evaluated candidates including excluded ones
                     if (isset($rrules['COUNT'])) {
                         $count++;
 
