@@ -1337,7 +1337,7 @@ class ICal
              * Where:
              *   enddate = <icalDate> || <icalDateTime>
              */
-            $count      = (int) !$initialDateIsExdate;
+            $count      = 1;
             $countLimit = (isset($rrules['COUNT'])) ? intval($rrules['COUNT']) : 0;
             $until      = date_create()->modify("{$this->defaultSpan} years")->setTime(23, 59, 59)->getTimestamp();
 
@@ -1500,14 +1500,15 @@ class ICal
                     if (!$isExcluded) {
                         $eventRecurrences[] = $candidate;
                         $this->eventCount++;
+                    }
 
-                        if (isset($rrules['COUNT'])) {
-                            $count++;
+                    // count all evaluated candidates, also excluded ones
+                    if (isset($rrules['COUNT'])) {
+                        $count++;
 
-                            // If RRULE[COUNT] is reached then break
-                            if ($count >= $countLimit) {
-                                break 2;
-                            }
+                        // If RRULE[COUNT] is reached then break
+                        if ($count >= $countLimit) {
+                            break 2;
                         }
                     }
                 }
@@ -1700,6 +1701,7 @@ class ICal
      * time zone depending on the event `TZID`.
      *
      * @return void
+     * @throws \Exception
      */
     protected function processDateConversions()
     {

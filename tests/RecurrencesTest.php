@@ -244,11 +244,33 @@ class RecurrencesTest extends TestCase
             'Europe/London',
             array(
                 'DTSTART;TZID=Europe/London:20190911T095000',
-                'RRULE:FREQ=WEEKLY;WKST=SU;COUNT=3;BYDAY=WE',
+                'RRULE:FREQ=WEEKLY;WKST=SU;COUNT=7;BYDAY=WE',
                 'EXDATE;TZID=Europe/London:20191023T095000',
                 'EXDATE;TZID=Europe/London:20191009T095000',
                 'EXDATE;TZID=Europe/London:20190925T095000',
                 'EXDATE;TZID=Europe/London:20190911T095000',
+            ),
+            3,
+            $checks
+        );
+    }
+
+    public function testCountWithExdate()
+    {
+        $checks = array(
+            array('index' => 0, 'dateString' => '20200323T050000', 'timezone' => 'Europe/Paris', 'message' => '1st event: '),
+            array('index' => 1, 'dateString' => '20200324T050000', 'timezone' => 'Europe/Paris', 'message' => '2nd event: '),
+            array('index' => 2, 'dateString' => '20200327T050000', 'timezone' => 'Europe/Paris', 'message' => '3rd event: ')
+        );
+        $this->assertVEVENT(
+            'Europe/London',
+            array(
+                'DTSTART;TZID=Europe/Paris:20200323T050000',
+                'DTEND;TZID=Europe/Paris:20200323T070000',
+                'RRULE:FREQ=DAILY;COUNT=5',
+                'EXDATE;TZID=Europe/Paris:20200326T050000',
+                'EXDATE;TZID=Europe/Paris:20200325T050000',
+                'DTSTAMP:20200318T141057Z'
             ),
             3,
             $checks
