@@ -618,12 +618,12 @@ class ICal
                 $line = rtrim($line); // Trim trailing whitespace
                 $line = $this->removeUnprintableChars($line);
 
-                if (!$this->disableCharacterReplacement) {
-                    $line = $this->cleanData($line);
-                }
-
                 if (empty($line)) {
                     continue;
+                }
+
+                if (!$this->disableCharacterReplacement) {
+                    $line = $this->cleanData($line);
                 }
 
                 $add = $this->keyValueFromString($line);
