@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This PHP class will read an ICS (`.ics`, `.ical`, `.ifb`) file, parse it and return an
  * array of its contents.
@@ -1224,7 +1225,7 @@ class ICal
                     $eventDtstartUnix = $this->iCalDateToUnixTimestamp($event['DTSTART_array'][3]);
 
                     // phpcs:ignore CustomPHPCS.ControlStructures.AssignmentInCondition
-                    if (false !== $alteredEventKey = array_search($eventDtstartUnix, $this->alteredRecurrenceInstances[$event['UID']])) {
+                    if ($alteredEventKey = array_search($eventDtstartUnix, $this->alteredRecurrenceInstances[$event['UID']]) !== false) {
                         $eventKeysToRemove[] = $alteredEventKey;
 
                         $alteredEvent = array_replace_recursive($events[$key], $events[$alteredEventKey]);
@@ -1392,7 +1393,7 @@ class ICal
                                     // value between 0 and 6. But setISODate() expects a value of 1 to 7.
                                     // Even with alternate week starts, we still need to +1 to set the
                                     // correct weekday.
-                                    $day += 1;
+                                    $day++;
 
                                     return $day;
                                 },
@@ -1545,7 +1546,8 @@ class ICal
 
             // Build the param array
             $dateParamArray = array();
-            if (!$initialDateWasUTC
+            if (
+                !$initialDateWasUTC
                 && isset($anEvent['DTSTART_array'][0]['TZID'])
                 && $this->isValidTimeZoneId($anEvent['DTSTART_array'][0]['TZID'])
             ) {
@@ -1893,7 +1895,8 @@ class ICal
             $eventStart = $anEvent->dtstart_array[2];
             $eventEnd   = (isset($anEvent->dtend_array[2])) ? $anEvent->dtend_array[2] : null;
 
-            if (($eventStart >= $rangeStart && $eventStart < $rangeEnd)         // Event start date contained in the range
+            if (
+                ($eventStart >= $rangeStart && $eventStart < $rangeEnd)         // Event start date contained in the range
                 || ($eventEnd !== null
                     && (
                         ($eventEnd > $rangeStart && $eventEnd <= $rangeEnd)     // Event end date contained in the range
@@ -2071,11 +2074,11 @@ class ICal
         if (function_exists('mb_chr')) {
             return mb_chr($code);
         } else {
-            if (0x80 > $code %= 0x200000) {
+            if (($code %= 0x200000) < 0x80) {
                 $s = chr($code);
-            } elseif (0x800 > $code) {
+            } elseif ($code < 0x800) {
                 $s = chr(0xc0 | $code >> 6) . chr(0x80 | $code & 0x3f);
-            } elseif (0x10000 > $code) {
+            } elseif ($code < 0x10000) {
                 $s = chr(0xe0 | $code >> 12) . chr(0x80 | $code >> 6 & 0x3f) . chr(0x80 | $code & 0x3f);
             } else {
                 $s = chr(0xf0 | $code >> 18) . chr(0x80 | $code >> 12 & 0x3f) . chr(0x80 | $code >> 6 & 0x3f) . chr(0x80 | $code & 0x3f);

@@ -260,7 +260,7 @@ class RecurrencesTest extends TestCase
         $checks = array(
             array('index' => 0, 'dateString' => '20200323T050000', 'timezone' => 'Europe/Paris', 'message' => '1st event: '),
             array('index' => 1, 'dateString' => '20200324T050000', 'timezone' => 'Europe/Paris', 'message' => '2nd event: '),
-            array('index' => 2, 'dateString' => '20200327T050000', 'timezone' => 'Europe/Paris', 'message' => '3rd event: ')
+            array('index' => 2, 'dateString' => '20200327T050000', 'timezone' => 'Europe/Paris', 'message' => '3rd event: '),
         );
         $this->assertVEVENT(
             'Europe/London',
@@ -270,7 +270,7 @@ class RecurrencesTest extends TestCase
                 'RRULE:FREQ=DAILY;COUNT=5',
                 'EXDATE;TZID=Europe/Paris:20200326T050000',
                 'EXDATE;TZID=Europe/Paris:20200325T050000',
-                'DTSTAMP:20200318T141057Z'
+                'DTSTAMP:20200318T141057Z',
             ),
             3,
             $checks
