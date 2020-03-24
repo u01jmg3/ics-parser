@@ -1225,7 +1225,7 @@ class ICal
                     $eventDtstartUnix = $this->iCalDateToUnixTimestamp($event['DTSTART_array'][3]);
 
                     // phpcs:ignore CustomPHPCS.ControlStructures.AssignmentInCondition
-                    if ($alteredEventKey = array_search($eventDtstartUnix, $this->alteredRecurrenceInstances[$event['UID']]) !== false) {
+                    if (($alteredEventKey = array_search($eventDtstartUnix, $this->alteredRecurrenceInstances[$event['UID']])) !== false) {
                         $eventKeysToRemove[] = $alteredEventKey;
 
                         $alteredEvent = array_replace_recursive($events[$key], $events[$alteredEventKey]);
