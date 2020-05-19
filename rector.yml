@@ -16,6 +16,9 @@ parameters:
         - Rector\CodeQuality\Rector\If_\SimplifyIfReturnBoolRector
         - Rector\CodeQuality\Rector\Return_\SimplifyUselessVariableRector
         - Rector\DeadCode\Rector\ClassMethod\RemoveUnusedParameterRector
+        - Rector\CodeQuality\Rector\If_\CombineIfRector
+        - Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector
+        - Rector\DeadCode\Rector\ClassConst\RemoveUnusedClassConstantRector
         - Rector\Php56\Rector\FuncCall\PowToExpRector
         - Rector\Php71\Rector\FuncCall\CountOnNullRector
         # PHP 5.6 incompatible
