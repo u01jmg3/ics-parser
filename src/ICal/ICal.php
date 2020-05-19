@@ -1689,7 +1689,9 @@ class ICal
             }
 
             // Positioning starts at 1, array indexes start at 0
-            $filteredMatches[] = $valuesList[$setPosition - 1];
+            if (isset($valuesList[$setPosition - 1])) {
+                $filteredMatches[] = $valuesList[$setPosition - 1];
+            }
         }
 
         return $filteredMatches;
