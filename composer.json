@@ -23,6 +23,12 @@
             "role": "Developer/Prior Owner"
         }
     ],
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/u01jmg3"
+        }
+    ],
     "require": {
         "php": ">=5.3.9",
         "ext-mbstring": "*",
