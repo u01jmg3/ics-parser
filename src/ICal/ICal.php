@@ -543,8 +543,9 @@ class ICal
      */
     public function initString($string)
     {
+        $string = str_replace(["\r\n", "\n\r", "\r"], "\n", $string);
         if (empty($this->cal)) {
-            $lines = explode(PHP_EOL, $string);
+            $lines = explode("\n", $string);
 
             $this->initLines($lines);
         } else {
