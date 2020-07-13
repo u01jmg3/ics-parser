@@ -1618,7 +1618,7 @@ class ICal
      * @param  \DateTime $initialDateTime
      * @return array
      */
-    protected function getDaysOfMonthMatchingByDayRRule($byDays, $initialDateTime)
+    protected function getDaysOfMonthMatchingByDayRRule(array $byDays, $initialDateTime)
     {
         $matchingDays = array();
 
@@ -1678,7 +1678,7 @@ class ICal
      * @param  array $valuesList
      * @return array
      */
-    protected function filterValuesUsingBySetPosRRule($bySetPos, $valuesList)
+    protected function filterValuesUsingBySetPosRRule(array $bySetPos, array $valuesList)
     {
         $filteredMatches = array();
 
