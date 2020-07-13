@@ -17,6 +17,9 @@ parameters:
         # Requires PHP 7.1 and above
         PhpCsFixer\Fixer\ClassNotation\VisibilityRequiredFixer: ~
 services:
+    SlevomatCodingStandard\ControlStructures\AssignmentInConditionSniff: ~
+    SlevomatCodingStandard\Namespaces\AlphabeticallySortedUsesSniff: ~
+    SlevomatCodingStandard\Namespaces\UnusedUsesSniff: ~
     PHP_CodeSniffer\Standards\Generic\Sniffs\Formatting\SpaceAfterNotSniff:
         spacing: 0
     PHP_CodeSniffer\Standards\Generic\Sniffs\Classes\SelfMemberReferenceSniff: ~
