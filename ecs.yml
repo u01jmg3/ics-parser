@@ -17,9 +17,15 @@ parameters:
         # Requires PHP 7.1 and above
         PhpCsFixer\Fixer\ClassNotation\VisibilityRequiredFixer: ~
 services:
+    PHP_CodeSniffer\Standards\Generic\Sniffs\Formatting\SpaceAfterNotSniff:
+        spacing: 0
     PHP_CodeSniffer\Standards\Generic\Sniffs\Classes\SelfMemberReferenceSniff: ~
     PhpCsFixer\Fixer\ArrayNotation\ArraySyntaxFixer:
         syntax: long
+    PhpCsFixer\Fixer\ControlStructure\YodaStyleFixer:
+        equal: false
+        identical: false
+        less_and_greater: false
     PhpCsFixer\Fixer\Alias\NoAliasFunctionsFixer: ~
     PhpCsFixer\Fixer\Alias\NoMixedEchoPrintFixer: ~
     PhpCsFixer\Fixer\ArrayNotation\NoMultilineWhitespaceAroundDoubleArrowFixer: ~

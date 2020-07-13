@@ -998,7 +998,7 @@ class ICal
             $matches             = str_getcsv($text, ':');
             $combinedValue       = '';
 
-            foreach ($matches as $key => $match) {
+            foreach (array_keys($matches) as $key) {
                 if ($key === 0) {
                     if (!empty($before)) {
                         $matches[$key] = $before . '"' . $matches[$key] . '"';
@@ -1182,7 +1182,7 @@ class ICal
      */
     protected function processEvents()
     {
-        $checks = array();
+        $checks = null;
         $events = (isset($this->cal['VEVENT'])) ? $this->cal['VEVENT'] : array();
 
         if (!empty($events)) {
@@ -1237,10 +1237,8 @@ class ICal
                 unset($checks);
             }
 
-            if (!empty($eventKeysToRemove)) {
-                foreach ($eventKeysToRemove as $eventKeyToRemove) {
-                    $events[$eventKeyToRemove] = null;
-                }
+            foreach ($eventKeysToRemove as $eventKeyToRemove) {
+                $events[$eventKeyToRemove] = null;
             }
 
             $this->cal['VEVENT'] = $events;
@@ -1584,10 +1582,8 @@ class ICal
         }
 
         // Nullify the initial events that are also EXDATEs
-        if (!empty($eventKeysToRemove)) {
-            foreach ($eventKeysToRemove as $eventKeyToRemove) {
-                $events[$eventKeyToRemove] = null;
-            }
+        foreach ($eventKeysToRemove as $eventKeyToRemove) {
+            $events[$eventKeyToRemove] = null;
         }
 
         $events = array_merge($events, $allEventRecurrences);
@@ -1866,7 +1862,7 @@ class ICal
         if (!is_null($rangeStart)) {
             try {
                 $rangeStart = new \DateTime($rangeStart, new \DateTimeZone($this->defaultTimeZone));
-            } catch (\Exception $e) {
+            } catch (\Exception $exception) {
                 error_log("ICal::eventsFromRange: Invalid date passed ({$rangeStart})");
                 $rangeStart = false;
             }
@@ -1877,7 +1873,7 @@ class ICal
         if (!is_null($rangeEnd)) {
             try {
                 $rangeEnd = new \DateTime($rangeEnd, new \DateTimeZone($this->defaultTimeZone));
-            } catch (\Exception $e) {
+            } catch (\Exception $exception) {
                 error_log("ICal::eventsFromRange: Invalid date passed ({$rangeEnd})");
                 $rangeEnd = false;
             }
@@ -2211,7 +2207,7 @@ class ICal
             end($subArray);
             $finalKey = key($subArray);
 
-            foreach ($subArray as $key => $value) {
+            foreach (array_keys($subArray) as $key) {
                 if ($key === 'TZID') {
                     $currentTimeZone = $this->timeZoneStringToDateTimeZone($subArray[$key]);
                 } elseif (is_numeric($key)) {
@@ -2251,7 +2247,7 @@ class ICal
             new \DateTime($value);
 
             return true;
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             return false;
         }
     }
