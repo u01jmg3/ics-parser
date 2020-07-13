@@ -29,6 +29,14 @@ services:
         equal: false
         identical: false
         less_and_greater: false
+    PhpCsFixer\Fixer\Whitespace\BlankLineBeforeStatementFixer:
+        statements: [
+            'continue',
+            'declare',
+            'return',
+            'throw',
+            'try',
+        ]
     PhpCsFixer\Fixer\Alias\NoAliasFunctionsFixer: ~
     PhpCsFixer\Fixer\Alias\NoMixedEchoPrintFixer: ~
     PhpCsFixer\Fixer\ArrayNotation\NoMultilineWhitespaceAroundDoubleArrowFixer: ~
@@ -93,7 +101,6 @@ services:
     PhpCsFixer\Fixer\Semicolon\SpaceAfterSemicolonFixer: ~
     PhpCsFixer\Fixer\StringNotation\HeredocToNowdocFixer: ~
     PhpCsFixer\Fixer\StringNotation\SingleQuoteFixer: ~
-    PhpCsFixer\Fixer\Whitespace\BlankLineBeforeStatementFixer: ~
     PhpCsFixer\Fixer\Whitespace\CompactNullableTypehint: ~
     PhpCsFixer\Fixer\Whitespace\LineEndingFixer: ~
     PhpCsFixer\Fixer\Whitespace\NoExtraConsecutiveBlankLinesFixer: ~
