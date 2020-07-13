@@ -582,6 +582,7 @@ class ICal
      * @param  string $username
      * @param  string $password
      * @param  string $userAgent
+     * @param  string $acceptLanguage
      * @return ICal
      */
     public function initUrl($url, $username = null, $password = null, $userAgent = null, $acceptLanguage = null)
