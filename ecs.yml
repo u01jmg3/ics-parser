@@ -78,7 +78,6 @@ services:
     PhpCsFixer\Fixer\PhpTag\FullOpeningTagFixer: ~
     PhpCsFixer\Fixer\PhpTag\NoClosingTagFixer: ~
     PhpCsFixer\Fixer\PhpdocNoUselessInheritdocFixer: ~
-    PhpCsFixer\Fixer\Phpdoc\NoBlankLinesAfterPhpdocFixer: ~
     PhpCsFixer\Fixer\Phpdoc\NoEmptyPhpdocFixer: ~
     PhpCsFixer\Fixer\Phpdoc\PhpdocIndentFixer: ~
     PhpCsFixer\Fixer\Phpdoc\PhpdocInlineTagFixer: ~
