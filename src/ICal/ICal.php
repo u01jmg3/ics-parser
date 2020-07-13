@@ -8,7 +8,7 @@
  *
  * @author  Jonathan Goode <https://github.com/u01jmg3>
  * @license https://opensource.org/licenses/mit-license.php MIT License
- * @version 2.1.19
+ * @version 2.1.20
  */
 
 namespace ICal;
