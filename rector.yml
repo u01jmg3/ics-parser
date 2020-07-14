@@ -47,3 +47,5 @@ parameters:
         - 'php72'
         - 'php73'
         - 'php74'
+services:
+    Rector\Php53\Rector\Ternary\TernaryToElvisRector: ~
