@@ -44,7 +44,6 @@ parameters:
         - 'code-quality'
         - 'coding-style'
         - 'dead-code'
-        - 'laravel'
         - 'php56'
         - 'php70'
         - 'php71'
