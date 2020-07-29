@@ -174,7 +174,8 @@ class Event
         );
 
         // Remove any blank values
-        $data   = array_filter($data);
+        $data = array_filter($data);
+
         $output = '';
 
         foreach ($data as $key => $value) {
