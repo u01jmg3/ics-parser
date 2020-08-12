@@ -80,18 +80,19 @@ use SlevomatCodingStandard\ControlStructures\AssignmentInConditionSniff;
 use SlevomatCodingStandard\Namespaces\AlphabeticallySortedUsesSniff;
 use SlevomatCodingStandard\Namespaces\UnusedUsesSniff;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symplify\EasyCodingStandard\Configuration\Option;
 
 // ecs check --fix .
 
 return static function (ContainerConfigurator $containerConfigurator): void {
     $parameters = $containerConfigurator->parameters();
 
-    $parameters->set('line_ending', "\n");
+    $parameters->set(Option::LINE_ENDING, "\n");
 
     // https://github.com/symplify/easy-coding-standard/blob/master/config/set/psr12.php
-    $parameters->set('sets', array('psr12'));
+    $parameters->set(Option::SETS, array('psr12'));
 
-    $parameters->set('skip', array(
+    $parameters->set(Option::SKIP, array(
         'PhpCsFixer\Fixer\Basic\BracesFixer'                           => null,
         'PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer'          => null,
         'PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer' => null,
