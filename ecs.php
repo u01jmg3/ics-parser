@@ -108,16 +108,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services = $containerConfigurator->services();
 
-    $services->set(AssignmentInConditionSniff::class);
-
-    $services->set(AlphabeticallySortedUsesSniff::class);
-
-    $services->set(UnusedUsesSniff::class);
-
     $services->set(SpaceAfterNotSniff::class)
         ->property('spacing', 0);
-
-    $services->set(SelfMemberReferenceSniff::class);
 
     $services->set(ArraySyntaxFixer::class)
         ->call('configure', array(array('syntax' => 'long')));
@@ -127,6 +119,14 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services->set(BlankLineBeforeStatementFixer::class)
         ->call('configure', array(array('statements' => array('continue', 'declare', 'return', 'throw', 'try'))));
+
+    $services->set(AssignmentInConditionSniff::class);
+
+    $services->set(AlphabeticallySortedUsesSniff::class);
+
+    $services->set(UnusedUsesSniff::class);
+
+    $services->set(SelfMemberReferenceSniff::class);
 
     $services->set(NoAliasFunctionsFixer::class);
 

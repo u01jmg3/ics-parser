@@ -46,6 +46,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         Rector\Php70\Rector\MethodCall\ThisCallOnStaticMethodToStaticCallRector::class,
         Rector\Php70\Rector\StaticCall\StaticCallOnNonStaticToInstanceCallRector::class,
         Rector\Php71\Rector\FuncCall\CountOnNullRector::class,
+        Rector\Php73\Rector\FuncCall\JsonThrowOnErrorRector::class,
         Rector\TypeDeclaration\Rector\FunctionLike\ParamTypeDeclarationRector::class,
         // PHP 5.6 incompatible
         Rector\CodeQuality\Rector\Ternary\ArrayKeyExistsTernaryThenValueToCoalescingRector::class, // PHP 7
@@ -56,7 +57,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         Rector\Php71\Rector\TryCatch\MultiExceptionCatchRector::class,
         Rector\Php73\Rector\FuncCall\ArrayKeyFirstLastRector::class,
         Rector\Php73\Rector\BinaryOp\IsCountableRector::class,
-        Rector\Php73\Rector\FuncCall\JsonThrowOnErrorRector::class,
     ));
 
     $parameters->set(Option::SETS, array(
