@@ -295,6 +295,32 @@ class RecurrencesTest extends TestCase
         );
     }
 
+    public function testExdatesInDifferentTimezone()
+    {
+        $checks = array(
+            array('index' => 0, 'dateString' => '20170503T190000', 'message' => '1st event: '),
+            array('index' => 1, 'dateString' => '20170510T190000', 'message' => '2nd event: '),
+            array('index' => 9, 'dateString' => '20170712T190000', 'message' => '10th event: '),
+            array('index' => 19, 'dateString' => '20171004T190000', 'message' => '20th event: '),
+        );
+        $this->assertVEVENT(
+            'America/Chicago',
+            array(
+                'DTSTART;TZID=America/Chicago:20170503T190000',
+                'RRULE:FREQ=WEEKLY;BYDAY=WE;WKST=SU;UNTIL=20180101',
+                'EXDATE:20170601T000000Z',
+                'EXDATE:20170803T000000Z',
+                'EXDATE:20170824T000000Z',
+                'EXDATE:20171026T000000Z',
+                'EXDATE:20171102T000000Z',
+                'EXDATE:20171123T010000Z',
+                'EXDATE:20171221T010000Z'
+            ),
+            28,
+            $checks
+        );
+    }
+
     public function assertVEVENT($defaultTimezone, $veventParts, $count, $checks)
     {
         $options = $this->getOptions($defaultTimezone);
