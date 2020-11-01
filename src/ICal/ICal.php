@@ -1298,11 +1298,13 @@ class ICal
                 if (!in_array($frequency, array('MONTHLY', 'YEARLY'))) {
                     if (!array_reduce($rrules['BYDAY'], $checkByDays, true)) {
                         error_log("ICal::ProcessRecurrences: A {$frequency} RRULE may not contain BYDAY values with numeric prefixes");
+
                         continue;
                     }
-                } else if ($frequency == 'YEARLY' and !empty($rrules['BYWEEKNO'])) {
+                } elseif ($frequency === 'YEARLY' && !empty($rrules['BYWEEKNO'])) {
                     if (!array_reduce($rrules['BYDAY'], $checkByDays, true)) {
-                        error_log("ICal::ProcessRecurrences: A YEARLY RRULE with a BYWEEKNO part may not contain BYDAY values with numeric prefixes");
+                        error_log('ICal::ProcessRecurrences: A YEARLY RRULE with a BYWEEKNO part may not contain BYDAY values with numeric prefixes');
+
                         continue;
                     }
                 }
@@ -1474,9 +1476,9 @@ class ICal
                                     $matchingDays[] = $bymonthRecurringDatetime->format('z') + 1;
                                 }
                             }
-                        } else if (!empty($rrules['BYWEEKNO'])) {
+                        } elseif (!empty($rrules['BYWEEKNO'])) {
                             $matchingDays = $this->getDaysOfYearMatchingByWeekNoRRule($rrules['BYWEEKNO'], $frequencyRecurringDateTime);
-                        } else if (!empty($rrules['BYYEARDAY'])) {
+                        } elseif (!empty($rrules['BYYEARDAY'])) {
                             $matchingDays = $this->getDaysOfYearMatchingByYearDayRRule($rrules['BYYEARDAY'], $frequencyRecurringDateTime);
                         }
 
@@ -1484,14 +1486,16 @@ class ICal
                             if (!empty($rrules['BYYEARDAY']) || !empty($rrules['BYWEEKNO'])) {
                                 $matchingDays = array_filter(
                                     $this->getDaysOfYearMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime),
-                                    function ($yearDay) use ($matchingDays) { return in_array($yearDay, $matchingDays); }
+                                    function ($yearDay) use ($matchingDays) {
+                                        return in_array($yearDay, $matchingDays);
+                                    }
                                 );
-                            } else if (count($matchingDays) == 0) {
+                            } elseif (count($matchingDays) === 0) {
                                 $matchingDays = $this->getDaysOfYearMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime);
                             }
                         }
 
-                        if (count($matchingDays) == 0) {
+                        if (count($matchingDays) === 0) {
                             $matchingDays = array($frequencyRecurringDateTime->format('z') + 1);
                         } else {
                             sort($matchingDays);
@@ -1636,17 +1640,19 @@ class ICal
      * @param  integer $limit
      * @return array
      */
-    private function resolveIndicesOfRange($indexes, $limit)
+    protected function resolveIndicesOfRange(array $indexes, $limit)
     {
         $matching = array();
         foreach ($indexes as $index) {
             if ($index > 0 && $index <= $limit) {
                 $matching[] = $index;
-            } else if ($index < 0 && -$index <= $limit) {
+            } elseif ($index < 0 && -$index <= $limit) {
                 $matching[] = $index + $limit + 1;
             }
         }
+
         sort($matching);
+
         return $matching;
     }
 
@@ -1687,10 +1693,11 @@ class ICal
             // Quantise the date to the first instance of the requested day in a month
             // (Or last if we have a -ve {ordwk})
             $bydayDateTime->modify(
-                (($ordwk < 0) ? 'Last' : 'First')
-                . ' '
-                . $this->weekdays[substr($weekday, -2)]  // e.g. "Monday"
-                . ' of ' . $initialDateTime->format('F') // e.g. "June"
+                (($ordwk < 0) ? 'Last' : 'First') .
+                ' ' .
+                $this->weekdays[substr($weekday, -2)] . // e.g. "Monday"
+                ' of ' .
+                $initialDateTime->format('F') // e.g. "June"
             );
 
             if ($ordwk < 0) { // -ve {ordwk}
@@ -1707,7 +1714,7 @@ class ICal
             }
         }
 
-        // Sort into ascending order.
+        // Sort into ascending order
         sort($matchingDays);
 
         return $matchingDays;
@@ -1750,11 +1757,11 @@ class ICal
             // Quantise the date to the first instance of the requested day in a year
             // (Or last if we have a -ve {ordwk})
             $bydayDateTime->modify(
-                (($ordwk < 0) ? 'Last' : 'First')
-                . ' '
-                . $this->weekdays[substr($weekday, -2)]  // e.g. "Monday"
-                . ' of '. (($ordwk < 0) ? 'December' : 'January')
-                . ' ' . $initialDateTime->format('Y') // e.g. "2018"
+                (($ordwk < 0) ? 'Last' : 'First') .
+                ' ' .
+                $this->weekdays[substr($weekday, -2)] . // e.g. "Monday"
+                ' of ' . (($ordwk < 0) ? 'December' : 'January') .
+                ' ' . $initialDateTime->format('Y') // e.g. "2018"
             );
 
             if ($ordwk < 0) { // -ve {ordwk}
@@ -1771,7 +1778,7 @@ class ICal
             }
         }
 
-        // Sort into ascending order.
+        // Sort into ascending order
         sort($matchingDays);
 
         return $matchingDays;
@@ -1796,6 +1803,7 @@ class ICal
     {
         // `\DateTime::format('L')` returns 1 if leap year, 0 if not.
         $daysInThisYear = $initialDateTime->format('L') ? 366 : 365;
+
         return $this->resolveIndicesOfRange($byYearDays, $daysInThisYear);
     }
 
@@ -1823,12 +1831,12 @@ class ICal
      * @param  \DateTime $initialDateTime
      * @return array
      */
-    protected function getDaysOfYearMatchingByWeekNoRRule($byWeekNums, $initialDateTime)
+    protected function getDaysOfYearMatchingByWeekNoRRule(array $byWeekNums, $initialDateTime)
     {
         // `\DateTime::format('L')` returns 1 if leap year, 0 if not.
         $isLeapYear = $initialDateTime->format('L');
-        $firstDayOfTheYear = date_create("first day of January {$initialDateTime->format('Y')}")->format("D");
-        $weeksInThisYear = ($firstDayOfTheYear == "Thu" || $isLeapYear && $firstDayOfTheYear == "Wed") ? 53 : 52;
+        $firstDayOfTheYear = date_create("first day of January {$initialDateTime->format('Y')}")->format('D');
+        $weeksInThisYear = ($firstDayOfTheYear === 'Thu' || $isLeapYear && $firstDayOfTheYear === 'Wed') ? 53 : 52;
 
         $matchingWeeks = $this->resolveIndicesOfRange($byWeekNums, $weeksInThisYear);
         $matchingDays = array();
@@ -1843,6 +1851,7 @@ class ICal
                 $matchingDays[] = $x + $dayNum;
             }
         }
+
         sort($matchingDays);
 
         return $matchingDays;

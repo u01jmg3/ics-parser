@@ -314,7 +314,7 @@ class RecurrencesTest extends TestCase
                 'EXDATE:20171026T000000Z',
                 'EXDATE:20171102T000000Z',
                 'EXDATE:20171123T010000Z',
-                'EXDATE:20171221T010000Z'
+                'EXDATE:20171221T010000Z',
             ),
             28,
             $checks
