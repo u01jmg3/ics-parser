@@ -554,8 +554,6 @@ class Rfc5545Examples extends TestCase
         );
     }
 
-/*  Requires support for BYYEARDAY under YEARLY [#11]
- *
     // Page 128, Test 3 :: Every third Year on the 1st, 100th, & 200th day for 10 occurrences
     public function test_page128_test3()
     {
@@ -574,10 +572,7 @@ class Rfc5545Examples extends TestCase
             $checks
         );
     }
-*/
 
-/*  Requires support for BYDAY *without* BYMONTH under YEARLY [No ticket]
- *
     // Page 128, Test 4 :: 20th Monday of a Year, forever
     //
     // COUNT rule does not exist in original example.
@@ -598,10 +593,7 @@ class Rfc5545Examples extends TestCase
             $checks
         );
     }
-*/
 
-/*  Requires support for BYWEEKNO under YEARLY [#11]
- *
     // Page 129, Test 1 :: Monday of Week 20, where the default start of the week is Monday, forever
     //
     // COUNT rule does not exist in original example.
@@ -622,7 +614,6 @@ class Rfc5545Examples extends TestCase
             $checks
         );
     }
-*/
 
     // Page 129, Test 2 :: Every Thursday in March, forever
     //
