@@ -1497,6 +1497,10 @@ class ICal
                             sort($matchingDays);
                         }
 
+                        if (!empty($rrules['BYSETPOS'])) {
+                            $matchingDays = $this->filterValuesUsingBySetPosRRule($rrules['BYSETPOS'], $matchingDays);
+                        }
+
                         foreach ($matchingDays as $day) {
                             $clonedDateTime = clone $frequencyRecurringDateTime;
                             $candidateDateTimes[] = $clonedDateTime->setDate(

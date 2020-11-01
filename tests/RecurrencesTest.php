@@ -321,6 +321,28 @@ class RecurrencesTest extends TestCase
         );
     }
 
+    public function testYearlyWithBySetPos()
+    {
+        $checks = array(
+            array('index' => 0, 'dateString' => '19970306T090000', 'message' => '1st occurrence: '),
+            array('index' => 1, 'dateString' => '19970313T090000', 'message' => '2nd occurrence: '),
+            array('index' => 2, 'dateString' => '19970325T090000', 'message' => '3rd occurrence: '),
+            array('index' => 3, 'dateString' => '19980305T090000', 'message' => '4th occurrence: '),
+            array('index' => 4, 'dateString' => '19980312T090000', 'message' => '5th occurrence: '),
+            array('index' => 5, 'dateString' => '19980326T090000', 'message' => '6th occurrence: '),
+            array('index' => 9, 'dateString' => '20000307T090000', 'message' => '10th occurrence: '),
+        );
+        $this->assertVEVENT(
+            'America/New_York',
+            array(
+                'DTSTART;TZID=America/New_York:19970306T090000',
+                'RRULE:FREQ=YEARLY;COUNT=10;BYMONTH=3;BYDAY=TU,TH;BYSETPOS=2,4,-2',
+            ),
+            10,
+            $checks
+        );
+    }
+
     public function assertVEVENT($defaultTimezone, $veventParts, $count, $checks)
     {
         $options = $this->getOptions($defaultTimezone);
