@@ -230,8 +230,8 @@ need to be evaluated before non-fitting events can be dropped.
 ---
 
 ## Credits
- - [Jonathan Goode](https://github.com/u01jmg3) (programming, bug fixing, enhancement, coding standard)
- - [John Grogg](john.grogg@gmail.com) (programming, addition of event recurrence handling)
+ - [Jonathan Goode](https://github.com/u01jmg3) (programming, bug fixing, codebase enhancement, coding standard adoption)
+ - [s0600204](https://github.com/s0600204) (major enhancements to RRULE support, many bug fixes and other contributions)
 
 ---
 
