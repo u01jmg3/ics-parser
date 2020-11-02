@@ -1363,14 +1363,16 @@ class ICal
                 switch ($frequency) {
                     case 'DAILY':
                         if (!empty($rrules['BYMONTHDAY'])) {
-                            if (!isset($monthdays)) {
+                            if (!isset($monthDays)) {
                                 // This variable is unset when we change months (see below)
-                                $monthdays = $this->getDaysOfMonthMatchingByMonthDayRRule($rrules['BYMONTHDAY'], $frequencyRecurringDateTime);
+                                $monthDays = $this->getDaysOfMonthMatchingByMonthDayRRule($rrules['BYMONTHDAY'], $frequencyRecurringDateTime);
                             }
-                            if (!in_array($frequencyRecurringDateTime->format('j'), $monthdays)) {
+
+                            if (!in_array($frequencyRecurringDateTime->format('j'), $monthDays)) {
                                 break;
                             }
                         }
+
                         $candidateDateTimes[] = clone $frequencyRecurringDateTime;
 
                         break;
@@ -1437,7 +1439,9 @@ class ICal
                             if (!empty($rrules['BYDAY'])) {
                                 $matchingDays = array_filter(
                                     $this->getDaysOfMonthMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime),
-                                    function ($monthDay) use ($matchingDays) { return in_array($monthDay, $matchingDays); }
+                                    function ($monthDay) use ($matchingDays) {
+                                        return in_array($monthDay, $matchingDays);
+                                    }
                                 );
                             }
                         } elseif (!empty($rrules['BYDAY'])) {
@@ -1480,7 +1484,7 @@ class ICal
                                 $monthDays = array();
                                 if (!empty($rrules['BYMONTHDAY'])) {
                                     $monthDays = $this->getDaysOfMonthMatchingByMonthDayRRule($rrules['BYMONTHDAY'], $bymonthRecurringDatetime);
-                                } else if (!empty($rrules['BYDAY'])) {
+                                } elseif (!empty($rrules['BYDAY'])) {
                                     $monthDays = $this->getDaysOfMonthMatchingByDayRRule($rrules['BYDAY'], $bymonthRecurringDatetime);
                                 } else {
                                     $monthDays[] = $bymonthRecurringDatetime->format('d');
@@ -1499,7 +1503,7 @@ class ICal
                             $matchingDays = $this->getDaysOfYearMatchingByWeekNoRRule($rrules['BYWEEKNO'], $frequencyRecurringDateTime);
                         } elseif (!empty($rrules['BYYEARDAY'])) {
                             $matchingDays = $this->getDaysOfYearMatchingByYearDayRRule($rrules['BYYEARDAY'], $frequencyRecurringDateTime);
-                        } else if (!empty($rrules['BYMONTHDAY'])) {
+                        } elseif (!empty($rrules['BYMONTHDAY'])) {
                             $matchingDays = $this->getDaysOfYearMatchingByMonthDayRRule($rrules['BYMONTHDAY'], $frequencyRecurringDateTime);
                         }
 
@@ -1590,14 +1594,15 @@ class ICal
                     }
                 }
 
-                // $monthdays is set in the DAILY frequency if the BYMONTHDAY stanza is present in
+                // $monthDays is set in the DAILY frequency if the BYMONTHDAY stanza is present in
                 // the RRULE. The variable only needs to be updated when we change months, so we
                 // unset it here, prompting a recreation next iteration.
-                if (isset($monthdays) && $frequencyRecurringDateTime->format('m') != $monthPreMove) {
-                    unset($monthdays);
+                if (isset($monthDays) && $frequencyRecurringDateTime->format('m') !== $monthPreMove) {
+                    unset($monthDays);
                 }
             }
-            unset($monthdays); // Unset it here as well, so it doesn't bleed into the calculation of the next recurring event.
+
+            unset($monthDays); // Unset it here as well, so it doesn't bleed into the calculation of the next recurring event.
 
             // Determine event length
             $eventLength = 0;
@@ -1764,7 +1769,7 @@ class ICal
      * @param  \DateTime $initialDateTime
      * @return array
      */
-    protected function getDaysOfMonthMatchingByMonthDayRRule($byMonthDays, $initialDateTime)
+    protected function getDaysOfMonthMatchingByMonthDayRRule(array $byMonthDays, $initialDateTime)
     {
         return $this->resolveIndicesOfRange($byMonthDays, $initialDateTime->format('t'));
     }
@@ -1794,7 +1799,7 @@ class ICal
      * @param  \DateTime $initialDateTime
      * @return array
      */
-    protected function getDaysOfYearMatchingByDayRRule($byDays, $initialDateTime)
+    protected function getDaysOfYearMatchingByDayRRule(array $byDays, $initialDateTime)
     {
         $matchingDays = array();
 
@@ -1848,7 +1853,7 @@ class ICal
      * @param  \DateTime $initialDateTime
      * @return array
      */
-    protected function getDaysOfYearMatchingByYearDayRRule($byYearDays, $initialDateTime)
+    protected function getDaysOfYearMatchingByYearDayRRule(array $byYearDays, $initialDateTime)
     {
         // `\DateTime::format('L')` returns 1 if leap year, 0 if not.
         $daysInThisYear = $initialDateTime->format('L') ? 366 : 365;
@@ -1921,7 +1926,7 @@ class ICal
      * @param  \DateTime $initialDateTime
      * @return array
      */
-    protected function getDaysOfYearMatchingByMonthDayRRule($byMonthDays, $initialDateTime)
+    protected function getDaysOfYearMatchingByMonthDayRRule(array $byMonthDays, $initialDateTime)
     {
         $matchingDays = array();
         $monthDateTime = clone $initialDateTime;
@@ -1941,6 +1946,7 @@ class ICal
                 )->format('z') + 1;
             }
         }
+
         return $matchingDays;
     }
 
