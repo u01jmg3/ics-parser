@@ -2569,11 +2569,11 @@ class ICal
      */
     protected function fileOrUrl($filename)
     {
-        $options = array();
-        $options['http'] = array();
+        $options                   = array();
+        $options['http']           = array();
         $options['http']['header'] = array();
-        if (!empty($this->httpBasicAuth) || !empty($this->httpUserAgent) || !empty($this->httpAcceptLanguage)) {
 
+        if (!empty($this->httpBasicAuth) || !empty($this->httpUserAgent) || !empty($this->httpAcceptLanguage)) {
             if (!empty($this->httpBasicAuth)) {
                 $username  = $this->httpBasicAuth['username'];
                 $password  = $this->httpBasicAuth['password'];
@@ -2590,8 +2590,9 @@ class ICal
                 array_push($options['http']['header'], "Accept-language: {$this->httpAcceptLanguage}");
             }
         }
-        // Defaults to http/1.0, which is ancient; bump it up to http/1.1
+
         $options['http']['protocol_version'] = '1.1';
+
         array_push($options['http']['header'], 'Connection: close');
 
         $context = stream_context_create($options);
