@@ -58,6 +58,12 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         Rector\Php71\Rector\TryCatch\MultiExceptionCatchRector::class,
         Rector\Php73\Rector\FuncCall\ArrayKeyFirstLastRector::class,
         Rector\Php73\Rector\BinaryOp\IsCountableRector::class,
+        Rector\Php74\Rector\Assign\NullCoalescingOperatorRector::class,
+        Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector::class,
+        Rector\Php74\Rector\FuncCall\ArraySpreadInsteadOfArrayMergeRector::class,
+        Rector\Php74\Rector\LNumber\AddLiteralSeparatorToNumberRector::class,
+        Rector\Php74\Rector\MethodCall\ChangeReflectionTypeToStringToGetNameRector::class,
+        Rector\Php74\Rector\StaticCall\ExportToReflectionFunctionRector::class,
     ));
 
     $parameters->set(Option::SETS, array(
