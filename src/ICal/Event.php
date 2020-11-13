@@ -46,14 +46,14 @@ class Event
     /**
      * When the event starts, represented as a timezone-adjusted string
      *
-     * @var string $dtstart_tz
+     * @var $dtstart_tz
      */
     public $dtstart_tz;
 
     /**
      * When the event ends, represented as a timezone-adjusted string
      *
-     * @var string $dtend_tz
+     * @var $dtend_tz
      */
     public $dtend_tz;
 
