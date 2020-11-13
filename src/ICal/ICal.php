@@ -639,9 +639,9 @@ class ICal
 
                 if (!is_array($values)) {
                     if (!empty($values)) {
-                        $values = array($values); // Make an array as not already
+                        $values     = array($values); // Make an array as not one already
                         $blankArray = array(); // Empty placeholder array
-                        array_push($values, $blankArray);
+                        $values[]   = $blankArray;
                     } else {
                         $values = array(); // Use blank array to ignore this line
                     }
@@ -886,7 +886,7 @@ class ICal
 
                 if (is_array($value)) {
                     // Add array of properties to the end
-                    array_push($this->cal[$key1][$key2][$key3]["{$keyword}_array"], $value);
+                    $this->cal[$key1][$key2][$key3]["{$keyword}_array"][] = $value;
                 } else {
                     if (!isset($this->cal[$key1][$key2][$key3][$keyword])) {
                         $this->cal[$key1][$key2][$key3][$keyword] = $value;
@@ -908,7 +908,7 @@ class ICal
 
                 if (is_array($value)) {
                     // Add array of properties to the end
-                    array_push($this->cal[$key1][$key2]["{$keyword}_array"], $value);
+                    $this->cal[$key1][$key2]["{$keyword}_array"][] = $value;
                 } else {
                     if (!isset($this->cal[$key1][$key2][$keyword])) {
                         $this->cal[$key1][$key2][$keyword] = $value;
@@ -927,7 +927,7 @@ class ICal
 
                         if ($keyword === 'DURATION') {
                             $duration = new \DateInterval($value);
-                            array_push($this->cal[$key1][$key2]["{$keyword}_array"], $duration);
+                            $this->cal[$key1][$key2]["{$keyword}_array"][] = $duration;
                         }
                     }
 
@@ -2579,21 +2579,21 @@ class ICal
                 $password  = $this->httpBasicAuth['password'];
                 $basicAuth = base64_encode("{$username}:{$password}");
 
-                array_push($options['http']['header'], "Authorization: Basic {$basicAuth}");
+                $options['http']['header'][] = "Authorization: Basic {$basicAuth}";
             }
 
             if (!empty($this->httpUserAgent)) {
-                array_push($options['http']['header'], "User-Agent: {$this->httpUserAgent}");
+                $options['http']['header'][] = "User-Agent: {$this->httpUserAgent}";
             }
 
             if (!empty($this->httpAcceptLanguage)) {
-                array_push($options['http']['header'], "Accept-language: {$this->httpAcceptLanguage}");
+                $options['http']['header'][] = "Accept-language: {$this->httpAcceptLanguage}";
             }
         }
 
         $options['http']['protocol_version'] = '1.1';
 
-        array_push($options['http']['header'], 'Connection: close');
+        $options['http']['header'][] = 'Connection: close';
 
         $context = stream_context_create($options);
 
