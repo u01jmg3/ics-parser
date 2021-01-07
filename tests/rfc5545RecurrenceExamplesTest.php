@@ -44,7 +44,7 @@ use PHPUnit\Framework\TestCase;
  *   have been similarly commented out and annotated with a ticket number
  *   (if one exists).
  */
-class Rfc5545Examples extends TestCase
+class rfc5545RecurrenceExamplesTest extends TestCase
 {
     // phpcs:disable Generic.Arrays.DisallowLongArraySyntax
     // phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps

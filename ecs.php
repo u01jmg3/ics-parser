@@ -80,7 +80,7 @@ use SlevomatCodingStandard\ControlStructures\AssignmentInConditionSniff;
 use SlevomatCodingStandard\Namespaces\AlphabeticallySortedUsesSniff;
 use SlevomatCodingStandard\Namespaces\UnusedUsesSniff;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symplify\EasyCodingStandard\Configuration\Option;
+use Symplify\EasyCodingStandard\ValueObject\Option;
 
 // ecs check --fix .
 
