@@ -2618,7 +2618,9 @@ class ICal
         // but are within quoted texts. We need to remove the quotes as they're not
         // actually part of the time zone.
         $timeZoneString = trim($timeZoneString, '"');
-        $timeZoneString = html_entity_decode($timeZoneString);
+        $timeZoneString = html_entity_decode($timeZoneString);     
+        // remove trailing counts for tz with same name introduced by some calendar apps
+        $timeZoneString = trim(preg_replace('/\d/', '', $timeZoneString));
 
         if ($this->isValidIanaTimeZoneId($timeZoneString)) {
             return new \DateTimeZone($timeZoneString);
