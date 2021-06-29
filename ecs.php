@@ -118,6 +118,9 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services->set(YodaStyleFixer::class)
         ->call('configure', array(array('equal' => false, 'identical' => false, 'less_and_greater' => false)));
 
+    $services->set(ListSyntaxFixer::class)
+        ->call('configure', [['syntax' => 'long']]);
+
     $services->set(BlankLineBeforeStatementFixer::class)
         ->call('configure', array(array('statements' => array('continue', 'declare', 'return', 'throw', 'try'))));
 
@@ -206,8 +209,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services->set(SingleImportPerStatementFixer::class);
 
     $services->set(SingleLineAfterImportsFixer::class);
-
-    $services->set(ListSyntaxFixer::class);
 
     $services->set(NoLeadingNamespaceWhitespaceFixer::class);
 
