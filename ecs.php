@@ -81,16 +81,17 @@ use SlevomatCodingStandard\Namespaces\AlphabeticallySortedUsesSniff;
 use SlevomatCodingStandard\Namespaces\UnusedUsesSniff;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symplify\EasyCodingStandard\ValueObject\Option;
+use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
 
 // ecs check --fix .
 
 return static function (ContainerConfigurator $containerConfigurator): void {
+    // https://github.com/symplify/easy-coding-standard/blob/main/config/set/psr12.php
+    $containerConfigurator->import(SetList::PSR_12);
+
     $parameters = $containerConfigurator->parameters();
 
     $parameters->set(Option::LINE_ENDING, "\n");
-
-    // https://github.com/symplify/easy-coding-standard/blob/master/config/set/psr12.php
-    $parameters->set(Option::SETS, array('psr12'));
 
     $parameters->set(Option::SKIP, array(
         'PhpCsFixer\Fixer\Basic\BracesFixer'                           => null,
