@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Core\Configuration\Option;
+use Rector\Laravel\Set\LaravelSetList;
 use Rector\Php53\Rector\Ternary\TernaryToElvisRector;
 use Rector\Set\ValueObject\SetList;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -18,7 +19,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $parameters->set(Option::AUTOLOAD_PATHS, array(__DIR__ . '/vendor/autoload.php'));
 
-    $parameters->set(Option::EXCLUDE_RECTORS, array(
+    $parameters->set(Option::SKIP, array(
+        // Rectors
         Rector\CodeQuality\Rector\Class_\CompleteDynamicPropertiesRector::class,
         Rector\CodeQuality\Rector\Concat\JoinStringConcatRector::class,
         Rector\CodeQuality\Rector\FuncCall\ChangeArrayPushToArrayAssignRector::class,
@@ -49,6 +51,9 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         Rector\Php71\Rector\FuncCall\CountOnNullRector::class,
         Rector\Php73\Rector\FuncCall\JsonThrowOnErrorRector::class,
         Rector\TypeDeclaration\Rector\FunctionLike\ParamTypeDeclarationRector::class,
+        Rector\CodingStyle\Rector\ClassMethod\UnSpreadOperatorRector::class,
+        Rector\CodingStyle\Rector\PostInc\PostIncDecToPreIncDecRector::class,
+        Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class,
         // PHP 5.6 incompatible
         Rector\CodeQuality\Rector\Ternary\ArrayKeyExistsTernaryThenValueToCoalescingRector::class, // PHP 7
         Rector\Php70\Rector\If_\IfToSpaceshipRector::class,
@@ -66,22 +71,20 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         Rector\Php74\Rector\StaticCall\ExportToReflectionFunctionRector::class,
     ));
 
-    $parameters->set(Option::SETS, array(
-        SetList::CODE_QUALITY,
-        SetList::CODING_STYLE,
-        SetList::DEAD_CODE,
-        SetList::LARAVEL_50,
-        SetList::LARAVEL_51,
-        SetList::LARAVEL_52,
-        SetList::LARAVEL_53,
-        SetList::LARAVEL_54,
-        SetList::PHP_56,
-        SetList::PHP_70,
-        SetList::PHP_71,
-        SetList::PHP_72,
-        SetList::PHP_73,
-        SetList::PHP_74,
-    ));
+    $containerConfigurator->import(SetList::CODE_QUALITY);
+    $containerConfigurator->import(SetList::CODING_STYLE);
+    $containerConfigurator->import(SetList::DEAD_CODE);
+    $containerConfigurator->import(LaravelSetList::LARAVEL_50);
+    $containerConfigurator->import(LaravelSetList::LARAVEL_51);
+    $containerConfigurator->import(LaravelSetList::LARAVEL_52);
+    $containerConfigurator->import(LaravelSetList::LARAVEL_53);
+    $containerConfigurator->import(LaravelSetList::LARAVEL_54);
+    $containerConfigurator->import(SetList::PHP_56);
+    $containerConfigurator->import(SetList::PHP_70);
+    $containerConfigurator->import(SetList::PHP_71);
+    $containerConfigurator->import(SetList::PHP_72);
+    $containerConfigurator->import(SetList::PHP_73);
+    $containerConfigurator->import(SetList::PHP_74);
 
     $services = $containerConfigurator->services();
 
