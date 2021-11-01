@@ -7,4 +7,3 @@ updates:
   open-pull-requests-limit: 10
   reviewers:
   - u01jmg3
-  versioning-strategy: increase-if-necessary
