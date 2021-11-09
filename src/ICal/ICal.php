@@ -896,6 +896,7 @@ class ICal
                         $this->cal[$key1][$key2][$key3][$keyword] .= ',' . $value;
                     }
                 }
+
                 break;
 
             case 'VEVENT':
@@ -935,6 +936,7 @@ class ICal
                         $this->cal[$key1][$key2][$keyword] .= ',' . $value;
                     }
                 }
+
                 break;
 
             case 'VFREEBUSY':
@@ -957,6 +959,7 @@ class ICal
                 } else {
                     $this->cal[$key1][$key2][$key3][] = $value;
                 }
+
                 break;
 
             case 'VTODO':
@@ -1015,7 +1018,7 @@ class ICal
             array_unshift($matches, $before . $text);
         }
 
-        if (count($matches) === 0) {
+        if ($matches === []) {
             return false;
         }
 
@@ -1429,6 +1432,7 @@ class ICal
                                 $day
                             );
                         }
+
                         break;
 
                     case 'MONTHLY':
@@ -1465,6 +1469,7 @@ class ICal
                                 $day
                             );
                         }
+
                         break;
 
                     case 'YEARLY':
@@ -1515,12 +1520,12 @@ class ICal
                                         return in_array($yearDay, $matchingDays);
                                     }
                                 );
-                            } elseif (count($matchingDays) === 0) {
+                            } elseif ($matchingDays === []) {
                                 $matchingDays = $this->getDaysOfYearMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime);
                             }
                         }
 
-                        if (count($matchingDays) === 0) {
+                        if ($matchingDays === []) {
                             $matchingDays = array($frequencyRecurringDateTime->format('z') + 1);
                         } else {
                             sort($matchingDays);
@@ -1538,6 +1543,7 @@ class ICal
                                 $day
                             );
                         }
+
                         break;
                 }
 
@@ -2119,7 +2125,7 @@ class ICal
      */
     public function hasEvents()
     {
-        return (count($this->events()) > 0) ?: false;
+        return ($this->events() !== []) ?: false;
     }
 
     /**

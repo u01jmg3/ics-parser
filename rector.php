@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Core\Configuration\Option;
+use Rector\Core\ValueObject\PhpVersion;
 use Rector\Laravel\Set\LaravelSetList;
 use Rector\Php53\Rector\Ternary\TernaryToElvisRector;
 use Rector\Set\ValueObject\SetList;
@@ -15,7 +16,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $parameters->set(Option::IMPORT_SHORT_CLASSES, false);
 
-    $parameters->set(Option::PHP_VERSION_FEATURES, '5.6');
+    $parameters->set(Option::PHP_VERSION_FEATURES, PhpVersion::PHP_56);
 
     $parameters->set(Option::AUTOLOAD_PATHS, array(__DIR__ . '/vendor/autoload.php'));
 
@@ -50,10 +51,15 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         Rector\Php70\Rector\StaticCall\StaticCallOnNonStaticToInstanceCallRector::class,
         Rector\Php71\Rector\FuncCall\CountOnNullRector::class,
         Rector\Php73\Rector\FuncCall\JsonThrowOnErrorRector::class,
+        Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector::class,
+        Rector\Php74\Rector\Property\TypedPropertyRector::class,
         Rector\TypeDeclaration\Rector\FunctionLike\ParamTypeDeclarationRector::class,
         Rector\CodingStyle\Rector\ClassMethod\UnSpreadOperatorRector::class,
         Rector\CodingStyle\Rector\PostInc\PostIncDecToPreIncDecRector::class,
         Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class,
+        Rector\CodeQuality\Rector\ClassMethod\DateTimeToDateTimeInterfaceRector::class,
+        Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
+        Rector\DeadCode\Rector\StaticCall\RemoveParentCallWithoutParentRector::class,
         // PHP 5.6 incompatible
         Rector\CodeQuality\Rector\Ternary\ArrayKeyExistsTernaryThenValueToCoalescingRector::class, // PHP 7
         Rector\Php70\Rector\If_\IfToSpaceshipRector::class,
@@ -69,6 +75,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         Rector\Php74\Rector\LNumber\AddLiteralSeparatorToNumberRector::class,
         Rector\Php74\Rector\MethodCall\ChangeReflectionTypeToStringToGetNameRector::class,
         Rector\Php74\Rector\StaticCall\ExportToReflectionFunctionRector::class,
+        Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPromotedPropertyRector::class,
     ));
 
     $containerConfigurator->import(SetList::CODE_QUALITY);
