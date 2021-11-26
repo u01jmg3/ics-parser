@@ -984,93 +984,91 @@ class ICal
      */
     protected function keyValueFromString($text)
     {
-        $text = htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8');
-
-        $colon = strpos($text, ':');
-        $quote = strpos($text, '"');
-        if ($colon === false) {
-            $matches = array();
-        } elseif ($quote === false || $colon < $quote) {
-            list($before, $after) = explode(':', $text, 2);
-            $matches              = array($text, $before, $after);
-        } else {
-            list($before, $text) = explode('"', $text, 2);
-            $text                = '"' . $text;
-            $matches             = str_getcsv($text, ':');
-            $combinedValue       = '';
-
-            foreach (array_keys($matches) as $key) {
-                if ($key === 0) {
-                    if (!empty($before)) {
-                        $matches[$key] = $before . '"' . $matches[$key] . '"';
-                    }
-                } else {
-                    if ($key > 1) {
-                        $combinedValue .= ':';
-                    }
-
-                    $combinedValue .= $matches[$key];
-                }
+        $split_line = $this->parseLine($text);
+        $object = [];
+        $param_obj = [];
+        $value_obj = '';
+        $i = 0;
+        while ($i < count($split_line)) {
+            if ($i == 0) {
+                $object[0] = $split_line[$i];
+                $i++;
+                continue;
             }
-
-            $matches    = array_slice($matches, 0, 2);
-            $matches[1] = $combinedValue;
-            array_unshift($matches, $before . $text);
-        }
-
-        if ($matches === []) {
-            return false;
-        }
-
-        if (preg_match('/^([A-Z-]+)([;][\w\W]*)?$/', $matches[1])) {
-            $matches = array_splice($matches, 1, 2); // Remove first match and re-align ordering
-
-            // Process properties
-            if (preg_match('/([A-Z-]+)[;]([\w\W]*)/', $matches[0], $properties)) {
-                // Remove first match
-                array_shift($properties);
-                // Fix to ignore everything in keyword after a ; (e.g. Language, TZID, etc.)
-                $matches[0] = $properties[0];
-                array_shift($properties); // Repeat removing first match
-
-                $formatted = array();
-                foreach ($properties as $property) {
-                    // Match semicolon separator outside of quoted substrings
-                    preg_match_all('~[^' . PHP_EOL . '";]+(?:"[^"\\\]*(?:\\\.[^"\\\]*)*"[^' . PHP_EOL . '";]*)*~', $property, $attributes);
-                    // Remove multi-dimensional array and use the first key
-                    $attributes = (count($attributes) === 0) ? array($property) : reset($attributes);
-
-                    if (is_array($attributes)) {
-                        foreach ($attributes as $attribute) {
-                            // Match equals sign separator outside of quoted substrings
-                            preg_match_all(
-                                '~[^' . PHP_EOL . '"=]+(?:"[^"\\\]*(?:\\\.[^"\\\]*)*"[^' . PHP_EOL . '"=]*)*~',
-                                $attribute,
-                                $values
-                            );
-                            // Remove multi-dimensional array and use the first key
-                            $value = (count($values) === 0) ? null : reset($values);
-
-                            if (is_array($value) && isset($value[1])) {
-                                // Remove double quotes from beginning and end only
-                                $formatted[$value[0]] = trim($value[1], '"');
-                            }
-                        }
-                    }
+            if ($split_line[$i] == ';') {
+                $i++;
+                $param_name = $split_line[$i];
+                $i += 2;
+                $param_value = [];
+                $multi_value = false;;
+                while ($i + 1 < count($split_line) && $split_line[$i + 1] == ',') {
+                    $param_value[] = $split_line[$i];
+                    $i += 2;
+                    $multi_value = true;
+                }
+                if ($multi_value) {
+                    $param_value[] = $split_line[$i];
                 }
 
-                // Assign the keyword property information
-                $properties[0] = $formatted;
 
-                // Add match to beginning of array
-                array_unshift($properties, $matches[1]);
-                $matches[1] = $properties;
+                if (count($param_value) == 0) {
+                    $param_value = $split_line[$i];
+                }
+                $param_obj[$param_name] = $param_value;
             }
-
-            return $matches;
-        } else {
-            return false; // Ignore this match
+            if ($split_line[$i] == ':') {
+                $i++;
+                while ($i < count($split_line)) {
+                    $value_obj .= $split_line[$i];
+                    $i++;
+                }
+            }
+            $i++;
         }
+        if (count($param_obj) > 0) {
+            $object[1][0] = $value_obj ;
+            $object[1][1] = $param_obj;
+        } else {
+            $object[1] = $value_obj;
+        }
+        return $object ?: false;
+    }
+
+    /**
+     * Parse Line into an array of unit token in order to create the object
+     * @param string $line
+     * @return array
+     */
+    protected function parseLine(string $line): array
+    {
+        $words = [];
+        $word = '';
+        $arrayOfChar = str_split($line);
+        $inDoubleQuote = false;
+        $counter = count($arrayOfChar);
+
+        foreach ($arrayOfChar as $char) {
+            $counter--;
+            if ($char === '"') {
+                if ($word !== '') {
+                    $words[] = $word;
+                }
+                $word = '';
+                $inDoubleQuote = !$inDoubleQuote;
+            } elseif (!in_array($char, [';', ':', ',', '=']) || $inDoubleQuote) {
+                $word .= $char;
+            } else {
+                if ($word !== '') {
+                    $words[] = $word;
+                }
+                $words[] = $char;
+                $word = '';
+            }
+            if ($counter == 0) {
+                $words[] = $word;
+            }
+        }
+        return $words;
     }
 
     /**
