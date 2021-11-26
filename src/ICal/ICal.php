@@ -984,52 +984,57 @@ class ICal
      */
     protected function keyValueFromString($text)
     {
-        $split_line = $this->parseLine($text);
+        $splitLine = $this->parseLine($text);
         $object = [];
-        $param_obj = [];
-        $value_obj = '';
+        $paramObj = [];
+        $valueObj = '';
         $i = 0;
-        while ($i < count($split_line)) {
+        while ($i < count($splitLine)) {
+            // The first token correspond to the property name
             if ($i == 0) {
-                $object[0] = $split_line[$i];
+                $object[0] = $splitLine[$i];
                 $i++;
                 continue;
             }
-            if ($split_line[$i] == ';') {
+            // After each semi-colon ics define the property parameters
+            if ($splitLine[$i] == ';') {
                 $i++;
-                $param_name = $split_line[$i];
+                $paramName = $splitLine[$i];
                 $i += 2;
-                $param_value = [];
-                $multi_value = false;;
-                while ($i + 1 < count($split_line) && $split_line[$i + 1] == ',') {
-                    $param_value[] = $split_line[$i];
+                $paramValue = [];
+                $multiValue = false;
+                // A parameter can have multiple value separed by coma
+                while ($i + 1 < count($splitLine) && $splitLine[$i + 1] == ',') {
+                    $paramValue[] = $splitLine[$i];
                     $i += 2;
-                    $multi_value = true;
+                    $multiValue = true;
                 }
-                if ($multi_value) {
-                    $param_value[] = $split_line[$i];
+                if ($multiValue) {
+                    $paramValue[] = $splitLine[$i];
                 }
-
-
-                if (count($param_value) == 0) {
-                    $param_value = $split_line[$i];
+                if (count($paramValue) == 0) {
+                    $paramValue = $splitLine[$i];
                 }
-                $param_obj[$param_name] = $param_value;
+                // Creation on object with paramName => paramValue
+                $paramObj[$paramName] = $paramValue;
             }
-            if ($split_line[$i] == ':') {
+            // After a colon all token are concatenated (Non Standard Behavior because property can have multiple values
+            // according to RFC5545.
+            if ($splitLine[$i] == ':') {
                 $i++;
-                while ($i < count($split_line)) {
-                    $value_obj .= $split_line[$i];
+                while ($i < count($splitLine)) {
+                    $valueObj .= $splitLine[$i];
                     $i++;
                 }
             }
             $i++;
         }
-        if (count($param_obj) > 0) {
-            $object[1][0] = $value_obj ;
-            $object[1][1] = $param_obj;
+        // Object construction
+        if (count($paramObj) > 0) {
+            $object[1][0] = $valueObj ;
+            $object[1][1] = $paramObj;
         } else {
-            $object[1] = $value_obj;
+            $object[1] = $valueObj;
         }
         return $object ?: false;
     }
@@ -1045,10 +1050,12 @@ class ICal
         $word = '';
         $arrayOfChar = str_split($line);
         $inDoubleQuote = false;
-        $counter = count($arrayOfChar);
+        $counter = 0;
+
 
         foreach ($arrayOfChar as $char) {
-            $counter--;
+            $counter++;
+            // Don't stop the word on ; , : = if it is in double quote
             if ($char === '"') {
                 if ($word !== '') {
                     $words[] = $word;
@@ -1064,7 +1071,7 @@ class ICal
                 $words[] = $char;
                 $word = '';
             }
-            if ($counter == 0) {
+            if ($counter == count($arrayOfChar)) {
                 $words[] = $word;
             }
         }
