@@ -982,7 +982,7 @@ class ICal
      * @param  string $text
      * @return array|boolean
      */
-    protected function keyValueFromString($text)
+    public function keyValueFromString($text)
     {
         $splitLine = $this->parseLine($text);
         $object = [];
@@ -1011,8 +1011,7 @@ class ICal
                 }
                 if ($multiValue) {
                     $paramValue[] = $splitLine[$i];
-                }
-                if (count($paramValue) == 0) {
+                } else {
                     $paramValue = $splitLine[$i];
                 }
                 // Creation on object with paramName => paramValue
@@ -1031,7 +1030,7 @@ class ICal
         }
         // Object construction
         if (count($paramObj) > 0) {
-            $object[1][0] = $valueObj ;
+            $object[1][0] = $valueObj;
             $object[1][1] = $paramObj;
         } else {
             $object[1] = $valueObj;
@@ -1040,7 +1039,7 @@ class ICal
     }
 
     /**
-     * Parse Line into an array of unit token in order to create the object
+     * Parse a line into an array of unit token in order to create the object
      * @param string $line
      * @return array
      */
@@ -1048,13 +1047,11 @@ class ICal
     {
         $words = [];
         $word = '';
+        // the use of str_split is not a problem here even if the character set is in utf8.
+        // Indeed we only compare the characters , ; : = " which are on a single bytes
         $arrayOfChar = str_split($line);
         $inDoubleQuote = false;
-        $counter = 0;
-
-
         foreach ($arrayOfChar as $char) {
-            $counter++;
             // Don't stop the word on ; , : = if it is in double quote
             if ($char === '"') {
                 if ($word !== '') {
@@ -1071,10 +1068,8 @@ class ICal
                 $words[] = $char;
                 $word = '';
             }
-            if ($counter == count($arrayOfChar)) {
-                $words[] = $word;
-            }
         }
+        $words[] = $word;
         return $words;
     }
 
