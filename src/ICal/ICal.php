@@ -985,40 +985,45 @@ class ICal
     public function keyValueFromString($text)
     {
         $splitLine = $this->parseLine($text);
-        $object = [];
-        $paramObj = [];
-        $valueObj = '';
-        $i = 0;
+        $object    = array();
+        $paramObj  = array();
+        $valueObj  = '';
+        $i         = 0;
+
         while ($i < count($splitLine)) {
-            // The first token correspond to the property name
+            // The first token corresponds to the property name
             if ($i == 0) {
                 $object[0] = $splitLine[$i];
                 $i++;
                 continue;
             }
-            // After each semi-colon ics define the property parameters
+
+            // After each semicolon define the property parameters
             if ($splitLine[$i] == ';') {
                 $i++;
                 $paramName = $splitLine[$i];
                 $i += 2;
-                $paramValue = [];
+                $paramValue = array();
                 $multiValue = false;
-                // A parameter can have multiple value separed by coma
+                // A parameter can have multiple values separated by a comma
                 while ($i + 1 < count($splitLine) && $splitLine[$i + 1] == ',') {
                     $paramValue[] = $splitLine[$i];
                     $i += 2;
                     $multiValue = true;
                 }
+
                 if ($multiValue) {
                     $paramValue[] = $splitLine[$i];
                 } else {
                     $paramValue = $splitLine[$i];
                 }
-                // Creation on object with paramName => paramValue
+
+                // Create object with paramName => paramValue
                 $paramObj[$paramName] = $paramValue;
             }
-            // After a colon all token are concatenated (Non Standard Behavior because property can have multiple values
-            // according to RFC5545.
+
+            // After a colon all tokens are concatenated (non-standard behaviour because the property can have multiple values
+            // according to RFC5545)
             if ($splitLine[$i] == ':') {
                 $i++;
                 while ($i < count($splitLine)) {
@@ -1026,8 +1031,10 @@ class ICal
                     $i++;
                 }
             }
+
             $i++;
         }
+
         // Object construction
         if (count($paramObj) > 0) {
             $object[1][0] = $valueObj;
@@ -1035,41 +1042,48 @@ class ICal
         } else {
             $object[1] = $valueObj;
         }
+
         return $object ?: false;
     }
 
     /**
-     * Parse a line into an array of unit token in order to create the object
-     * @param string $line
+     * Parses a line from an iCal file into an array of tokens
+     *
+     * @param  string $line
      * @return array
      */
-    protected function parseLine(string $line): array
+    protected function parseLine($line)
     {
-        $words = [];
-        $word = '';
-        // the use of str_split is not a problem here even if the character set is in utf8.
-        // Indeed we only compare the characters , ; : = " which are on a single bytes
+        $words = array();
+        $word  = '';
+        // The use of str_split is not a problem here even if the character set is in utf8
+        // Indeed we only compare the characters , ; : = " which are on a single byte
         $arrayOfChar = str_split($line);
-        $inDoubleQuote = false;
+        $inDoubleQuotes = false;
+
         foreach ($arrayOfChar as $char) {
-            // Don't stop the word on ; , : = if it is in double quote
+            // Don't stop the word on ; , : = if it is enclosed in double quotes
             if ($char === '"') {
                 if ($word !== '') {
                     $words[] = $word;
                 }
+
                 $word = '';
-                $inDoubleQuote = !$inDoubleQuote;
-            } elseif (!in_array($char, [';', ':', ',', '=']) || $inDoubleQuote) {
+                $inDoubleQuotes = !$inDoubleQuotes;
+            } elseif (!in_array($char, array(';', ':', ',', '=')) || $inDoubleQuotes) {
                 $word .= $char;
             } else {
                 if ($word !== '') {
                     $words[] = $word;
                 }
+
                 $words[] = $char;
                 $word = '';
             }
         }
+
         $words[] = $word;
+
         return $words;
     }
 
