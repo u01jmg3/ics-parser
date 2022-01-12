@@ -53,6 +53,27 @@ class KeyValueTest extends TestCase
         );
     }
 
+    public function testParametersOfKeysWithMultipleValues()
+    {
+        $checks = array(
+            0 => 'ATTENDEE',
+            1 => array(
+                0 => 'mailto:jsmith@example.com',
+                1 => array(
+                    'DELEGATED-TO' => array(
+                        0 => 'mailto:jdoe@example.com',
+                        1 => 'mailto:jqpublic@example.com',
+                    ),
+                ),
+            ),
+        );
+
+        $this->assertLines(
+            'ATTENDEE;DELEGATED-TO="mailto:jdoe@example.com","mailto:jqpublic@example.com":mailto:jsmith@example.com',
+            $checks
+        );
+    }
+
     private function assertLines($lines, array $checks)
     {
         $ical = new ICal();
