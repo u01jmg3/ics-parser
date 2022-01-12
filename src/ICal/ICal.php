@@ -1363,7 +1363,7 @@ class ICal
              *   enddate = <icalDate> || <icalDateTime>
              */
             $count      = 1;
-            $countLimit = (isset($rrules['COUNT'])) ? intval($rrules['COUNT']) : 0;
+            $countLimit = (isset($rrules['COUNT'])) ? intval($rrules['COUNT']) : PHP_INT_MAX;
             $until      = date_create()->modify("{$this->defaultSpan} years")->setTime(23, 59, 59)->getTimestamp();
 
             if (isset($rrules['UNTIL'])) {
@@ -1373,7 +1373,7 @@ class ICal
             $eventRecurrences = array();
 
             $frequencyRecurringDateTime = clone $initialEventDate;
-            while ($frequencyRecurringDateTime->getTimestamp() <= $until) {
+            while ($frequencyRecurringDateTime->getTimestamp() <= $until && $count < $countLimit) {
                 $candidateDateTimes = array();
 
                 // phpcs:ignore Squiz.ControlStructures.SwitchDeclaration.MissingDefault
@@ -1587,14 +1587,11 @@ class ICal
                         $this->eventCount++;
                     }
 
-                    // Count all evaluated candidates including excluded ones
-                    if (isset($rrules['COUNT'])) {
-                        $count++;
-
-                        // If RRULE[COUNT] is reached then break
-                        if ($count >= $countLimit) {
-                            break 2;
-                        }
+                    // Count all evaluated candidates including excluded ones,
+                    // and if RRULE[COUNT] (if set) is reached then break.
+                    $count++;
+                    if ($count >= $countLimit) {
+                        break 2;
                     }
                 }
 

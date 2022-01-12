@@ -429,6 +429,23 @@ class RecurrencesTest extends TestCase
         );
     }
 
+    public function testCountIsOne()
+    {
+        $checks = array(
+            array('index' => 0, 'dateString' => '20211201T090000', 'message' => '1st and only expected event: '),
+        );
+        $this->assertVEVENT(
+            'UTC',
+            array(
+                'DTSTART:20211201T090000',
+                'DTEND:20211201T100000',
+                'RRULE:FREQ=DAILY;COUNT=1',
+            ),
+            1,
+            $checks
+        );
+    }
+
     public function assertVEVENT($defaultTimezone, $veventParts, $count, $checks)
     {
         $options = $this->getOptions($defaultTimezone);
