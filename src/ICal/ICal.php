@@ -982,95 +982,109 @@ class ICal
      * @param  string $text
      * @return array|boolean
      */
-    protected function keyValueFromString($text)
+    public function keyValueFromString($text)
     {
-        $text = htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8');
+        $splitLine = $this->parseLine($text);
+        $object    = array();
+        $paramObj  = array();
+        $valueObj  = '';
+        $i         = 0;
 
-        $colon = strpos($text, ':');
-        $quote = strpos($text, '"');
-        if ($colon === false) {
-            $matches = array();
-        } elseif ($quote === false || $colon < $quote) {
-            list($before, $after) = explode(':', $text, 2);
-            $matches              = array($text, $before, $after);
-        } else {
-            list($before, $text) = explode('"', $text, 2);
-            $text                = '"' . $text;
-            $matches             = str_getcsv($text, ':');
-            $combinedValue       = '';
+        while ($i < count($splitLine)) {
+            // The first token corresponds to the property name
+            if ($i == 0) {
+                $object[0] = $splitLine[$i];
+                $i++;
+                continue;
+            }
 
-            foreach (array_keys($matches) as $key) {
-                if ($key === 0) {
-                    if (!empty($before)) {
-                        $matches[$key] = $before . '"' . $matches[$key] . '"';
-                    }
+            // After each semicolon define the property parameters
+            if ($splitLine[$i] == ';') {
+                $i++;
+                $paramName = $splitLine[$i];
+                $i += 2;
+                $paramValue = array();
+                $multiValue = false;
+                // A parameter can have multiple values separated by a comma
+                while ($i + 1 < count($splitLine) && $splitLine[$i + 1] == ',') {
+                    $paramValue[] = $splitLine[$i];
+                    $i += 2;
+                    $multiValue = true;
+                }
+
+                if ($multiValue) {
+                    $paramValue[] = $splitLine[$i];
                 } else {
-                    if ($key > 1) {
-                        $combinedValue .= ':';
-                    }
+                    $paramValue = $splitLine[$i];
+                }
 
-                    $combinedValue .= $matches[$key];
+                // Create object with paramName => paramValue
+                $paramObj[$paramName] = $paramValue;
+            }
+
+            // After a colon all tokens are concatenated (non-standard behaviour because the property can have multiple values
+            // according to RFC5545)
+            if ($splitLine[$i] == ':') {
+                $i++;
+                while ($i < count($splitLine)) {
+                    $valueObj .= $splitLine[$i];
+                    $i++;
                 }
             }
 
-            $matches    = array_slice($matches, 0, 2);
-            $matches[1] = $combinedValue;
-            array_unshift($matches, $before . $text);
+            $i++;
         }
 
-        if ($matches === []) {
-            return false;
-        }
-
-        if (preg_match('/^([A-Z-]+)([;][\w\W]*)?$/', $matches[1])) {
-            $matches = array_splice($matches, 1, 2); // Remove first match and re-align ordering
-
-            // Process properties
-            if (preg_match('/([A-Z-]+)[;]([\w\W]*)/', $matches[0], $properties)) {
-                // Remove first match
-                array_shift($properties);
-                // Fix to ignore everything in keyword after a ; (e.g. Language, TZID, etc.)
-                $matches[0] = $properties[0];
-                array_shift($properties); // Repeat removing first match
-
-                $formatted = array();
-                foreach ($properties as $property) {
-                    // Match semicolon separator outside of quoted substrings
-                    preg_match_all('~[^' . PHP_EOL . '";]+(?:"[^"\\\]*(?:\\\.[^"\\\]*)*"[^' . PHP_EOL . '";]*)*~', $property, $attributes);
-                    // Remove multi-dimensional array and use the first key
-                    $attributes = (count($attributes) === 0) ? array($property) : reset($attributes);
-
-                    if (is_array($attributes)) {
-                        foreach ($attributes as $attribute) {
-                            // Match equals sign separator outside of quoted substrings
-                            preg_match_all(
-                                '~[^' . PHP_EOL . '"=]+(?:"[^"\\\]*(?:\\\.[^"\\\]*)*"[^' . PHP_EOL . '"=]*)*~',
-                                $attribute,
-                                $values
-                            );
-                            // Remove multi-dimensional array and use the first key
-                            $value = (count($values) === 0) ? null : reset($values);
-
-                            if (is_array($value) && isset($value[1])) {
-                                // Remove double quotes from beginning and end only
-                                $formatted[$value[0]] = trim($value[1], '"');
-                            }
-                        }
-                    }
-                }
-
-                // Assign the keyword property information
-                $properties[0] = $formatted;
-
-                // Add match to beginning of array
-                array_unshift($properties, $matches[1]);
-                $matches[1] = $properties;
-            }
-
-            return $matches;
+        // Object construction
+        if (count($paramObj) > 0) {
+            $object[1][0] = $valueObj;
+            $object[1][1] = $paramObj;
         } else {
-            return false; // Ignore this match
+            $object[1] = $valueObj;
         }
+
+        return $object ?: false;
+    }
+
+    /**
+     * Parses a line from an iCal file into an array of tokens
+     *
+     * @param  string $line
+     * @return array
+     */
+    protected function parseLine($line)
+    {
+        $words = array();
+        $word  = '';
+        // The use of str_split is not a problem here even if the character set is in utf8
+        // Indeed we only compare the characters , ; : = " which are on a single byte
+        $arrayOfChar = str_split($line);
+        $inDoubleQuotes = false;
+
+        foreach ($arrayOfChar as $char) {
+            // Don't stop the word on ; , : = if it is enclosed in double quotes
+            if ($char === '"') {
+                if ($word !== '') {
+                    $words[] = $word;
+                }
+
+                $word = '';
+                $inDoubleQuotes = !$inDoubleQuotes;
+            } elseif (!in_array($char, array(';', ':', ',', '=')) || $inDoubleQuotes) {
+                $word .= $char;
+            } else {
+                if ($word !== '') {
+                    $words[] = $word;
+                }
+
+                $words[] = $char;
+                $word = '';
+            }
+        }
+
+        $words[] = $word;
+
+        return $words;
     }
 
     /**
