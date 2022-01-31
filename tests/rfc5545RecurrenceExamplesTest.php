@@ -63,7 +63,7 @@ class rfc5545RecurrenceExamplesTest extends TestCase
         date_default_timezone_set($this->originalTimeZone);
     }
 
-    // Page 123, Test 1 :: Daily, 10 Occurences
+    // Page 123, Test 1 :: Daily, 10 Occurrences
     public function test_page123_test1()
     {
         $checks = array(
