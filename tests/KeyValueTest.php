@@ -5,6 +5,11 @@ use PHPUnit\Framework\TestCase;
 
 class KeyValueTest extends TestCase
 {
+    // phpcs:disable Generic.Arrays.DisallowLongArraySyntax
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    // phpcs:disable Squiz.Commenting.FunctionComment
+    // phpcs:disable Squiz.Commenting.VariableComment
+
     public function testBoundaryCharactersInsideQuotes()
     {
         $checks = array(
