@@ -190,6 +190,14 @@ class ICal
      */
     protected $httpAcceptLanguage;
 
+
+    /**
+     * Holds the custom HTTP Protocol Version
+     *
+     * @var string
+     */
+    protected $httpProtocolVersion;
+
     /**
      * Define which variables can be configured
      *
@@ -583,7 +591,7 @@ class ICal
      * @param  string $acceptLanguage
      * @return ICal
      */
-    public function initUrl($url, $username = null, $password = null, $userAgent = null, $acceptLanguage = null)
+    public function initUrl($url, $username = null, $password = null, $userAgent = null, $acceptLanguage = null, $httpProtocolVersion = null)
     {
         if (!is_null($username) && !is_null($password)) {
             $this->httpBasicAuth['username'] = $username;
@@ -596,6 +604,10 @@ class ICal
 
         if (!is_null($acceptLanguage)) {
             $this->httpAcceptLanguage = $acceptLanguage;
+        }
+
+        if (!is_null($httpProtocolVersion)) {
+            $this->httpProtocolVersion = $httpProtocolVersion;
         }
 
         $this->initFile($url);
@@ -1512,10 +1524,10 @@ class ICal
                                 // And add each of them to the list of recurrences
                                 foreach ($monthDays as $day) {
                                     $matchingDays[] = $bymonthRecurringDatetime->setDate(
-                                        $frequencyRecurringDateTime->format('Y'),
-                                        $bymonthRecurringDatetime->format('m'),
-                                        $day
-                                    )->format('z') + 1;
+                                            $frequencyRecurringDateTime->format('Y'),
+                                            $bymonthRecurringDatetime->format('m'),
+                                            $day
+                                        )->format('z') + 1;
                                 }
                             }
                         } elseif (!empty($rrules['BYWEEKNO'])) {
@@ -1914,10 +1926,10 @@ class ICal
         $byweekDateTime = clone $initialDateTime;
         foreach ($matchingWeeks as $weekNum) {
             $dayNum = $byweekDateTime->setISODate(
-                $initialDateTime->format('Y'),
-                $weekNum,
-                1
-            )->format('z') + 1;
+                    $initialDateTime->format('Y'),
+                    $weekNum,
+                    1
+                )->format('z') + 1;
             for ($x = 0; $x < 7; ++$x) {
                 $matchingDays[] = $x + $dayNum;
             }
@@ -1957,10 +1969,10 @@ class ICal
             $monthDays = $this->getDaysOfMonthMatchingByMonthDayRRule($byMonthDays, $monthDateTime);
             foreach ($monthDays as $day) {
                 $matchingDays[] = $monthDateTime->setDate(
-                    $initialDateTime->format('Y'),
-                    $monthDateTime->format('m'),
-                    $day
-                )->format('z') + 1;
+                        $initialDateTime->format('Y'),
+                        $monthDateTime->format('m'),
+                        $day
+                    )->format('z') + 1;
             }
         }
 
@@ -2608,7 +2620,11 @@ class ICal
             }
         }
 
-        $options['http']['protocol_version'] = '1.1';
+        if (!empty($this->httpProtocolVersion)) {
+            $options['http']['protocol_version'] = $this->httpProtocolVersion;
+        } else {
+            $options['http']['protocol_version'] = '1.1';
+        }
 
         $options['http']['header'][] = 'Connection: close';
 
