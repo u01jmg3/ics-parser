@@ -190,6 +190,14 @@ class ICal
      */
     protected $httpAcceptLanguage;
 
+
+    /**
+     * Holds the custom HTTP Protocol Version
+     *
+     * @var string
+     */
+    protected $httpProtocolVersion;
+
     /**
      * Define which variables can be configured
      *
@@ -581,9 +589,10 @@ class ICal
      * @param  string $password
      * @param  string $userAgent
      * @param  string $acceptLanguage
+     * @param  string $httpProtocolVersion
      * @return ICal
      */
-    public function initUrl($url, $username = null, $password = null, $userAgent = null, $acceptLanguage = null)
+    public function initUrl($url, $username = null, $password = null, $userAgent = null, $acceptLanguage = null, $httpProtocolVersion = null)
     {
         if (!is_null($username) && !is_null($password)) {
             $this->httpBasicAuth['username'] = $username;
@@ -596,6 +605,10 @@ class ICal
 
         if (!is_null($acceptLanguage)) {
             $this->httpAcceptLanguage = $acceptLanguage;
+        }
+
+        if (!is_null($httpProtocolVersion)) {
+            $this->httpProtocolVersion = $httpProtocolVersion;
         }
 
         $this->initFile($url);
@@ -2608,7 +2621,11 @@ class ICal
             }
         }
 
-        $options['http']['protocol_version'] = '1.1';
+        if (!empty($this->httpProtocolVersion)) {
+            $options['http']['protocol_version'] = $this->httpProtocolVersion;
+        } else {
+            $options['http']['protocol_version'] = '1.1';
+        }
 
         $options['http']['header'][] = 'Connection: close';
 
