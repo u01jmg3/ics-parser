@@ -1524,10 +1524,10 @@ class ICal
                                 // And add each of them to the list of recurrences
                                 foreach ($monthDays as $day) {
                                     $matchingDays[] = $bymonthRecurringDatetime->setDate(
-                                            $frequencyRecurringDateTime->format('Y'),
-                                            $bymonthRecurringDatetime->format('m'),
-                                            $day
-                                        )->format('z') + 1;
+                                        $frequencyRecurringDateTime->format('Y'),
+                                        $bymonthRecurringDatetime->format('m'),
+                                        $day
+                                    )->format('z') + 1;
                                 }
                             }
                         } elseif (!empty($rrules['BYWEEKNO'])) {
@@ -1926,10 +1926,10 @@ class ICal
         $byweekDateTime = clone $initialDateTime;
         foreach ($matchingWeeks as $weekNum) {
             $dayNum = $byweekDateTime->setISODate(
-                    $initialDateTime->format('Y'),
-                    $weekNum,
-                    1
-                )->format('z') + 1;
+                $initialDateTime->format('Y'),
+                $weekNum,
+                1
+            )->format('z') + 1;
             for ($x = 0; $x < 7; ++$x) {
                 $matchingDays[] = $x + $dayNum;
             }
@@ -1969,10 +1969,10 @@ class ICal
             $monthDays = $this->getDaysOfMonthMatchingByMonthDayRRule($byMonthDays, $monthDateTime);
             foreach ($monthDays as $day) {
                 $matchingDays[] = $monthDateTime->setDate(
-                        $initialDateTime->format('Y'),
-                        $monthDateTime->format('m'),
-                        $day
-                    )->format('z') + 1;
+                    $initialDateTime->format('Y'),
+                    $monthDateTime->format('m'),
+                    $day
+                )->format('z') + 1;
             }
         }
 
