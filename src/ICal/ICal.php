@@ -190,9 +190,8 @@ class ICal
      */
     protected $httpAcceptLanguage;
 
-
     /**
-     * Holds the custom HTTP Protocol Version
+     * Holds the custom HTTP Protocol version
      *
      * @var string
      */
