@@ -1476,6 +1476,8 @@ class ICal
                             }
                         } elseif (!empty($rrules['BYDAY'])) {
                             $matchingDays = $this->getDaysOfMonthMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime);
+                        } else {
+                            $matchingDays[] = $frequencyRecurringDateTime->format('d');
                         }
 
                         if (!empty($rrules['BYSETPOS'])) {
