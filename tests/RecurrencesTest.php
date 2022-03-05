@@ -72,7 +72,7 @@ class RecurrencesTest extends TestCase
             array(
                 'DTSTART;VALUE=DATE:20180701',
                 'DTEND;VALUE=DATE:20180702',
-                'RRULE:FREQ=MONTHLY;BYMONTHDAY=1;WKST=SU;COUNT=3',
+                'RRULE:FREQ=MONTHLY;WKST=SU;COUNT=3',
             ),
             3,
             $checks
