@@ -17,16 +17,15 @@
  - Install [Composer](https://getcomposer.org/)
    - Add the following dependency to `composer.json`
      - :warning: **Note with Composer the owner is `johngrogg` and not `u01jmg3`**
-   - To access the latest stable branch (`v2`) use the following
-     - To access new features you can require [`dev-master`](https://getcomposer.org/doc/articles/aliases.md#branch-alias)
-
+   - To access the latest stable branch (`v3`) use the following
        ```yaml
        {
            "require": {
-               "johngrogg/ics-parser": "^2"
+               "johngrogg/ics-parser": "^3"
            }
        }
        ```
+    - To access new features you can require [`dev-master`](https://getcomposer.org/doc/articles/aliases.md#branch-alias)
 
 ## Running tests
 
