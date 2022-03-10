@@ -1050,7 +1050,7 @@ class ICal
         }
 
         // Object construction
-        if (count($paramObj) > 0) {
+        if ($paramObj !== []) {
             $object[1][0] = $valueObj;
             $object[1][1] = $paramObj;
         } else {

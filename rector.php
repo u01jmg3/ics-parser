@@ -34,18 +34,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector::class,
         Rector\CodeQuality\Rector\If_\SimplifyIfReturnBoolRector::class,
         Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class,
+        Rector\CodeQuality\Rector\PropertyFetch\ExplicitMethodCallOverMagicGetSetRector::class,
         Rector\CodeQuality\Rector\Return_\SimplifyUselessVariableRector::class,
         Rector\CodingStyle\Rector\ClassConst\VarConstantCommentRector::class,
         Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector::class,
         Rector\CodingStyle\Rector\FuncCall\ConsistentPregDelimiterRector::class,
-        Rector\CodingStyle\Rector\Function_\CamelCaseFunctionNamingToUnderscoreRector::class,
         Rector\CodingStyle\Rector\String_\SymplifyQuoteEscapeRector::class,
         Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector::class,
-        Rector\DeadCode\Rector\ClassConst\RemoveUnusedClassConstantRector::class,
-        Rector\DeadCode\Rector\ClassMethod\RemoveUnusedParameterRector::class,
-        Rector\Naming\Rector\Property\UnderscoreToCamelCasePropertyNameRector::class,
-        Rector\Naming\Rector\Variable\UnderscoreToCamelCaseVariableNameRector::class,
-        Rector\Php56\Rector\FuncCall\PowToExpRector::class,
         Rector\Php70\Rector\FuncCall\NonVariableToVariableOnFunctionCallRector::class,
         Rector\Php70\Rector\MethodCall\ThisCallOnStaticMethodToStaticCallRector::class,
         Rector\Php70\Rector\StaticCall\StaticCallOnNonStaticToInstanceCallRector::class,
@@ -57,25 +52,26 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         Rector\CodingStyle\Rector\ClassMethod\UnSpreadOperatorRector::class,
         Rector\CodingStyle\Rector\PostInc\PostIncDecToPreIncDecRector::class,
         Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class,
+        Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPromotedPropertyRector::class,
         Rector\CodeQuality\Rector\ClassMethod\DateTimeToDateTimeInterfaceRector::class,
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
         Rector\DeadCode\Rector\StaticCall\RemoveParentCallWithoutParentRector::class,
+        Rector\Transform\Rector\String_\StringToClassConstantRector::class,
         // PHP 5.6 incompatible
         Rector\CodeQuality\Rector\Ternary\ArrayKeyExistsTernaryThenValueToCoalescingRector::class, // PHP 7
         Rector\Php70\Rector\If_\IfToSpaceshipRector::class,
         Rector\Php70\Rector\Ternary\TernaryToSpaceshipRector::class,
-        Rector\Php71\Rector\BinaryOp\IsIterableRector::class,
+        Rector\Php71\Rector\BooleanOr\IsIterableRector::class,
         Rector\Php71\Rector\List_\ListToArrayDestructRector::class,
         Rector\Php71\Rector\TryCatch\MultiExceptionCatchRector::class,
         Rector\Php73\Rector\FuncCall\ArrayKeyFirstLastRector::class,
-        Rector\Php73\Rector\BinaryOp\IsCountableRector::class,
+        Rector\Php73\Rector\BooleanOr\IsCountableRector::class,
         Rector\Php74\Rector\Assign\NullCoalescingOperatorRector::class,
-        Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector::class,
         Rector\Php74\Rector\FuncCall\ArraySpreadInsteadOfArrayMergeRector::class,
         Rector\Php74\Rector\LNumber\AddLiteralSeparatorToNumberRector::class,
         Rector\Php74\Rector\MethodCall\ChangeReflectionTypeToStringToGetNameRector::class,
         Rector\Php74\Rector\StaticCall\ExportToReflectionFunctionRector::class,
-        Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPromotedPropertyRector::class,
+        Rector\CodingStyle\Rector\ClassConst\RemoveFinalFromConstRector::class, // PHP 8
     ));
 
     $containerConfigurator->import(SetList::CODE_QUALITY);
@@ -86,7 +82,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $containerConfigurator->import(LaravelSetList::LARAVEL_52);
     $containerConfigurator->import(LaravelSetList::LARAVEL_53);
     $containerConfigurator->import(LaravelSetList::LARAVEL_54);
-    $containerConfigurator->import(SetList::PHP_56);
     $containerConfigurator->import(SetList::PHP_70);
     $containerConfigurator->import(SetList::PHP_71);
     $containerConfigurator->import(SetList::PHP_72);
