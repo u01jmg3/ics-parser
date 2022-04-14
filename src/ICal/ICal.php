@@ -1304,7 +1304,7 @@ class ICal
 
             // Separate the RRULE stanzas, and explode the values that are lists.
             $rrules = array();
-            foreach (explode(';', $anEvent['RRULE']) as $s) {
+            foreach (array_filter(explode(';', $anEvent['RRULE'])) as $s) {
                 list($k, $v) = explode('=', $s);
                 if (in_array($k, array('BYSETPOS', 'BYDAY', 'BYMONTHDAY', 'BYMONTH', 'BYYEARDAY', 'BYWEEKNO'))) {
                     $rrules[$k] = explode(',', $v);
