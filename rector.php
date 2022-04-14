@@ -8,11 +8,15 @@ use Rector\Laravel\Set\LaravelSetList;
 use Rector\Php53\Rector\Ternary\TernaryToElvisRector;
 use Rector\Set\ValueObject\SetList;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-
+use Rector\PHPUnit\Set\PHPUnitSetList;
 // rector process src
 
 return static function (ContainerConfigurator $containerConfigurator): void {
+    $containerConfigurator->import(PHPUnitSetList::PHPUNIT_90);
+
     $parameters = $containerConfigurator->parameters();
+
+
 
     $parameters->set(Option::IMPORT_SHORT_CLASSES, false);
 
