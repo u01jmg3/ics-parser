@@ -35,16 +35,11 @@
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "~3.6.0",
-        "phpunit/phpunit": "^5"
+        "phpunit/phpunit": "^5|^9"
     },
     "autoload": {
         "psr-0": {
             "ICal": "src/"
-        }
-    },
-    "config": {
-        "platform": {
-            "php": "5.6"
         }
     },
     "scripts": {
