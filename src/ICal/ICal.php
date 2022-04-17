@@ -2354,9 +2354,9 @@ class ICal
     /**
      * Parses a duration and applies it to a date
      *
-     * @param  string $date
-     * @param  string $duration
-     * @param  string $format
+     * @param  string        $date
+     * @param  \DateInterval $duration
+     * @param  string        $format
      * @return integer|\DateTime
      */
     protected function parseDuration($date, $duration, $format = self::UNIX_FORMAT)
