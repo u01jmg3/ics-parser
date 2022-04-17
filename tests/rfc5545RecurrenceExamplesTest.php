@@ -998,7 +998,7 @@ class rfc5545RecurrenceExamplesTest extends TestCase
         $expectedTimeStamp = strtotime($expectedDateString);
 
         $this->assertEquals($expectedTimeStamp, $event->dtstart_array[2], $message . 'timestamp mismatch (expected ' . $expectedDateString . ' vs actual ' . $event->dtstart . ')');
-        $this->assertAttributeEquals($expectedDateString, 'dtstart', $event, $message . 'dtstart mismatch (timestamp is okay)');
+        $this->assertEquals($expectedDateString, $event->dtstart, $message . 'dtstart mismatch (timestamp is okay)');
     }
 
     public function getOptions($defaultTimezone)

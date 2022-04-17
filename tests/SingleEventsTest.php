@@ -469,10 +469,9 @@ class SingleEventsTest extends TestCase
             $event->dtstart_array[2],
             $message . 'timestamp mismatch (expected ' . $expectedDateString . ' vs actual ' . $event->dtstart . ')'
         );
-        $this->assertAttributeEquals(
+        $this->assertEquals(
             $expectedDateString,
-            'dtstart',
-            $event,
+            $event->dtstart,
             $message . 'dtstart mismatch (timestamp is okay)'
         );
     }
