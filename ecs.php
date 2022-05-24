@@ -79,17 +79,17 @@ use PhpCsFixer\Fixer\Whitespace\SingleBlankLineAtEofFixer;
 use SlevomatCodingStandard\ControlStructures\AssignmentInConditionSniff;
 use SlevomatCodingStandard\Namespaces\AlphabeticallySortedUsesSniff;
 use SlevomatCodingStandard\Namespaces\UnusedUsesSniff;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symplify\EasyCodingStandard\Config\ECSConfig;
 use Symplify\EasyCodingStandard\ValueObject\Option;
 use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
 
 // ecs check --fix .
 
-return static function (ContainerConfigurator $containerConfigurator): void {
+return static function (ECSConfig $ecsConfig): void {
     // https://github.com/symplify/easy-coding-standard/blob/main/config/set/psr12.php
-    $containerConfigurator->import(SetList::PSR_12);
+    $ecsConfig->import(SetList::PSR_12);
 
-    $parameters = $containerConfigurator->parameters();
+    $parameters = $ecsConfig->parameters();
 
     $parameters->set(Option::LINE_ENDING, "\n");
 
@@ -107,7 +107,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         'PhpCsFixer\Fixer\ClassNotation\VisibilityRequiredFixer' => null,
     ));
 
-    $services = $containerConfigurator->services();
+    $services = $ecsConfig->services();
 
     $services->set(SpaceAfterNotSniff::class)
         ->property('spacing', 0);

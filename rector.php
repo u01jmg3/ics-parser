@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
+use Rector\Config\RectorConfig;
 use Rector\Core\Configuration\Option;
 use Rector\Core\ValueObject\PhpVersion;
 use Rector\Laravel\Set\LaravelSetList;
 use Rector\Php53\Rector\Ternary\TernaryToElvisRector;
 use Rector\Set\ValueObject\SetList;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 // rector process src
 
-return static function (ContainerConfigurator $containerConfigurator): void {
-    $parameters = $containerConfigurator->parameters();
+return static function (RectorConfig $rectorConfig): void {
+    $parameters = $rectorConfig->parameters();
 
     $parameters->set(Option::IMPORT_SHORT_CLASSES, false);
 
@@ -35,7 +35,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         Rector\CodeQuality\Rector\If_\SimplifyIfReturnBoolRector::class,
         Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class,
         Rector\CodeQuality\Rector\PropertyFetch\ExplicitMethodCallOverMagicGetSetRector::class,
-        Rector\CodeQuality\Rector\Return_\SimplifyUselessVariableRector::class,
+        Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector::class,
         Rector\CodingStyle\Rector\ClassConst\VarConstantCommentRector::class,
         Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector::class,
         Rector\CodingStyle\Rector\FuncCall\ConsistentPregDelimiterRector::class,
@@ -74,21 +74,21 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         Rector\CodingStyle\Rector\ClassConst\RemoveFinalFromConstRector::class, // PHP 8
     ));
 
-    $containerConfigurator->import(SetList::CODE_QUALITY);
-    $containerConfigurator->import(SetList::CODING_STYLE);
-    $containerConfigurator->import(SetList::DEAD_CODE);
-    $containerConfigurator->import(LaravelSetList::LARAVEL_50);
-    $containerConfigurator->import(LaravelSetList::LARAVEL_51);
-    $containerConfigurator->import(LaravelSetList::LARAVEL_52);
-    $containerConfigurator->import(LaravelSetList::LARAVEL_53);
-    $containerConfigurator->import(LaravelSetList::LARAVEL_54);
-    $containerConfigurator->import(SetList::PHP_70);
-    $containerConfigurator->import(SetList::PHP_71);
-    $containerConfigurator->import(SetList::PHP_72);
-    $containerConfigurator->import(SetList::PHP_73);
-    $containerConfigurator->import(SetList::PHP_74);
+    $rectorConfig->import(SetList::CODE_QUALITY);
+    $rectorConfig->import(SetList::CODING_STYLE);
+    $rectorConfig->import(SetList::DEAD_CODE);
+    $rectorConfig->import(LaravelSetList::LARAVEL_50);
+    $rectorConfig->import(LaravelSetList::LARAVEL_51);
+    $rectorConfig->import(LaravelSetList::LARAVEL_52);
+    $rectorConfig->import(LaravelSetList::LARAVEL_53);
+    $rectorConfig->import(LaravelSetList::LARAVEL_54);
+    $rectorConfig->import(SetList::PHP_70);
+    $rectorConfig->import(SetList::PHP_71);
+    $rectorConfig->import(SetList::PHP_72);
+    $rectorConfig->import(SetList::PHP_73);
+    $rectorConfig->import(SetList::PHP_74);
 
-    $services = $containerConfigurator->services();
+    $services = $rectorConfig->services();
 
     $services->set(TernaryToElvisRector::class);
 };
