@@ -181,7 +181,7 @@ class ICal
      *
      * @var string
      */
-    protected $httpUserAgent;
+    protected $httpUserAgent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)';
 
     /**
      * Holds the custom Accept Language string header
@@ -210,6 +210,7 @@ class ICal
         'filterDaysAfter',
         'filterDaysBefore',
         'skipRecurrence',
+        'httpUserAgent',
     );
 
     /**
