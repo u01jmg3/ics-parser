@@ -512,6 +512,7 @@ class RecurrencesTest extends TestCase
             'disableCharacterReplacement' => false,            // Default value
             'filterDaysAfter'             => null,             // Default value
             'filterDaysBefore'            => null,             // Default value
+            'httpUserAgent'               => null,             // Default value
             'skipRecurrence'              => false,            // Default value
         );
 

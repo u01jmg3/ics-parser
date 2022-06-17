@@ -209,6 +209,7 @@ class ICal
         'disableCharacterReplacement',
         'filterDaysAfter',
         'filterDaysBefore',
+        'httpUserAgent',
         'skipRecurrence',
     );
 
