@@ -506,13 +506,13 @@ class RecurrencesTest extends TestCase
     public function getOptions($defaultTimezone)
     {
         $options = array(
-            'defaultSpan'                 => 2,                            // Default value
-            'defaultTimeZone'             => $defaultTimezone,             // Default value: UTC
-            'defaultWeekStart'            => 'MO',                         // Default value
-            'disableCharacterReplacement' => false,                        // Default value
-            'filterDaysAfter'             => null,                         // Default value
-            'filterDaysBefore'            => null,                         // Default value
-            'skipRecurrence'              => false,                        // Default value
+            'defaultSpan'                 => 2,                // Default value
+            'defaultTimeZone'             => $defaultTimezone, // Default value: UTC
+            'defaultWeekStart'            => 'MO',             // Default value
+            'disableCharacterReplacement' => false,            // Default value
+            'filterDaysAfter'             => null,             // Default value
+            'filterDaysBefore'            => null,             // Default value
+            'skipRecurrence'              => false,            // Default value
         );
 
         return $options;
