@@ -1021,7 +1021,7 @@ class ICal
                 $paramValue = array();
                 $multiValue = false;
                 // A parameter can have multiple values separated by a comma
-                while ($i + 1 < count($splitLine) && $splitLine[$i + 1] == ',') {
+                while ($i + 1 < count($splitLine) && $splitLine[$i + 1] === ',') {
                     $paramValue[] = $splitLine[$i];
                     $i += 2;
                     $multiValue = true;
@@ -1039,7 +1039,7 @@ class ICal
 
             // After a colon all tokens are concatenated (non-standard behaviour because the property can have multiple values
             // according to RFC5545)
-            if ($splitLine[$i] == ':') {
+            if ($splitLine[$i] === ':') {
                 $i++;
                 while ($i < count($splitLine)) {
                     $valueObj .= $splitLine[$i];
