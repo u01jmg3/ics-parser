@@ -53,7 +53,6 @@ return static function (RectorConfig $rectorConfig): void {
         Rector\CodingStyle\Rector\PostInc\PostIncDecToPreIncDecRector::class,
         Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class,
         Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPromotedPropertyRector::class,
-        Rector\CodeQuality\Rector\ClassMethod\DateTimeToDateTimeInterfaceRector::class,
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
         Rector\DeadCode\Rector\StaticCall\RemoveParentCallWithoutParentRector::class,
         Rector\Transform\Rector\String_\StringToClassConstantRector::class,
