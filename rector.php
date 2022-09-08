@@ -12,6 +12,8 @@ use Rector\Set\ValueObject\SetList;
 // rector process src
 
 return static function (RectorConfig $rectorConfig): void {
+    $rectorConfig->disableParallel();
+
     $parameters = $rectorConfig->parameters();
 
     $parameters->set(Option::IMPORT_SHORT_CLASSES, false);
@@ -56,6 +58,8 @@ return static function (RectorConfig $rectorConfig): void {
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
         Rector\DeadCode\Rector\StaticCall\RemoveParentCallWithoutParentRector::class,
         Rector\Transform\Rector\String_\StringToClassConstantRector::class,
+        Rector\CodeQuality\Rector\FuncCall\InlineIsAInstanceOfRector::class,
+        Rector\CodingStyle\Rector\Closure\StaticClosureRector::class,
         // PHP 5.6 incompatible
         Rector\CodeQuality\Rector\Ternary\ArrayKeyExistsTernaryThenValueToCoalescingRector::class, // PHP 7
         Rector\Php70\Rector\If_\IfToSpaceshipRector::class,

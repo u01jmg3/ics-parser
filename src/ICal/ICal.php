@@ -1256,7 +1256,7 @@ class ICal
                     $eventDtstartUnix = $this->iCalDateToUnixTimestamp($event['DTSTART_array'][3]);
 
                     // phpcs:ignore CustomPHPCS.ControlStructures.AssignmentInCondition
-                    if (($alteredEventKey = array_search($eventDtstartUnix, $this->alteredRecurrenceInstances[$event['UID']])) !== false) {
+                    if (($alteredEventKey = array_search($eventDtstartUnix, $this->alteredRecurrenceInstances[$event['UID']], true)) !== false) {
                         $eventKeysToRemove[] = $alteredEventKey;
 
                         $alteredEvent = array_replace_recursive($events[$key], $events[$alteredEventKey]);
@@ -1421,15 +1421,15 @@ class ICal
 
                             if (empty($rrules['WKST'])) {
                                 if ($this->defaultWeekStart !== self::ISO_8601_WEEK_START) {
-                                    $wkstTransition = array_search($this->defaultWeekStart, array_keys($this->weekdays));
+                                    $wkstTransition = array_search($this->defaultWeekStart, array_keys($this->weekdays), true);
                                 }
                             } elseif ($rrules['WKST'] !== self::ISO_8601_WEEK_START) {
-                                $wkstTransition = array_search($rrules['WKST'], array_keys($this->weekdays));
+                                $wkstTransition = array_search($rrules['WKST'], array_keys($this->weekdays), true);
                             }
 
                             $matchingDays = array_map(
                                 function ($weekday) use ($initialDayOfWeek, $wkstTransition, $interval) {
-                                    $day = array_search($weekday, array_keys($this->weekdays));
+                                    $day = array_search($weekday, array_keys($this->weekdays), true);
 
                                     if ($day < $initialDayOfWeek) {
                                         $day += 7;
