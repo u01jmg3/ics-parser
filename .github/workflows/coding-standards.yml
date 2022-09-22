@@ -1,0 +1,41 @@
+name: Coding Standards
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  Scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+          tools: composer:2.2
+
+      - name: Install dependencies
+        run: |
+          composer install --quiet
+          composer require rector/rector symplify/easy-coding-standard --quiet
+
+      - name: Execute tests
+        run: vendor/bin/phpunit --verbose
+
+      - name: Execute Rector
+        run: vendor/bin/rector process src --dry-run
+
+      - name: Execute ECS
+        run: vendor/bin/ecs check
+
+      - name: Execute PHPStan
+        run: vendor/bin/phpstan analyse src
