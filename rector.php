@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Rector\Config\RectorConfig;
 use Rector\Core\Configuration\Option;
 use Rector\Core\ValueObject\PhpVersion;
-use Rector\Laravel\Set\LaravelSetList;
 use Rector\Php53\Rector\Ternary\TernaryToElvisRector;
 use Rector\Set\ValueObject\SetList;
 
@@ -80,16 +79,14 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->import(SetList::CODE_QUALITY);
     $rectorConfig->import(SetList::CODING_STYLE);
     $rectorConfig->import(SetList::DEAD_CODE);
-    $rectorConfig->import(LaravelSetList::LARAVEL_50);
-    $rectorConfig->import(LaravelSetList::LARAVEL_51);
-    $rectorConfig->import(LaravelSetList::LARAVEL_52);
-    $rectorConfig->import(LaravelSetList::LARAVEL_53);
-    $rectorConfig->import(LaravelSetList::LARAVEL_54);
     $rectorConfig->import(SetList::PHP_70);
     $rectorConfig->import(SetList::PHP_71);
     $rectorConfig->import(SetList::PHP_72);
     $rectorConfig->import(SetList::PHP_73);
     $rectorConfig->import(SetList::PHP_74);
+    $rectorConfig->import(SetList::PHP_80);
+    $rectorConfig->import(SetList::PHP_81);
+    $rectorConfig->import(SetList::PHP_82);
 
     $services = $rectorConfig->services();
 
