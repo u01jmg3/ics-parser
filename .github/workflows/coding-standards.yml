@@ -13,6 +13,13 @@ jobs:
   Scan:
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [5.6, 7.4, '8.0', 8.1, 8.2]
+
+    name: PHP ${{ matrix.php }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -20,28 +27,40 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "7.4"
+          php-version: ${{ matrix.php }}
           tools: composer:2.2
           coverage: none
 
-      - name: Install dependencies
-        run: |
-          composer install --quiet --no-scripts
-          composer config allow-plugins.bamarni/composer-bin-plugin true --no-plugins
-          composer require bamarni/composer-bin-plugin rector/rector:0.14.6 squizlabs/php_codesniffer --dev --quiet --no-scripts
-          composer bin easy-coding-standard require symplify/easy-coding-standard --dev --quiet --no-scripts
+      - name: Install dependencies for PHP 5.6
+        run: composer update --quiet --no-scripts
+        if: matrix.php == 5.6
 
-      - name: Execute PHPCodeSniffer
-        run: vendor/bin/phpcs -n -s --standard=psr12 src
+      - name: Install dependencies for PHP 7.4+
+        run: composer install --quiet --no-scripts
+        if: matrix.php >= 7.4
 
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
 
+      - name: Install additional dependencies
+        run: |
+          composer config allow-plugins.bamarni/composer-bin-plugin true --no-plugins
+          composer require bamarni/composer-bin-plugin rector/rector:0.14.6 squizlabs/php_codesniffer --dev --quiet --no-scripts
+          composer bin easy-coding-standard require symplify/easy-coding-standard --dev --quiet --no-scripts
+        if: matrix.php == 7.4
+
+      - name: Execute PHPCodeSniffer
+        run: vendor/bin/phpcs -n -s --standard=psr12 src
+        if: matrix.php == 7.4
+
       - name: Execute Rector
         run: vendor/bin/rector process src --dry-run
+        if: matrix.php == 7.4
 
       - name: Execute ECS
         run: vendor/bin/ecs check
+        if: matrix.php == 7.4
 
       - name: Execute PHPStan
         run: vendor/bin/phpstan analyse src
+        if: matrix.php == 7.4
