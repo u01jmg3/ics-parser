@@ -128,6 +128,13 @@ class Event
     public $attendee;
 
     /**
+     * Manage additional properties
+     *
+     * @var array<string, mixed>
+     */
+    private $additionalProperties = [];
+
+    /**
      * Creates the Event object
      *
      * @param  array $data
@@ -137,8 +144,27 @@ class Event
     {
         foreach ($data as $key => $value) {
             $variable = self::snakeCase($key);
-            $this->{$variable} = self::prepareData($value);
+            if (property_exists($this, $variable)) {
+                $this->{$variable} = $this->prepareData($value);
+            } else {
+                $this->additionalProperties[$variable] = $this->prepareData($value);
+            }
         }
+    }
+
+    /**
+     * Magic getter method
+     *
+     * @param  string $additionalPropertyName
+     * @return mixed
+     */
+    public function __get($additionalPropertyName)
+    {
+        if (array_key_exists($additionalPropertyName, $this->additionalProperties)) {
+            return $this->additionalProperties[$additionalPropertyName];
+        }
+
+        return null;
     }
 
     /**
@@ -151,8 +177,12 @@ class Event
     {
         if (is_string($value)) {
             return stripslashes(trim(str_replace('\n', "\n", $value)));
-        } elseif (is_array($value)) {
-            return array_map('self::prepareData', $value);
+        }
+
+        if (is_array($value)) {
+            return array_map(function ($value) {
+                return $this->prepareData($value);
+            }, $value);
         }
 
         return $value;
