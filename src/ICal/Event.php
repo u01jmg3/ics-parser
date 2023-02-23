@@ -128,6 +128,8 @@ class Event
     public $attendee;
 
     /**
+     * Manage additional properties
+     *
      * @var array<string, mixed>
      */
     private $additionalProperties = [];
@@ -151,14 +153,17 @@ class Event
     }
 
     /**
-     * @param string $additionalPropertyName
-     * @return mixed|null
+     * Magic getter method
+     *
+     * @param  string $additionalPropertyName
+     * @return mixed
      */
     public function __get($additionalPropertyName)
     {
         if (array_key_exists($additionalPropertyName, $this->additionalProperties)) {
             return $this->additionalProperties[$additionalPropertyName];
         }
+
         return null;
     }
 
