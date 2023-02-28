@@ -36,6 +36,7 @@ return static function (RectorConfig $rectorConfig): void {
         Rector\CodeQuality\Rector\If_\SimplifyIfReturnBoolRector::class,
         Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class,
         Rector\CodeQuality\Rector\PropertyFetch\ExplicitMethodCallOverMagicGetSetRector::class,
+        Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessLastVariableAssignRector::class,
         Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector::class,
         Rector\CodingStyle\Rector\ClassConst\VarConstantCommentRector::class,
         Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector::class,
@@ -59,6 +60,8 @@ return static function (RectorConfig $rectorConfig): void {
         Rector\Transform\Rector\String_\StringToClassConstantRector::class,
         Rector\CodeQuality\Rector\FuncCall\InlineIsAInstanceOfRector::class,
         Rector\CodingStyle\Rector\Closure\StaticClosureRector::class,
+        Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector::class,
+        Rector\CodeQuality\Rector\ClassMethod\ReturnTypeFromStrictScalarReturnExprRector::class,
         // PHP 5.6 incompatible
         Rector\CodeQuality\Rector\Ternary\ArrayKeyExistsTernaryThenValueToCoalescingRector::class, // PHP 7
         Rector\Php70\Rector\If_\IfToSpaceshipRector::class,
