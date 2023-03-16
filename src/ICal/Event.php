@@ -168,6 +168,17 @@ class Event
     }
 
     /**
+     * Magic isset method
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    public function __isset($name)
+    {
+        return is_null($this->$name) === false;
+    }
+
+    /**
      * Prepares the data for output
      *
      * @param  mixed $value
