@@ -2603,41 +2603,56 @@ class ICal
      */
     protected function fileOrUrl($filename)
     {
-        $options                   = array();
-        $options['http']           = array();
-        $options['http']['header'] = array();
+        if (str_starts_with($filename, 'http')) {
+            $options = array(
 
-        if (!empty($this->httpBasicAuth) || !empty($this->httpUserAgent) || !empty($this->httpAcceptLanguage)) {
-            if (!empty($this->httpBasicAuth)) {
-                $username  = $this->httpBasicAuth['username'];
-                $password  = $this->httpBasicAuth['password'];
-                $basicAuth = base64_encode("{$username}:{$password}");
-
-                $options['http']['header'][] = "Authorization: Basic {$basicAuth}";
-            }
-
+                CURLOPT_CUSTOMREQUEST => "GET",
+                CURLOPT_POST => false,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HEADER => false,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_AUTOREFERER => true,
+                CURLOPT_CONNECTTIMEOUT => 120,
+                CURLOPT_TIMEOUT => 120,
+                CURLOPT_MAXREDIRS => 10
+            );
             if (!empty($this->httpUserAgent)) {
-                $options['http']['header'][] = "User-Agent: {$this->httpUserAgent}";
+                $options[CURLOPT_USERAGENT] = $this->httpUserAgent;
+            } else {
+                $options[CURLOPT_USERAGENT] = 'ics-parser';
             }
-
+            if (!empty($this->httpBasicAuth)) {
+                $username = $this->httpBasicAuth['username'];
+                $password = $this->httpBasicAuth['password'];
+                $options[CURLOPT_USERPWD] = "$username:$password";
+            }
             if (!empty($this->httpAcceptLanguage)) {
-                $options['http']['header'][] = "Accept-language: {$this->httpAcceptLanguage}";
+                $options[CURLOPT_HTTPHEADER] = ["Accept-language: {$this->httpAcceptLanguage}"];
             }
-        }
 
-        if (!empty($this->httpProtocolVersion)) {
-            $options['http']['protocol_version'] = $this->httpProtocolVersion;
+            $ch = curl_init($filename);
+            curl_setopt_array($ch, $options);
+            $content = curl_exec($ch);
+            $errno = curl_errno($ch);
+            $errorMessage = curl_error($ch);
+            $header = curl_getinfo($ch);
+            curl_close($ch);
+
+            if ($errno != 0) {
+                throw new \Exception("Error getting url '{$filename}': $errno $errorMessage");
+            }
+
+            if ($header['http_code'] != 200) {
+                throw new \Exception("Error getting url '{$filename}'. Status code: {$header['http_code']}, $errorMessage, $content");
+            }
+
+            return preg_split("/\r\n|\n|\r/", $content);
         } else {
-            $options['http']['protocol_version'] = '1.1';
-        }
-
-        $options['http']['header'][] = 'Connection: close';
-
-        $context = stream_context_create($options);
-
-        // phpcs:ignore CustomPHPCS.ControlStructures.AssignmentInCondition
-        if (($lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES, $context)) === false) {
-            throw new \Exception("The file path or URL '{$filename}' does not exist.");
+            // phpcs:ignore CustomPHPCS.ControlStructures.AssignmentInCondition
+            if (($lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)) === false) {
+                throw new \Exception("The file path or URL '{$filename}' does not exist.");
+            }
         }
 
         return $lines;
@@ -2671,5 +2686,12 @@ class ICal
         }
 
         return new \DateTimeZone($this->defaultTimeZone);
+    }
+}
+
+if (!function_exists('str_starts_with')) {
+    function str_starts_with($haystack, $needle)
+    {
+        return (string)$needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0;
     }
 }
