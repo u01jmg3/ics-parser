@@ -2625,6 +2625,12 @@ class ICal
             }
         }
 
+        if (empty($this->httpUserAgent)) {
+            if (mb_stripos($filename, 'outlook.office365.com') !== false) {
+                $options['http']['header'][] = 'User-Agent: A User Agent';
+            }
+        }
+
         if (!empty($this->httpProtocolVersion)) {
             $options['http']['protocol_version'] = $this->httpProtocolVersion;
         } else {

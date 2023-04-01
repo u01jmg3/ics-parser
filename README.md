@@ -74,10 +74,12 @@ composer test
 
 Outlook has a quirk where it requires the User Agent string to be set in your request headers.
 
-Using the `httpUserAgent` argument when creating your ICal object solves this problem.
+We have done this for you by injecting a default User Agent string, if one has not been specified.
+
+If you wish to provide your own User agent string you can do so by using the `httpUserAgent` argument when creating your ICal object.
 
 ```php
-$ical = new ICal($url, array('httpUserAgent' => 'A User Agent'));
+$ical = new ICal($url, array('httpUserAgent' => 'A Different User Agent'));
 ```
 
 ---
