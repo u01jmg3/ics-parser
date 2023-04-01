@@ -2491,6 +2491,7 @@ class ICal
     protected function cleanData($data)
     {
         $replacementChars = array(
+            "\t"           => ' ',
             "\xe2\x80\x98" => "'",   // ‘
             "\xe2\x80\x99" => "'",   // ’
             "\xe2\x80\x9a" => "'",   // ‚
@@ -2502,7 +2503,7 @@ class ICal
             "\xe2\x80\x93" => '-',   // –
             "\xe2\x80\x94" => '--',  // —
             "\xe2\x80\xa6" => '...', // …
-            "\xc2\xa0"     => ' ',
+            "\xc2\xa0"     => ' ',   // Non-breaking space
         );
         // Replace UTF-8 characters
         $cleanedData = strtr($data, $replacementChars);
