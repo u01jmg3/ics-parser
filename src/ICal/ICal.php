@@ -885,7 +885,7 @@ class ICal
      */
     protected function addCalendarComponentWithKeyAndValue($component, $keyword, $value)
     {
-        if ($keyword == false) {
+        if ($keyword === false) {
             $keyword = $this->lastKeyword;
         }
 
@@ -1007,7 +1007,7 @@ class ICal
 
         while ($i < count($splitLine)) {
             // The first token corresponds to the property name
-            if ($i == 0) {
+            if ($i === 0) {
                 $object[0] = $splitLine[$i];
                 $i++;
                 continue;
@@ -1355,7 +1355,7 @@ class ICal
 
             // Determine if the initial date is also an EXDATE
             $initialDateIsExdate = array_reduce($exdates, function ($carry, $exdate) use ($initialEventDate) {
-                return $carry || $exdate->getTimestamp() == $initialEventDate->getTimestamp();
+                return $carry || $exdate->getTimestamp() === $initialEventDate->getTimestamp();
             }, false);
 
             if ($initialDateIsExdate) {
@@ -1590,7 +1590,7 @@ class ICal
 
                     // Exclusions
                     $isExcluded = array_filter($exdates, function ($exdate) use ($timestamp) {
-                        return $exdate->getTimestamp() == $timestamp;
+                        return $exdate->getTimestamp() === $timestamp;
                     });
 
                     if (isset($this->alteredRecurrenceInstances[$anEvent['UID']])) {
