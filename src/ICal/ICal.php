@@ -868,6 +868,7 @@ class ICal
     protected function unfold(array $lines)
     {
         $string = implode(PHP_EOL, $lines);
+        $string = str_ireplace('&nbsp;', ' ', $string);
         $string = preg_replace('/' . PHP_EOL . '[ \t]/', '', $string);
 
         $lines = explode(PHP_EOL, $string);

@@ -65,6 +65,7 @@ UID:15lc1nvupht8dtfiptenljoiv4@google.com
 CREATED:20110121T195616Z
 DESCRIPTION;LANGUAGE=en-gb:This is a short description\nwith a new line. Some "special" 's
  igns' may be interesting\, too.
+&nbsp; And a non-breaking space.
 LAST-MODIFIED:20150409T150000Z
 LOCATION:Kansas
 SEQUENCE:2
