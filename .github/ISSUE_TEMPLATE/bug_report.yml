@@ -1,0 +1,53 @@
+name: Bug Report
+description: "Report something that's broken."
+labels: ["bug-normal"]
+body:
+  - type: markdown
+    attributes:
+      value: "Before raising an issue, please check the issue has not already been fixed in `dev-master`. You can also search through our [closed issues](../issues?q=is%3Aissue+is%3Aclosed+)."
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP Version
+      description: Provide the PHP version that you are using.
+      placeholder: 8.1.4
+    validations:
+      required: true
+  - type: input
+    id: php-date-timezone
+    attributes:
+      label: PHP date.timezone
+      description: Provide the PHP date.timezone that you are using.
+      placeholder: "[Country] / [City]"
+    validations:
+      required: true
+  - type: input
+    id: ics-parser-version
+    attributes:
+      label: ICS Parser Version
+      description: Provide the `ics-parser` library version that you are using.
+      placeholder: 3.2.1
+    validations:
+      required: true
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating System
+      description: Provide the operating system that you are using.
+      placeholder: "Windows / Mac / Linux"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Provide a detailed description of the issue that you are facing.
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Provide detailed steps to reproduce your issue. It is **essential** that you supply a copy of the iCal file that is causing the parser to behave incorrectly to allow us to investigate. Prior to uploading the iCal file, please remove any personal or identifying information.
+    validations:
+      required: true
