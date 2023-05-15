@@ -1381,15 +1381,33 @@ class ICal
             $count      = 1;
             $countLimit = (isset($rrules['COUNT'])) ? intval($rrules['COUNT']) : PHP_INT_MAX;
             $until      = date_create()->modify("{$this->defaultSpan} years")->setTime(23, 59, 59)->getTimestamp();
+            $untilWhile = $until;
 
             if (isset($rrules['UNTIL'])) {
-                $until = min($until, $this->iCalDateToUnixTimestamp($rrules['UNTIL']));
+                $untilDT = $this->iCalDateToDateTime($rrules['UNTIL']);
+                $until = min($until, $untilDT->getTimestamp());
+            
+                // There are certain edge cases where we need to go a little beyond the UNTIL to
+                // ensure we get all events. Consider:
+                //
+                //   DTSTART:20200103
+                //   RRULE:FREQ=MONTHLY;BYDAY=-5FR;UNTIL=20200502
+                //
+                // In this case the last occurrence should be 1st May, however when we transition
+                // from April to May:
+                //
+                //   $until ~= 2nd May
+                //   $frequencyRecurringDateTime ~= 3rd May
+                //
+                // And as the latter comes after the former, the while loop ends before any dates
+                // in May have the chance to be considered.
+                $untilWhile = min($untilWhile, $untilDT->modify("+1 {$this->frequencyConversion[$frequency]}")->getTimestamp());
             }
 
             $eventRecurrences = array();
 
             $frequencyRecurringDateTime = clone $initialEventDate;
-            while ($frequencyRecurringDateTime->getTimestamp() <= $until && $count < $countLimit) {
+            while ($frequencyRecurringDateTime->getTimestamp() <= $untilWhile && $count < $countLimit) {
                 $candidateDateTimes = array();
 
                 // phpcs:ignore Squiz.ControlStructures.SwitchDeclaration.MissingDefault

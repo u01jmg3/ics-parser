@@ -464,7 +464,7 @@ class RecurrencesTest extends TestCase
             array('index' => 6, 'dateString' => '20200930T090000', 'message' => '7th event: '),
             array('index' => 7, 'dateString' => '20201002T090000', 'message' => '8th event: '),
             array('index' => 8, 'dateString' => '20201230T090000', 'message' => '9th event: '),
-            //array('index' => 9, 'dateString' => '20210101T090000', 'message' => '10th and last event: '),
+            array('index' => 9, 'dateString' => '20210101T090000', 'message' => '10th and last event: '),
         );
         $this->assertVEVENT(
             'UTC',
@@ -473,7 +473,7 @@ class RecurrencesTest extends TestCase
                 'DTEND:20200103T100000',
                 'RRULE:FREQ=MONTHLY;BYDAY=5WE,-5FR;UNTIL=20210102T090000',
             ),
-            9,
+            10,
             $checks
         );
     }
