@@ -1753,6 +1753,7 @@ class ICal
     protected function getDaysOfMonthMatchingByDayRRule(array $byDays, $initialDateTime)
     {
         $matchingDays = array();
+        $currentMonth = $initialDateTime->format('n');
 
         foreach ($byDays as $weekday) {
             $bydayDateTime = clone $initialDateTime;
@@ -1771,12 +1772,12 @@ class ICal
 
             if ($ordwk < 0) { // -ve {ordwk}
                 $bydayDateTime->modify((++$ordwk) . ' week');
-                if ($bydayDateTime->format('n') === $initialDateTime->format('n')) {
+                if ($bydayDateTime->format('n') === $currentMonth) {
                     $matchingDays[] = $bydayDateTime->format('j');
                 }
             } elseif ($ordwk > 0) { // +ve {ordwk}
                 $bydayDateTime->modify((--$ordwk) . ' week');
-                if ($bydayDateTime->format('n') === $initialDateTime->format('n')) {
+                if ($bydayDateTime->format('n') === $currentMonth) {
                     $matchingDays[] = $bydayDateTime->format('j');
                 }
             } else { // No {ordwk}
