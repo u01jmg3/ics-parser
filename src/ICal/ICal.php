@@ -1771,10 +1771,14 @@ class ICal
 
             if ($ordwk < 0) { // -ve {ordwk}
                 $bydayDateTime->modify((++$ordwk) . ' week');
-                $matchingDays[] = $bydayDateTime->format('j');
+                if ($bydayDateTime->format('n') === $initialDateTime->format('n')) {
+                    $matchingDays[] = $bydayDateTime->format('j');
+                }
             } elseif ($ordwk > 0) { // +ve {ordwk}
                 $bydayDateTime->modify((--$ordwk) . ' week');
-                $matchingDays[] = $bydayDateTime->format('j');
+                if ($bydayDateTime->format('n') === $initialDateTime->format('n')) {
+                    $matchingDays[] = $bydayDateTime->format('j');
+                }
             } else { // No {ordwk}
                 while ($bydayDateTime->format('n') === $initialDateTime->format('n')) {
                     $matchingDays[] = $bydayDateTime->format('j');
