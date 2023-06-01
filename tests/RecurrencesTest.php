@@ -452,6 +452,32 @@ class RecurrencesTest extends TestCase
         );
     }
 
+    public function test5thByDayOfMonth()
+    {
+        $checks = array(
+            array('index' => 0, 'dateString' => '20200103T090000', 'message' => '1st event: '),
+            array('index' => 1, 'dateString' => '20200129T090000', 'message' => '2nd event: '),
+            array('index' => 2, 'dateString' => '20200429T090000', 'message' => '3rd event: '),
+            array('index' => 3, 'dateString' => '20200501T090000', 'message' => '4th event: '),
+            array('index' => 4, 'dateString' => '20200703T090000', 'message' => '5th event: '),
+            array('index' => 5, 'dateString' => '20200729T090000', 'message' => '6th event: '),
+            array('index' => 6, 'dateString' => '20200930T090000', 'message' => '7th event: '),
+            array('index' => 7, 'dateString' => '20201002T090000', 'message' => '8th event: '),
+            array('index' => 8, 'dateString' => '20201230T090000', 'message' => '9th event: '),
+            array('index' => 9, 'dateString' => '20210101T090000', 'message' => '10th and last event: '),
+        );
+        $this->assertVEVENT(
+            'UTC',
+            array(
+                'DTSTART:20200103T090000',
+                'DTEND:20200103T100000',
+                'RRULE:FREQ=MONTHLY;BYDAY=5WE,-5FR;UNTIL=20210102T090000',
+            ),
+            10,
+            $checks
+        );
+    }
+
     public function assertVEVENT($defaultTimezone, $veventParts, $count, $checks)
     {
         $options = $this->getOptions($defaultTimezone);
