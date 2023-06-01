@@ -1385,8 +1385,8 @@ class ICal
 
             if (isset($rrules['UNTIL'])) {
                 $untilDT = $this->iCalDateToDateTime($rrules['UNTIL']);
-                $until = min($until, $untilDT->getTimestamp());
-            
+                $until   = min($until, $untilDT->getTimestamp());
+
                 // There are certain edge cases where we need to go a little beyond the UNTIL to
                 // ensure we get all events. Consider:
                 //
