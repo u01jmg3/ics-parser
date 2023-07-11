@@ -640,7 +640,13 @@ class ICal
                 }
 
                 if (!$this->disableCharacterReplacement) {
-                    $line = $this->cleanData($line);
+                    $line = str_replace([
+                        '&nbsp;',
+                        "\t",
+                        "\xc2\xa0", // Non-breaking space
+                    ], ' ', $line);
+
+                    $line = $this->cleanCharacters($line);
                 }
 
                 $add = $this->keyValueFromString($line);
@@ -2443,53 +2449,6 @@ class ICal
     }
 
     /**
-     * Replace all occurrences of the search string with the replacement string.
-     * Multibyte safe.
-     *
-     * @param  string|array $search
-     * @param  string|array $replace
-     * @param  string|array $subject
-     * @param  string       $encoding
-     * @param  integer      $count
-     * @return array|string
-     */
-    protected static function mb_str_replace($search, $replace, $subject, $encoding = null, &$count = 0) // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
-    {
-        if (is_array($subject)) {
-            // Call `mb_str_replace()` for each subject in the array, recursively
-            foreach ($subject as $key => $value) {
-                $subject[$key] = self::mb_str_replace($search, $replace, $value, $encoding, $count);
-            }
-        } else {
-            // Normalize $search and $replace so they are both arrays of the same length
-            $searches     = is_array($search) ? array_values($search) : array($search);
-            $replacements = is_array($replace) ? array_values($replace) : array($replace);
-            $replacements = array_pad($replacements, count($searches), '');
-
-            foreach ($searches as $key => $search) {
-                if (is_null($encoding)) {
-                    $encoding = mb_detect_encoding($search, 'UTF-8', true);
-                }
-
-                $replace   = $replacements[$key];
-                $searchLen = mb_strlen($search, $encoding);
-
-                $sb = array();
-                while (($offset = mb_strpos($subject, $search, 0, $encoding)) !== false) {
-                    $sb[]    = mb_substr($subject, 0, $offset, $encoding);
-                    $subject = mb_substr($subject, $offset + $searchLen, null, $encoding);
-                    ++$count;
-                }
-
-                $sb[]    = $subject;
-                $subject = implode($replace, $sb);
-            }
-        }
-
-        return $subject;
-    }
-
-    /**
      * Places double-quotes around texts that have characters not permitted
      * in parameter-texts, but are permitted in quoted-texts.
      *
@@ -2506,39 +2465,37 @@ class ICal
     }
 
     /**
-     * Replaces curly quotes and other special characters
-     * with their standard equivalents
+     * Replace curly quotes and other special characters with their standard equivalents
+     * @see https://utf8-chartable.de/unicode-utf8-table.pl?start=8211&utf8=string-literal
      *
-     * @param  string $data
+     * @param  string $input
      * @return string
      */
-    protected function cleanData($data)
+    protected function cleanCharacters($input)
     {
-        $replacementChars = array(
-            "\t"           => ' ',
-            "\xe2\x80\x98" => "'",   // ‘
-            "\xe2\x80\x99" => "'",   // ’
-            "\xe2\x80\x9a" => "'",   // ‚
-            "\xe2\x80\x9b" => "'",   // ‛
-            "\xe2\x80\x9c" => '"',   // “
-            "\xe2\x80\x9d" => '"',   // ”
-            "\xe2\x80\x9e" => '"',   // „
-            "\xe2\x80\x9f" => '"',   // ‟
-            "\xe2\x80\x93" => '-',   // –
-            "\xe2\x80\x94" => '--',  // —
-            "\xe2\x80\xa6" => '...', // …
-            "\xc2\xa0"     => ' ',   // Non-breaking space
+        return strtr(
+            $input,
+            array(
+                "\xe2\x80\x98" => "'",   // ‘
+                "\xe2\x80\x99" => "'",   // ’
+                "\xe2\x80\x9a" => "'",   // ‚
+                "\xe2\x80\x9b" => "'",   // ‛
+                "\xe2\x80\x9c" => '"',   // “
+                "\xe2\x80\x9d" => '"',   // ”
+                "\xe2\x80\x9e" => '"',   // „
+                "\xe2\x80\x9f" => '"',   // ‟
+                "\xe2\x80\x93" => '-',   // –
+                "\xe2\x80\x94" => '--',  // —
+                "\xe2\x80\xa6" => '...', // …
+                chr(145)       => "'",   // ‘
+                chr(146)       => "'",   // ’
+                chr(147)       => '"',   // “
+                chr(148)       => '"',   // ”
+                chr(150)       => '-',   // –
+                chr(151)       => '--',  // —
+                chr(133)       => '...', // …
+            )
         );
-        // Replace UTF-8 characters
-        $cleanedData = strtr($data, $replacementChars);
-
-        // Replace Windows-1252 equivalents
-        $charsToReplace = array_map(function ($code) {
-            return $this->mb_chr($code);
-        }, array(133, 145, 146, 147, 148, 150, 151, 194));
-        $cleanedData = $this->mb_str_replace($charsToReplace, $replacementChars, $cleanedData);
-
-        return $cleanedData;
     }
 
     /**
