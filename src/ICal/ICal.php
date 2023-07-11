@@ -1536,7 +1536,7 @@ class ICal
                             foreach ($rrules['BYMONTH'] as $byMonth) {
                                 $bymonthRecurringDatetime->setDate(
                                     (int) $frequencyRecurringDateTime->format('Y'),
-                                    $byMonth,
+                                    (int) $byMonth,
                                     (int) $frequencyRecurringDateTime->format('d')
                                 );
 
