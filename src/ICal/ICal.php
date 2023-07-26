@@ -640,11 +640,11 @@ class ICal
                 }
 
                 if (!$this->disableCharacterReplacement) {
-                    $line = str_replace([
+                    $line = str_replace(array(
                         '&nbsp;',
                         "\t",
                         "\xc2\xa0", // Non-breaking space
-                    ], ' ', $line);
+                    ), ' ', $line);
 
                     $line = $this->cleanCharacters($line);
                 }
@@ -685,8 +685,8 @@ class ICal
 
                             break;
 
-                        // https://www.kanzaki.com/docs/ical/vevent.html
                         case 'BEGIN:VEVENT':
+                            // https://www.kanzaki.com/docs/ical/vevent.html
                             if (!is_array($value)) {
                                 $this->eventCount++;
                             }
@@ -695,8 +695,8 @@ class ICal
 
                             break;
 
-                        // https://www.kanzaki.com/docs/ical/vfreebusy.html
                         case 'BEGIN:VFREEBUSY':
+                            // https://www.kanzaki.com/docs/ical/vfreebusy.html
                             if (!is_array($value)) {
                                 $this->freeBusyIndex++;
                             }
@@ -918,7 +918,6 @@ class ICal
                         $this->cal[$key1][$key2][$key3][$keyword] .= ',' . $value;
                     }
                 }
-
                 break;
 
             case 'VEVENT':
@@ -958,7 +957,6 @@ class ICal
                         $this->cal[$key1][$key2][$keyword] .= ',' . $value;
                     }
                 }
-
                 break;
 
             case 'VFREEBUSY':
@@ -981,7 +979,6 @@ class ICal
                 } else {
                     $this->cal[$key1][$key2][$key3][] = $value;
                 }
-
                 break;
 
             case 'VTODO':
@@ -1017,6 +1014,7 @@ class ICal
             if ($i === 0) {
                 $object[0] = $splitLine[$i];
                 $i++;
+
                 continue;
             }
 
@@ -1058,7 +1056,7 @@ class ICal
         }
 
         // Object construction
-        if ($paramObj !== []) {
+        if ($paramObj !== array()) {
             $object[1][0] = $valueObj;
             $object[1][1] = $paramObj;
         } else {
@@ -1486,7 +1484,6 @@ class ICal
                                 $day
                             );
                         }
-
                         break;
 
                     case 'MONTHLY':
@@ -1525,7 +1522,6 @@ class ICal
                                 $day
                             );
                         }
-
                         break;
 
                     case 'YEARLY':
@@ -1576,12 +1572,12 @@ class ICal
                                         return in_array($yearDay, $matchingDays);
                                     }
                                 );
-                            } elseif ($matchingDays === []) {
+                            } elseif ($matchingDays === array()) {
                                 $matchingDays = $this->getDaysOfYearMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime);
                             }
                         }
 
-                        if ($matchingDays === []) {
+                        if ($matchingDays === array()) {
                             $matchingDays = array($frequencyRecurringDateTime->format('z') + 1);
                         } else {
                             sort($matchingDays);
@@ -1599,7 +1595,6 @@ class ICal
                                 $day
                             );
                         }
-
                         break;
                 }
 
@@ -2183,7 +2178,7 @@ class ICal
      */
     public function hasEvents()
     {
-        return ($this->events() !== []) ?: false;
+        return ($this->events() !== array()) ?: false;
     }
 
     /**
@@ -2257,7 +2252,8 @@ class ICal
 
             if (
                 ($eventStart >= $rangeStart && $eventStart < $rangeEnd)         // Event start date contained in the range
-                || ($eventEnd !== null
+                || (
+                    $eventEnd !== null
                     && (
                         ($eventEnd > $rangeStart && $eventEnd <= $rangeEnd)     // Event end date contained in the range
                         || ($eventStart < $rangeStart && $eventEnd > $rangeEnd) // Event starts before and finishes after range
