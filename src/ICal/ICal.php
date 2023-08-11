@@ -1145,7 +1145,7 @@ class ICal
 
         if ($date[4] === 'Z') {
             $dateTimeZone = new \DateTimeZone(self::TIME_ZONE_UTC);
-        } elseif (!empty($date[1])) {
+        } elseif (isset($date[1]) && $date[1] !== '') {
             $dateTimeZone = $this->timeZoneStringToDateTimeZone($date[1]);
         } else {
             $dateTimeZone = new \DateTimeZone($this->defaultTimeZone);
@@ -1156,7 +1156,7 @@ class ICal
         // set to 00:00:00. Without it, the time would be set to the current system time.
         $dateFormat = '!Ymd';
         $dateBasic  = $date[2];
-        if (!empty($date[3])) {
+        if (isset($date[3]) && $date[3] !== '') {
             $dateBasic  .= "T{$date[3]}";
             $dateFormat .= '\THis';
         }
@@ -1338,7 +1338,7 @@ class ICal
 
                         continue;
                     }
-                } elseif ($frequency === 'YEARLY' && !empty($rrules['BYWEEKNO'])) {
+                } elseif ($frequency === 'YEARLY' && (isset($rrules['BYWEEKNO']) && ($rrules['BYWEEKNO'] !== '' && $rrules['BYWEEKNO'] !== array()))) {
                     if (!array_reduce($rrules['BYDAY'], $checkByDays, true)) {
                         error_log('ICal::ProcessRecurrences: A YEARLY RRULE with a BYWEEKNO part may not contain BYDAY values with numeric prefixes');
 
@@ -1417,7 +1417,7 @@ class ICal
                 // phpcs:ignore Squiz.ControlStructures.SwitchDeclaration.MissingDefault
                 switch ($frequency) {
                     case 'DAILY':
-                        if (!empty($rrules['BYMONTHDAY'])) {
+                        if (isset($rrules['BYMONTHDAY']) && ($rrules['BYMONTHDAY'] !== array() && $rrules['BYMONTHDAY'] !== '')) {
                             if (!isset($monthDays)) {
                                 // This variable is unset when we change months (see below)
                                 $monthDays = $this->getDaysOfMonthMatchingByMonthDayRRule($rrules['BYMONTHDAY'], $frequencyRecurringDateTime);
@@ -1436,7 +1436,7 @@ class ICal
                         $initialDayOfWeek = $frequencyRecurringDateTime->format('N');
                         $matchingDays     = array($initialDayOfWeek);
 
-                        if (!empty($rrules['BYDAY'])) {
+                        if (isset($rrules['BYDAY']) && ($rrules['BYDAY'] !== array() && $rrules['BYDAY'] !== '')) {
                             // setISODate() below uses the ISO-8601 specification of weeks: start on
                             // a Monday, end on a Sunday. However, RRULEs (or the caller of the
                             // parser) may state an alternate WeeKSTart.
@@ -1489,9 +1489,9 @@ class ICal
                     case 'MONTHLY':
                         $matchingDays = array();
 
-                        if (!empty($rrules['BYMONTHDAY'])) {
+                        if (isset($rrules['BYMONTHDAY']) && ($rrules['BYMONTHDAY'] !== array() && $rrules['BYMONTHDAY'] !== '')) {
                             $matchingDays = $this->getDaysOfMonthMatchingByMonthDayRRule($rrules['BYMONTHDAY'], $frequencyRecurringDateTime);
-                            if (!empty($rrules['BYDAY'])) {
+                            if (isset($rrules['BYDAY']) && ($rrules['BYDAY'] !== '' && $rrules['BYDAY'] !== array())) {
                                 $matchingDays = array_filter(
                                     $this->getDaysOfMonthMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime),
                                     function ($monthDay) use ($matchingDays) {
@@ -1499,13 +1499,13 @@ class ICal
                                     }
                                 );
                             }
-                        } elseif (!empty($rrules['BYDAY'])) {
+                        } elseif (isset($rrules['BYDAY']) && ($rrules['BYDAY'] !== array() && $rrules['BYDAY'] !== '')) {
                             $matchingDays = $this->getDaysOfMonthMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime);
                         } else {
                             $matchingDays[] = $frequencyRecurringDateTime->format('d');
                         }
 
-                        if (!empty($rrules['BYSETPOS'])) {
+                        if (isset($rrules['BYSETPOS']) && ($rrules['BYSETPOS'] !== array() && $rrules['BYSETPOS'] !== '')) {
                             $matchingDays = $this->filterValuesUsingBySetPosRRule($rrules['BYSETPOS'], $matchingDays);
                         }
 
@@ -1527,7 +1527,7 @@ class ICal
                     case 'YEARLY':
                         $matchingDays = array();
 
-                        if (!empty($rrules['BYMONTH'])) {
+                        if (isset($rrules['BYMONTH']) && ($rrules['BYMONTH'] !== array() && $rrules['BYMONTH'] !== '')) {
                             $bymonthRecurringDatetime = clone $frequencyRecurringDateTime;
                             foreach ($rrules['BYMONTH'] as $byMonth) {
                                 $bymonthRecurringDatetime->setDate(
@@ -1539,9 +1539,9 @@ class ICal
                                 // Determine the days of the month affected
                                 // (The interaction between BYMONTHDAY and BYDAY is resolved later.)
                                 $monthDays = array();
-                                if (!empty($rrules['BYMONTHDAY'])) {
+                                if (isset($rrules['BYMONTHDAY']) && ($rrules['BYMONTHDAY'] !== '' && $rrules['BYMONTHDAY'] !== array())) {
                                     $monthDays = $this->getDaysOfMonthMatchingByMonthDayRRule($rrules['BYMONTHDAY'], $bymonthRecurringDatetime);
-                                } elseif (!empty($rrules['BYDAY'])) {
+                                } elseif (isset($rrules['BYDAY']) && ($rrules['BYDAY'] !== '' && $rrules['BYDAY'] !== array())) {
                                     $monthDays = $this->getDaysOfMonthMatchingByDayRRule($rrules['BYDAY'], $bymonthRecurringDatetime);
                                 } else {
                                     $monthDays[] = $bymonthRecurringDatetime->format('d');
@@ -1556,16 +1556,16 @@ class ICal
                                     )->format('z') + 1;
                                 }
                             }
-                        } elseif (!empty($rrules['BYWEEKNO'])) {
+                        } elseif (isset($rrules['BYWEEKNO']) && ($rrules['BYWEEKNO'] !== array() && $rrules['BYWEEKNO'] !== '')) {
                             $matchingDays = $this->getDaysOfYearMatchingByWeekNoRRule($rrules['BYWEEKNO'], $frequencyRecurringDateTime);
-                        } elseif (!empty($rrules['BYYEARDAY'])) {
+                        } elseif (isset($rrules['BYYEARDAY']) && ($rrules['BYYEARDAY'] !== array() && $rrules['BYYEARDAY'] !== '')) {
                             $matchingDays = $this->getDaysOfYearMatchingByYearDayRRule($rrules['BYYEARDAY'], $frequencyRecurringDateTime);
-                        } elseif (!empty($rrules['BYMONTHDAY'])) {
+                        } elseif (isset($rrules['BYMONTHDAY']) && ($rrules['BYMONTHDAY'] !== array() && $rrules['BYMONTHDAY'] !== '')) {
                             $matchingDays = $this->getDaysOfYearMatchingByMonthDayRRule($rrules['BYMONTHDAY'], $frequencyRecurringDateTime);
                         }
 
-                        if (!empty($rrules['BYDAY'])) {
-                            if (!empty($rrules['BYYEARDAY']) || !empty($rrules['BYMONTHDAY']) || !empty($rrules['BYWEEKNO'])) {
+                        if (isset($rrules['BYDAY']) && ($rrules['BYDAY'] !== array() && $rrules['BYDAY'] !== '')) {
+                            if (isset($rrules['BYYEARDAY']) && ($rrules['BYYEARDAY'] !== '' && $rrules['BYYEARDAY'] !== array()) || isset($rrules['BYMONTHDAY']) && ($rrules['BYMONTHDAY'] !== '' && $rrules['BYMONTHDAY'] !== array()) || isset($rrules['BYWEEKNO']) && ($rrules['BYWEEKNO'] !== '' && $rrules['BYWEEKNO'] !== array())) {
                                 $matchingDays = array_filter(
                                     $this->getDaysOfYearMatchingByDayRRule($rrules['BYDAY'], $frequencyRecurringDateTime),
                                     function ($yearDay) use ($matchingDays) {
@@ -1583,7 +1583,7 @@ class ICal
                             sort($matchingDays);
                         }
 
-                        if (!empty($rrules['BYSETPOS'])) {
+                        if (isset($rrules['BYSETPOS']) && ($rrules['BYSETPOS'] !== '' && $rrules['BYSETPOS'] !== array())) {
                             $matchingDays = $this->filterValuesUsingBySetPosRRule($rrules['BYSETPOS'], $matchingDays);
                         }
 
@@ -2264,7 +2264,7 @@ class ICal
             }
         }
 
-        if (empty($extendedEvents)) {
+        if ($extendedEvents === array()) {
             return array();
         }
 

@@ -45,23 +45,23 @@ jobs:
       - name: Install additional dependencies
         run: |
           composer config allow-plugins.bamarni/composer-bin-plugin true --no-plugins
-          composer require bamarni/composer-bin-plugin rector/rector:0.14.6 squizlabs/php_codesniffer --dev --quiet --no-scripts
+          composer require bamarni/composer-bin-plugin rector/rector squizlabs/php_codesniffer --dev --quiet --no-scripts
           composer bin easy-coding-standard config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
           composer bin easy-coding-standard require symplify/easy-coding-standard slevomat/coding-standard --dev --quiet --no-scripts
-        if: matrix.php == 7.4
+        if: matrix.php == 8.2
 
       - name: Execute PHPCodeSniffer
         run: vendor/bin/phpcs -n -s --standard=psr12 src
-        if: matrix.php == 7.4
+        if: matrix.php == 8.2
 
       - name: Execute Rector
         run: vendor/bin/rector process src --dry-run
-        if: matrix.php == 7.4
+        if: matrix.php == 8.2
 
       - name: Execute ECS
         run: vendor/bin/ecs check .
-        if: matrix.php == 7.4
+        if: matrix.php == 8.2
 
       - name: Execute PHPStan
         run: vendor/bin/phpstan analyse src
-        if: matrix.php == 7.4
+        if: matrix.php == 8.2
