@@ -32,7 +32,6 @@ return static function (RectorConfig $rectorConfig): void {
             Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector::class,
             Rector\CodeQuality\Rector\If_\SimplifyIfReturnBoolRector::class,
             Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class,
-            Rector\CodingStyle\Rector\ClassMethod\UnSpreadOperatorRector::class,
             Rector\CodingStyle\Rector\Closure\StaticClosureRector::class,
             Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector::class,
             Rector\CodingStyle\Rector\PostInc\PostIncDecToPreIncDecRector::class,
