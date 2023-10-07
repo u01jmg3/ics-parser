@@ -553,7 +553,7 @@ class ICal
     {
         $string = str_replace(array("\r\n", "\n\r", "\r"), "\n", $string);
 
-        if (empty($this->cal)) {
+        if ($this->cal === array()) {
             $lines = explode("\n", $string);
 
             $this->initLines($lines);
@@ -572,7 +572,7 @@ class ICal
      */
     public function initFile($file)
     {
-        if (empty($this->cal)) {
+        if ($this->cal === array()) {
             $lines = $this->fileOrUrl($file);
 
             $this->initLines($lines);
@@ -760,7 +760,7 @@ class ICal
                 $this->processRecurrences();
 
                 // Apply changes to altered recurrence instances
-                if (!empty($this->alteredRecurrenceInstances)) {
+                if ($this->alteredRecurrenceInstances !== array()) {
                     $events = $this->cal['VEVENT'];
 
                     foreach ($this->alteredRecurrenceInstances as $alteredRecurrenceInstance) {
@@ -793,7 +793,7 @@ class ICal
     {
         $events = $this->cal['VEVENT'];
 
-        if (!empty($events)) {
+        if ($events !== array()) {
             $lastIndex = count($events) - 1;
             $lastEvent = $events[$lastIndex];
 
@@ -816,7 +816,7 @@ class ICal
     {
         $events = (isset($this->cal['VEVENT'])) ? $this->cal['VEVENT'] : array();
 
-        if (!empty($events)) {
+        if ($events !== array()) {
             foreach ($events as $key => $anEvent) {
                 if ($anEvent === null) {
                     unset($events[$key]);
@@ -1135,7 +1135,7 @@ class ICal
 
         preg_match($pattern, $icalDate, $date);
 
-        if (empty($date)) {
+        if ($date === array()) {
             throw new \Exception('Invalid iCal date format.');
         }
 
@@ -1220,7 +1220,7 @@ class ICal
         $checks = null;
         $events = (isset($this->cal['VEVENT'])) ? $this->cal['VEVENT'] : array();
 
-        if (!empty($events)) {
+        if ($events !== array()) {
             foreach ($events as $key => $anEvent) {
                 foreach (array('DTSTART', 'DTEND', 'RECURRENCE-ID') as $type) {
                     if (isset($anEvent[$type])) {
@@ -1290,7 +1290,7 @@ class ICal
         $events = (isset($this->cal['VEVENT'])) ? $this->cal['VEVENT'] : array();
 
         // If there are no events, then we have nothing to process.
-        if (empty($events)) {
+        if ($events === array()) {
             return;
         }
 
@@ -2063,7 +2063,7 @@ class ICal
     {
         $events = (isset($this->cal['VEVENT'])) ? $this->cal['VEVENT'] : array();
 
-        if (!empty($events)) {
+        if ($events !== array()) {
             foreach ($events as $key => $anEvent) {
                 if (is_null($anEvent) || !$this->isValidDate($anEvent['DTSTART'])) {
                     unset($events[$key]);
@@ -2101,10 +2101,8 @@ class ICal
 
         $events = array();
 
-        if (!empty($array)) {
-            foreach ($array as $event) {
-                $events[] = new Event($event);
-            }
+        foreach ($array as $event) {
+            $events[] = new Event($event);
         }
 
         return $events;
@@ -2209,7 +2207,7 @@ class ICal
         // Sort events before processing range
         $events = $this->sortEventsWithOrder($this->events());
 
-        if (empty($events)) {
+        if ($events === array()) {
             return array();
         }
 
@@ -2584,8 +2582,8 @@ class ICal
         $options['http']           = array();
         $options['http']['header'] = array();
 
-        if (!empty($this->httpBasicAuth) || !empty($this->httpUserAgent) || !empty($this->httpAcceptLanguage)) {
-            if (!empty($this->httpBasicAuth)) {
+        if ($this->httpBasicAuth === array() || !empty($this->httpUserAgent) || !empty($this->httpAcceptLanguage)) {
+            if ($this->httpBasicAuth !== array()) {
                 $username  = $this->httpBasicAuth['username'];
                 $password  = $this->httpBasicAuth['password'];
                 $basicAuth = base64_encode("{$username}:{$password}");
