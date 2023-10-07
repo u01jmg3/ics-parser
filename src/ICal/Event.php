@@ -250,10 +250,15 @@ class Event
      */
     protected static function snakeCase($input, $glue = '_', $separator = '-')
     {
-        $input = preg_split('/(?<=[a-z])(?=[A-Z])/x', $input);
-        $input = implode($glue, $input);
-        $input = str_replace($separator, $glue, $input);
+        $inputSplit = preg_split('/(?<=[a-z])(?=[A-Z])/x', $input);
 
-        return strtolower($input);
+        if ($inputSplit === false) {
+            return $input;
+        }
+
+        $inputSplit = implode($glue, $inputSplit);
+        $inputSplit = str_replace($separator, $glue, $inputSplit);
+
+        return strtolower($inputSplit);
     }
 }
