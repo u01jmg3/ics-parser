@@ -2272,8 +2272,7 @@ class ICal
     }
 
     /**
-     * Returns a sorted array of the events following a given string,
-     * or `false` if no events exist in the range.
+     * Returns a sorted array of the events following a given string
      *
      * @param  string $interval
      * @return array
