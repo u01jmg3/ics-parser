@@ -517,7 +517,7 @@ class ICal
 
         // Fallback to use the system default time zone
         if (!isset($this->defaultTimeZone) || !$this->isValidTimeZoneId($this->defaultTimeZone)) {
-            $this->defaultTimeZone = date_default_timezone_get();
+            $this->defaultTimeZone = $this->getDefaultTimeZone(true);
         }
 
         // Ideally you would use `PHP_INT_MIN` from PHP 7
@@ -1109,6 +1109,24 @@ class ICal
     }
 
     /**
+     * Returns the default time zone if set.
+     * Falls back to the system default if not set.
+     *
+     * @param  boolean $forceReturnSystemDefault
+     * @return string
+     */
+    private function getDefaultTimeZone($forceReturnSystemDefault = false)
+    {
+        $systemDefault = date_default_timezone_get();
+
+        if ($forceReturnSystemDefault) {
+            return $systemDefault;
+        }
+
+        return $this->defaultTimeZone ?: $systemDefault;
+    }
+
+    /**
      * Returns a `DateTime` object from an iCal date time format
      *
      * @param  string $icalDate
@@ -1149,7 +1167,7 @@ class ICal
         } elseif (isset($date[1]) && $date[1] !== '') {
             $dateTimeZone = $this->timeZoneStringToDateTimeZone($date[1]);
         } else {
-            $dateTimeZone = new \DateTimeZone($this->defaultTimeZone);
+            $dateTimeZone = new \DateTimeZone($this->getDefaultTimeZone());
         }
 
         // The exclamation mark at the start of the format string indicates that if a
@@ -2216,24 +2234,24 @@ class ICal
 
         if (!is_null($rangeStart)) {
             try {
-                $rangeStart = new \DateTime($rangeStart, new \DateTimeZone($this->defaultTimeZone));
+                $rangeStart = new \DateTime($rangeStart, new \DateTimeZone($this->getDefaultTimeZone()));
             } catch (\Exception $exception) {
                 error_log("ICal::eventsFromRange: Invalid date passed ({$rangeStart})");
                 $rangeStart = false;
             }
         } else {
-            $rangeStart = new \DateTime('now', new \DateTimeZone($this->defaultTimeZone));
+            $rangeStart = new \DateTime('now', new \DateTimeZone($this->getDefaultTimeZone()));
         }
 
         if (!is_null($rangeEnd)) {
             try {
-                $rangeEnd = new \DateTime($rangeEnd, new \DateTimeZone($this->defaultTimeZone));
+                $rangeEnd = new \DateTime($rangeEnd, new \DateTimeZone($this->getDefaultTimeZone()));
             } catch (\Exception $exception) {
                 error_log("ICal::eventsFromRange: Invalid date passed ({$rangeEnd})");
                 $rangeEnd = false;
             }
         } else {
-            $rangeEnd = new \DateTime('now', new \DateTimeZone($this->defaultTimeZone));
+            $rangeEnd = new \DateTime('now', new \DateTimeZone($this->getDefaultTimeZone()));
             $rangeEnd->modify('+20 years');
         }
 
@@ -2278,8 +2296,9 @@ class ICal
      */
     public function eventsFromInterval($interval)
     {
-        $rangeStart = new \DateTime('now', new \DateTimeZone($this->defaultTimeZone));
-        $rangeEnd   = new \DateTime('now', new \DateTimeZone($this->defaultTimeZone));
+        $timeZone   = $this->getDefaultTimeZone();
+        $rangeStart = new \DateTime('now', new \DateTimeZone($timeZone));
+        $rangeEnd   = new \DateTime('now', new \DateTimeZone($timeZone));
 
         $dateInterval = \DateInterval::createFromDateString($interval);
         $rangeEnd->add($dateInterval);
@@ -2508,7 +2527,7 @@ class ICal
         }
 
         $output          = array();
-        $currentTimeZone = new \DateTimeZone($this->defaultTimeZone);
+        $currentTimeZone = new \DateTimeZone($this->getDefaultTimeZone());
 
         foreach ($exdates as $subArray) {
             end($subArray);
@@ -2528,7 +2547,7 @@ class ICal
 
                     if ($key === $finalKey) {
                         // Reset to default
-                        $currentTimeZone = new \DateTimeZone($this->defaultTimeZone);
+                        $currentTimeZone = new \DateTimeZone($this->getDefaultTimeZone());
                     }
                 }
             }
@@ -2652,6 +2671,6 @@ class ICal
             return new \DateTimeZone(self::$windowsTimeZonesMap[$timeZoneString]);
         }
 
-        return new \DateTimeZone($this->defaultTimeZone);
+        return new \DateTimeZone($this->getDefaultTimeZone());
     }
 }
