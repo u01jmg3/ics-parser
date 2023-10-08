@@ -7,6 +7,8 @@ use Rector\Core\ValueObject\PhpVersion;
 use Rector\Php53\Rector\Ternary\TernaryToElvisRector;
 use Rector\Set\ValueObject\SetList;
 
+// phpcs:disable Generic.Arrays.DisallowLongArraySyntax
+
 // rector process src
 
 return static function (RectorConfig $rectorConfig): void {

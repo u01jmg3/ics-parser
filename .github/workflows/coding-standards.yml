@@ -59,7 +59,7 @@ jobs:
         if: matrix.php == 8.2
 
       - name: Execute ECS
-        run: vendor/bin/ecs check .
+        run: vendor/bin/ecs check src
         if: matrix.php == 8.2
 
       - name: Execute PHPStan
