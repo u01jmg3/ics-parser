@@ -1211,7 +1211,7 @@ class ICal
         $dateArray = $event["{$key}_array"];
 
         if ($key === 'DURATION') {
-            $dateTime = $this->parseDuration($event['DTSTART'], $dateArray[2], null);
+            $dateTime = $this->parseDuration($event['DTSTART'], $dateArray[2]);
         } else {
             // When constructing from a Unix Timestamp, no time zone needs passing.
             $dateTime = new \DateTime("@{$dateArray[2]}");
@@ -2400,10 +2400,9 @@ class ICal
      *
      * @param  string        $date
      * @param  \DateInterval $duration
-     * @param  string|null   $format
-     * @return integer|\DateTime
+     * @return \DateTime
      */
-    protected function parseDuration($date, $duration, $format = self::UNIX_FORMAT)
+    protected function parseDuration($date, $duration)
     {
         $dateTime = date_create($date);
         $dateTime->modify("{$duration->y} year");
@@ -2413,15 +2412,7 @@ class ICal
         $dateTime->modify("{$duration->i} minute");
         $dateTime->modify("{$duration->s} second");
 
-        if (is_null($format)) {
-            $output = $dateTime;
-        } elseif ($format === self::UNIX_FORMAT) {
-            $output = $dateTime->getTimestamp();
-        } else {
-            $output = $dateTime->format($format);
-        }
-
-        return $output;
+        return $dateTime;
     }
 
     /**
