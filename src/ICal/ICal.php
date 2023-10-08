@@ -649,12 +649,7 @@ class ICal
                     $line = $this->cleanCharacters($line);
                 }
 
-                $add = $this->keyValueFromString($line);
-
-                if ($add === false) {
-                    continue;
-                }
-
+                $add     = $this->keyValueFromString($line);
                 $keyword = $add[0];
                 $values  = $add[1]; // May be an array containing multiple values
 
@@ -1000,7 +995,7 @@ class ICal
      * Gets the key value pair from an iCal string
      *
      * @param  string $text
-     * @return array|boolean
+     * @return array
      */
     public function keyValueFromString($text)
     {
@@ -2279,10 +2274,6 @@ class ICal
             ) {
                 $extendedEvents[] = $anEvent;
             }
-        }
-
-        if ($extendedEvents === array()) {
-            return array();
         }
 
         return $extendedEvents;
