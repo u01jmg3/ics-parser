@@ -949,7 +949,7 @@ class ICal
                         }
                     }
 
-                    if ($this->cal[$key1][$key2][$keyword] !== $value) {
+                    if (!is_array($value) && $this->cal[$key1][$key2][$keyword] !== $value) {
                         $this->cal[$key1][$key2][$keyword] .= ',' . $value;
                     }
                 }
@@ -988,7 +988,9 @@ class ICal
                 break;
         }
 
-        $this->lastKeyword = $keyword;
+        if (is_string($keyword)) {
+            $this->lastKeyword = $keyword;
+        }
     }
 
     /**
@@ -1125,7 +1127,7 @@ class ICal
      * Returns a `DateTime` object from an iCal date time format
      *
      * @param  string $icalDate
-     * @return \DateTime
+     * @return \DateTime|false
      * @throws \Exception
      */
     public function iCalDateToDateTime($icalDate)
@@ -1186,7 +1188,15 @@ class ICal
      */
     public function iCalDateToUnixTimestamp($icalDate)
     {
-        return $this->iCalDateToDateTime($icalDate)->getTimestamp();
+        $iCalDateToDateTime = $this->iCalDateToDateTime($icalDate);
+
+        if ($iCalDateToDateTime === false) {
+            trigger_error("ICal::iCalDateToUnixTimestamp: Invalid date passed ({$icalDate})", E_USER_NOTICE);
+
+            return 0;
+        }
+
+        return $iCalDateToDateTime->getTimestamp();
     }
 
     /**
@@ -1195,7 +1205,7 @@ class ICal
      * @param  array       $event
      * @param  string      $key
      * @param  string|null $format
-     * @return string|boolean|\DateTime
+     * @return string|integer|boolean|\DateTime
      */
     public function iCalDateWithTimeZone(array $event, $key, $format = self::DATE_TIME_FORMAT)
     {
@@ -1207,13 +1217,23 @@ class ICal
 
         if ($key === 'DURATION') {
             $dateTime = $this->parseDuration($event['DTSTART'], $dateArray[2]);
+
+            if ($dateTime instanceof \DateTime === false) {
+                trigger_error("ICal::iCalDateWithTimeZone: Invalid date passed ({$event['DTSTART']})", E_USER_NOTICE);
+
+                return false;
+            }
         } else {
             // When constructing from a Unix Timestamp, no time zone needs passing.
             $dateTime = new \DateTime("@{$dateArray[2]}");
         }
 
-        // Set the time zone we wish to use when running `$dateTime->format`.
-        $dateTime->setTimezone(new \DateTimeZone($this->calendarTimeZone()));
+        $calendarTimeZone = $this->calendarTimeZone();
+
+        if (!is_null($calendarTimeZone)) {
+            // Set the time zone we wish to use when running `$dateTime->format`.
+            $dateTime->setTimezone(new \DateTimeZone($calendarTimeZone));
+        }
 
         if (is_null($format)) {
             return $dateTime;
@@ -1322,6 +1342,12 @@ class ICal
             // Create new initial starting point.
             $initialEventDate = $this->icalDateToDateTime($anEvent['DTSTART_array'][3]);
 
+            if ($initialEventDate === false) {
+                trigger_error("ICal::processRecurrences: Invalid date passed ({$anEvent['DTSTART_array'][3]})", E_USER_NOTICE);
+
+                continue;
+            }
+
             // Separate the RRULE stanzas, and explode the values that are lists.
             $rrules = array();
             foreach (array_filter(explode(';', $anEvent['RRULE'])) as $s) {
@@ -1333,8 +1359,13 @@ class ICal
                 }
             }
 
-            // Get frequency
             $frequency = $rrules['FREQ'];
+
+            if (!is_string($frequency)) {
+                trigger_error('ICal::processRecurrences: Invalid frequency passed', E_USER_NOTICE);
+
+                continue;
+            }
 
             // Reject RRULE if BYDAY stanza is invalid:
             // > The BYDAY rule part MUST NOT be specified with a numeric value
@@ -1361,7 +1392,6 @@ class ICal
                 }
             }
 
-            // Get Interval
             $interval = (empty($rrules['INTERVAL'])) ? 1 : (int) $rrules['INTERVAL'];
 
             // Throw an error if this isn't an integer.
@@ -1398,12 +1428,17 @@ class ICal
              */
             $count      = 1;
             $countLimit = (isset($rrules['COUNT'])) ? intval($rrules['COUNT']) : PHP_INT_MAX;
-            $until      = date_create()->modify("{$this->defaultSpan} years")->setTime(23, 59, 59)->getTimestamp();
+            $now        = date_create();
+
+            $until = $now === false
+                ? 0
+                : $now->modify("{$this->defaultSpan} years")->setTime(23, 59, 59)->getTimestamp();
+
             $untilWhile = $until;
 
-            if (isset($rrules['UNTIL'])) {
+            if (isset($rrules['UNTIL']) && is_string($rrules['UNTIL'])) {
                 $untilDT = $this->iCalDateToDateTime($rrules['UNTIL']);
-                $until   = min($until, $untilDT->getTimestamp());
+                $until   = min($until, ($untilDT === false) ? $until : $untilDT->getTimestamp());
 
                 // There are certain edge cases where we need to go a little beyond the UNTIL to
                 // ensure we get all events. Consider:
@@ -1419,7 +1454,7 @@ class ICal
                 //
                 // And as the latter comes after the former, the while loop ends before any dates
                 // in May have the chance to be considered.
-                $untilWhile = min($untilWhile, $untilDT->modify("+1 {$this->frequencyConversion[$frequency]}")->getTimestamp());
+                $untilWhile = min($untilWhile, ($untilDT === false) ? $untilWhile : $untilDT->modify("+1 {$this->frequencyConversion[$frequency]}")->getTimestamp());
             }
 
             $eventRecurrences = array();
@@ -1495,7 +1530,7 @@ class ICal
                             $candidateDateTimes[] = $clonedDateTime->setISODate(
                                 (int) $frequencyRecurringDateTime->format('o'),
                                 (int) $frequencyRecurringDateTime->format('W'),
-                                $day
+                                (int) $day
                             );
                         }
                         break;
@@ -1961,9 +1996,10 @@ class ICal
     protected function getDaysOfYearMatchingByWeekNoRRule(array $byWeekNums, $initialDateTime)
     {
         // `\DateTime::format('L')` returns 1 if leap year, 0 if not.
-        $isLeapYear = $initialDateTime->format('L');
-        $firstDayOfTheYear = date_create("first day of January {$initialDateTime->format('Y')}")->format('D');
-        $weeksInThisYear = ($firstDayOfTheYear === 'Thu' || $isLeapYear && $firstDayOfTheYear === 'Wed') ? 53 : 52;
+        $isLeapYear        = $initialDateTime->format('L');
+        $initialYear       = date_create("first day of January {$initialDateTime->format('Y')}");
+        $firstDayOfTheYear = ($initialYear === false) ? null : $initialYear->format('D');
+        $weeksInThisYear   = ($firstDayOfTheYear === 'Thu' || $isLeapYear && $firstDayOfTheYear === 'Wed') ? 53 : 52;
 
         $matchingWeeks = $this->resolveIndicesOfRange($byWeekNums, $weeksInThisYear);
         $matchingDays = array();
@@ -2250,13 +2286,15 @@ class ICal
             $rangeEnd->modify('+20 years');
         }
 
-        // If start and end are identical and are dates with no times...
-        if ($rangeEnd->format('His') == 0 && $rangeStart->getTimestamp() === $rangeEnd->getTimestamp()) {
-            $rangeEnd->modify('+1 day');
-        }
+        if ($rangeEnd !== false && $rangeStart !== false) {
+            // If start and end are identical and are dates with no times...
+            if ($rangeEnd->format('His') == 0 && $rangeStart->getTimestamp() === $rangeEnd->getTimestamp()) {
+                $rangeEnd->modify('+1 day');
+            }
 
-        $rangeStart = $rangeStart->getTimestamp();
-        $rangeEnd   = $rangeEnd->getTimestamp();
+            $rangeStart = $rangeStart->getTimestamp();
+            $rangeEnd   = $rangeEnd->getTimestamp();
+        }
 
         foreach ($events as $anEvent) {
             $eventStart = $anEvent->dtstart_array[2];
@@ -2292,7 +2330,10 @@ class ICal
         $rangeEnd   = new \DateTime('now', new \DateTimeZone($timeZone));
 
         $dateInterval = \DateInterval::createFromDateString($interval);
-        $rangeEnd->add($dateInterval);
+
+        if ($dateInterval instanceof \DateInterval) {
+            $rangeEnd->add($dateInterval);
+        }
 
         return $this->eventsFromRange($rangeStart->format('Y-m-d'), $rangeEnd->format('Y-m-d'));
     }
@@ -2391,11 +2432,16 @@ class ICal
      *
      * @param  string        $date
      * @param  \DateInterval $duration
-     * @return \DateTime
+     * @return \DateTime|false
      */
     protected function parseDuration($date, $duration)
     {
         $dateTime = date_create($date);
+
+        if ($dateTime === false) {
+            return false;
+        }
+
         $dateTime->modify("{$duration->y} year");
         $dateTime->modify("{$duration->m} month");
         $dateTime->modify("{$duration->d} day");
@@ -2410,7 +2456,7 @@ class ICal
      * Removes unprintable ASCII and UTF-8 characters
      *
      * @param  string $data
-     * @return string
+     * @return string|null
      */
     protected function removeUnprintableChars($data)
     {
