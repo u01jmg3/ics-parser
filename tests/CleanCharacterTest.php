@@ -19,14 +19,35 @@ class CleanCharacterTest extends TestCase
         return $method;
     }
 
-    public function testCleanCharacters()
+    public function testCleanCharactersWithUnicodeCharacters()
+    {
+        $ical = new ICal();
+
+        self::assertSame(
+            '...',
+            self::getMethod('cleanCharacters')->invokeArgs($ical, array("\xe2\x80\xa6"))
+        );
+    }
+
+    public function testCleanCharactersWithEmojis()
     {
         $ical  = new ICal();
         $input = 'Test with emoji 🔴👍🏻';
 
         self::assertSame(
-            self::getMethod('cleanCharacters')->invokeArgs($ical, array($input)),
-            $input
+            $input,
+            self::getMethod('cleanCharacters')->invokeArgs($ical, array($input))
+        );
+    }
+
+    public function testCleanCharactersWithWindowsCharacters()
+    {
+        $ical  = new ICal();
+        $input = self::getMethod('mb_chr')->invokeArgs($ical, array(133));
+
+        self::assertSame(
+            '...',
+            self::getMethod('cleanCharacters')->invokeArgs($ical, array($input))
         );
     }
 }
