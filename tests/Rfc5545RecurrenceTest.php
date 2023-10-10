@@ -44,7 +44,7 @@ use PHPUnit\Framework\TestCase;
  *   have been similarly commented out and annotated with a ticket number
  *   (if one exists).
  */
-class rfc5545RecurrenceExamplesTest extends TestCase
+class Rfc5545RecurrenceTest extends TestCase
 {
     // phpcs:disable Generic.Arrays.DisallowLongArraySyntax
     // phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
@@ -1003,8 +1003,8 @@ class rfc5545RecurrenceExamplesTest extends TestCase
 
         $expectedTimeStamp = strtotime($expectedDateString);
 
-        $this->assertEquals($expectedTimeStamp, $event->dtstart_array[2], $message . 'timestamp mismatch (expected ' . $expectedDateString . ' vs actual ' . $event->dtstart . ')');
-        $this->assertEquals($expectedDateString, $event->dtstart, $message . 'dtstart mismatch (timestamp is okay)');
+        $this->assertSame($expectedTimeStamp, $event->dtstart_array[2], $message . 'timestamp mismatch (expected ' . $expectedDateString . ' vs actual ' . $event->dtstart . ')');
+        $this->assertSame($expectedDateString, $event->dtstart, $message . 'dtstart mismatch (timestamp is okay)');
     }
 
     public function getOptions($defaultTimezone)

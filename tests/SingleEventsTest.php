@@ -6,7 +6,6 @@ use PHPUnit\Framework\TestCase;
 class SingleEventsTest extends TestCase
 {
     // phpcs:disable Generic.Arrays.DisallowLongArraySyntax
-    // phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     // phpcs:disable Squiz.Commenting.FunctionComment
     // phpcs:disable Squiz.Commenting.VariableComment
 
@@ -474,12 +473,12 @@ class SingleEventsTest extends TestCase
 
         $expectedTimeStamp = strtotime($expectedDateString);
 
-        $this->assertEquals(
+        $this->assertSame(
             $expectedTimeStamp,
             $event->dtstart_array[2],
             $message . 'timestamp mismatch (expected ' . $expectedDateString . ' vs actual ' . $event->dtstart . ')'
         );
-        $this->assertEquals(
+        $this->assertSame(
             $expectedDateString,
             $event->dtstart,
             $message . 'dtstart mismatch (timestamp is okay)'

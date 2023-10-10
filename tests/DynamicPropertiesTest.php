@@ -5,6 +5,8 @@ use PHPUnit\Framework\TestCase;
 
 class DynamicPropertiesTest extends TestCase
 {
+    // phpcs:disable Squiz.Commenting.FunctionComment
+
     public function testDynamicArraysAreSet()
     {
         $ical = new ICal('./tests/ical/ical-monthly.ics');
