@@ -32,7 +32,7 @@ class Event
     /**
      * https://www.kanzaki.com/docs/ical/duration.html
      *
-     * @var string
+     * @var string|null
      */
     public $duration;
 
@@ -81,14 +81,14 @@ class Event
     /**
      * https://www.kanzaki.com/docs/ical/description.html
      *
-     * @var string
+     * @var string|null
      */
     public $description;
 
     /**
      * https://www.kanzaki.com/docs/ical/location.html
      *
-     * @var string
+     * @var string|null
      */
     public $location;
 
