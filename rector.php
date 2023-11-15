@@ -52,6 +52,7 @@ return static function (RectorConfig $rectorConfig): void {
             Rector\Transform\Rector\String_\StringToClassConstantRector::class,
             // PHP 5.6 incompatible
             Rector\CodeQuality\Rector\Ternary\ArrayKeyExistsTernaryThenValueToCoalescingRector::class, // PHP 7
+            Rector\CodingStyle\Rector\FuncCall\ArraySpreadInsteadOfArrayMergeRector::class, // PHP 7.4
             Rector\Php70\Rector\If_\IfToSpaceshipRector::class,
             Rector\Php70\Rector\Ternary\TernaryToSpaceshipRector::class,
             Rector\Php71\Rector\BooleanOr\IsIterableRector::class,
@@ -60,7 +61,6 @@ return static function (RectorConfig $rectorConfig): void {
             Rector\Php73\Rector\FuncCall\ArrayKeyFirstLastRector::class,
             Rector\Php73\Rector\BooleanOr\IsCountableRector::class,
             Rector\Php74\Rector\Assign\NullCoalescingOperatorRector::class,
-            Rector\Php74\Rector\FuncCall\ArraySpreadInsteadOfArrayMergeRector::class,
             Rector\Php74\Rector\LNumber\AddLiteralSeparatorToNumberRector::class,
             Rector\Php74\Rector\StaticCall\ExportToReflectionFunctionRector::class,
             Rector\CodingStyle\Rector\ClassConst\RemoveFinalFromConstRector::class, // PHP 8
