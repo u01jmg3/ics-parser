@@ -132,7 +132,7 @@ class Event
      *
      * @var array<string, mixed>
      */
-    private $additionalProperties = array();
+    public $additionalProperties = array();
 
     /**
      * Creates the Event object
