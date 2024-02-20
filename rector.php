@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
-use Rector\Core\ValueObject\PhpVersion;
 use Rector\Php53\Rector\Ternary\TernaryToElvisRector;
 use Rector\Set\ValueObject\SetList;
+use Rector\ValueObject\PhpVersion;
 
 // phpcs:disable Generic.Arrays.DisallowLongArraySyntax
 
@@ -46,7 +46,6 @@ return static function (RectorConfig $rectorConfig): void {
             Rector\DeadCode\Rector\StaticCall\RemoveParentCallWithoutParentRector::class,
             Rector\Php70\Rector\MethodCall\ThisCallOnStaticMethodToStaticCallRector::class,
             Rector\Php70\Rector\StaticCall\StaticCallOnNonStaticToInstanceCallRector::class,
-            Rector\Php71\Rector\FuncCall\CountOnNullRector::class,
             Rector\Php73\Rector\FuncCall\JsonThrowOnErrorRector::class,
             Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector::class,
             Rector\Transform\Rector\String_\StringToClassConstantRector::class,
