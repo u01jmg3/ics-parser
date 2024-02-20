@@ -2460,7 +2460,7 @@ class ICal
      */
     protected function removeUnprintableChars($data)
     {
-        return preg_replace('/[\x00-\x1F\x7F\xA0]/u', '', $data);
+        return preg_replace('/[\x00-\x1F\x7F]/u', '', $data);
     }
 
     /**
