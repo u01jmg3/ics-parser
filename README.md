@@ -252,5 +252,5 @@ need to be evaluated before non-fitting events can be dropped.
 ## Tools for Testing
 
  - [iCal Validator](https://icalendar.org/validator.html)
- - [Recurrence Rule Tester](https://jakubroztocil.github.io/rrule/)
+ - [Recurrence Rule Tester](https://jkbrzt.github.io/rrule/)
  - [Unix Timestamp Converter](https://www.unixtimestamp.com)
