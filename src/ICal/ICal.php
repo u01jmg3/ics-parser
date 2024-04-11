@@ -497,6 +497,13 @@ class ICal
     private $shouldFilterByWindow = false;
 
     /**
+     * `true` if the parser found a BEGIN:VCALENDAR on the content first line
+     *
+     * @var boolean
+     */
+    public $isIcalContent = false;
+
+    /**
      * Creates the ICal object
      *
      * @param  mixed $files
@@ -630,6 +637,7 @@ class ICal
         $lines = $this->unfold($lines);
 
         if (stristr($lines[0], 'BEGIN:VCALENDAR') !== false) {
+            $this->isIcalContent = true;
             $component = '';
             foreach ($lines as $line) {
                 $line = rtrim($line); // Trim trailing whitespace
@@ -1351,7 +1359,7 @@ class ICal
             // Separate the RRULE stanzas, and explode the values that are lists.
             $rrules = array();
             foreach (array_filter(explode(';', $anEvent['RRULE'])) as $s) {
-                list($k, $v) = explode('=', $s);
+                [$k, $v] = explode('=', $s);
                 if (in_array($k, array('BYSETPOS', 'BYDAY', 'BYMONTHDAY', 'BYMONTH', 'BYYEARDAY', 'BYWEEKNO'))) {
                     $rrules[$k] = explode(',', $v);
                 } else {
