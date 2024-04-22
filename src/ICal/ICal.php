@@ -113,6 +113,13 @@ class ICal
     public $cal = array();
 
     /**
+     * `true` if some lines were parsed
+     *
+     * @var boolean
+     */
+    public $contentParsed = false;
+
+    /**
      * Tracks the VFREEBUSY component
      *
      * @var integer
@@ -775,6 +782,8 @@ class ICal
             }
 
             $this->processDateConversions();
+
+            $this->contentParsed = true;
         }
     }
 
