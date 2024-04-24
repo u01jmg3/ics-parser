@@ -634,6 +634,7 @@ class ICal
      */
     protected function initLines(array $lines)
     {
+        $this->contentParsed = false;
         $lines = $this->unfold($lines);
 
         if (stristr($lines[0], 'BEGIN:VCALENDAR') !== false) {
