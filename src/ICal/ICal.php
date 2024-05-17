@@ -95,7 +95,7 @@ class ICal
      * If this value is an integer, the parser will ignore all events more than roughly this many days before now.
      * If this value is a date, the parser will ignore all events occurring before this date.
      *
-     * @var DateTimeInterface|integer|null
+     * @var \DateTimeInterface|integer|null
      */
     public $filterDaysBefore;
 
@@ -103,7 +103,7 @@ class ICal
      * If this value is an integer, the parser will ignore all events more than roughly this many days after now.
      * If this value is a date, the parser will ignore all events occurring after this date.
      *
-     * @var DateTimeInterface|integer|null
+     * @var \DateTimeInterface|integer|null
      */
     public $filterDaysAfter;
 
@@ -525,7 +525,7 @@ class ICal
         // Ideally you would use `PHP_INT_MIN` from PHP 7
         $php_int_min = -2147483648;
 
-        $this->windowMinTimestamp = $php_int_min; 
+        $this->windowMinTimestamp = $php_int_min;
 
         if (!is_null($this->filterDaysBefore)) {
             if (is_int($this->filterDaysBefore)) {
@@ -538,14 +538,14 @@ class ICal
                 $this->windowMinTimestamp = $this->filterDaysBefore->getTimestamp();
             }
         }
-        
+
         $this->windowMaxTimestamp = PHP_INT_MAX;
 
         if (!is_null($this->filterDaysAfter)) {
             if (is_int($this->filterDaysAfter)) {
                 $this->windowMaxTimestamp = (new \DateTime('now'))
-                ->add(new \DateInterval('P' . $this->filterDaysAfter . 'D'))
-                ->getTimestamp();
+                    ->add(new \DateInterval('P' . $this->filterDaysAfter . 'D'))
+                    ->getTimestamp();
             }
 
             if ($this->filterDaysAfter instanceof \DateTimeInterface) {
