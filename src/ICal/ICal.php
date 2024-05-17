@@ -92,16 +92,18 @@ class ICal
     public $disableCharacterReplacement = false;
 
     /**
-     * With this being non-null the parser will ignore all events more than roughly this many days after now.
+     * If this value is an integer, the parser will ignore all events more than roughly this many days before now.
+     * If this value is a date, the parser will ignore all events occurring before this date.
      *
-     * @var integer|null
+     * @var DateTimeInterface|integer|null
      */
     public $filterDaysBefore;
 
     /**
-     * With this being non-null the parser will ignore all events more than roughly this many days before now.
+     * If this value is an integer, the parser will ignore all events more than roughly this many days after now.
+     * If this value is a date, the parser will ignore all events occurring after this date.
      *
-     * @var integer|null
+     * @var DateTimeInterface|integer|null
      */
     public $filterDaysAfter;
 
@@ -523,8 +525,33 @@ class ICal
         // Ideally you would use `PHP_INT_MIN` from PHP 7
         $php_int_min = -2147483648;
 
-        $this->windowMinTimestamp = is_null($this->filterDaysBefore) ? $php_int_min : (new \DateTime('now'))->sub(new \DateInterval('P' . $this->filterDaysBefore . 'D'))->getTimestamp();
-        $this->windowMaxTimestamp = is_null($this->filterDaysAfter) ? PHP_INT_MAX : (new \DateTime('now'))->add(new \DateInterval('P' . $this->filterDaysAfter . 'D'))->getTimestamp();
+        $this->windowMinTimestamp = $php_int_min; 
+
+        if (!is_null($this->filterDaysBefore)) {
+            if (is_int($this->filterDaysBefore)) {
+                $this->windowMinTimestamp = (new \DateTime('now'))
+                    ->sub(new \DateInterval('P' . $this->filterDaysBefore . 'D'))
+                    ->getTimestamp();
+            }
+
+            if ($this->filterDaysBefore instanceof \DateTimeInterface) {
+                $this->windowMinTimestamp = $this->filterDaysBefore->getTimestamp();
+            }
+        }
+        
+        $this->windowMaxTimestamp = PHP_INT_MAX;
+
+        if (!is_null($this->filterDaysAfter)) {
+            if (is_int($this->filterDaysAfter)) {
+                $this->windowMaxTimestamp = (new \DateTime('now'))
+                ->add(new \DateInterval('P' . $this->filterDaysAfter . 'D'))
+                ->getTimestamp();
+            }
+
+            if ($this->filterDaysAfter instanceof \DateTimeInterface) {
+                $this->windowMaxTimestamp = $this->filterDaysAfter->getTimestamp();
+            }
+        }
 
         $this->shouldFilterByWindow = !is_null($this->filterDaysBefore) || !is_null($this->filterDaysAfter);
 
