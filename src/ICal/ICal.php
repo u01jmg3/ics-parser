@@ -1171,9 +1171,9 @@ class ICal
          */
         $pattern  = '/^(?:TZID=)?([^:]*|".*")'; // [1]: Time zone
         $pattern .= ':?';                       //      Time zone delimiter
-        $pattern .= '([0-9]{8})';               // [2]: YYYYMMDD
+        $pattern .= '(\d{8})';                  // [2]: YYYYMMDD
         $pattern .= 'T?';                       //      Time delimiter
-        $pattern .= '(?(?<=T)([0-9]{6}))';      // [3]: HHMMSS (filled if delimiter present)
+        $pattern .= '(?(?<=T)(\d{6}))';         // [3]: HHMMSS (filled if delimiter present)
         $pattern .= '(Z?)/';                    // [4]: UTC flag
 
         preg_match($pattern, $icalDate, $date);
