@@ -2657,7 +2657,7 @@ class ICal
         $options['http']           = array();
         $options['http']['header'] = array();
 
-        if ($this->httpBasicAuth === array() || !empty($this->httpUserAgent) || !empty($this->httpAcceptLanguage)) {
+        if ($this->httpBasicAuth !== array() || !empty($this->httpUserAgent) || !empty($this->httpAcceptLanguage)) {
             if ($this->httpBasicAuth !== array()) {
                 $username  = $this->httpBasicAuth['username'];
                 $password  = $this->httpBasicAuth['password'];
