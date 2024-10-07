@@ -705,7 +705,7 @@ class ICal
 
                 foreach ($values as $value) {
                     switch ($line) {
-                            // https://www.kanzaki.com/docs/ical/vtodo.html
+                        // https://www.kanzaki.com/docs/ical/vtodo.html
                         case 'BEGIN:VTODO':
                             if (!is_array($value)) {
                                 $this->todoCount++;
@@ -1291,10 +1291,8 @@ class ICal
 
         if ($events !== array()) {
             foreach ($events as $key => $anEvent) {
-
                 if ($this->ignoreIncompleteEvents && !$this->hasAllRequiredFields($anEvent)) {
                     unset($events[$key]);
-
                     continue;
                 }
 
@@ -1874,10 +1872,10 @@ class ICal
             // (Or last if we have a -ve {ordwk})
             $bydayDateTime->modify(
                 (($ordwk < 0) ? 'Last' : 'First') .
-                    ' ' .
-                    $this->weekdays[substr($weekday, -2)] . // e.g. "Monday"
-                    ' of ' .
-                    $initialDateTime->format('F') // e.g. "June"
+                ' ' .
+                $this->weekdays[substr($weekday, -2)] . // e.g. "Monday"
+                ' of ' .
+                $initialDateTime->format('F') // e.g. "June"
             );
 
             if ($ordwk < 0) { // -ve {ordwk}
@@ -1962,10 +1960,10 @@ class ICal
             // (Or last if we have a -ve {ordwk})
             $bydayDateTime->modify(
                 (($ordwk < 0) ? 'Last' : 'First') .
-                    ' ' .
-                    $this->weekdays[substr($weekday, -2)] . // e.g. "Monday"
-                    ' of ' . (($ordwk < 0) ? 'December' : 'January') .
-                    ' ' . $initialDateTime->format('Y') // e.g. "2018"
+                ' ' .
+                $this->weekdays[substr($weekday, -2)] . // e.g. "Monday"
+                ' of ' . (($ordwk < 0) ? 'December' : 'January') .
+                ' ' . $initialDateTime->format('Y') // e.g. "2018"
             );
 
             if ($ordwk < 0) { // -ve {ordwk}
@@ -2437,6 +2435,7 @@ class ICal
         }
 
         unset($valid['']);
+
         if (isset($valid[$timeZone]) || in_array($timeZone, timezone_identifiers_list(\DateTimeZone::ALL_WITH_BC))) {
             $this->validIanaTimeZones[] = $timeZone;
 
