@@ -200,6 +200,13 @@ class ICal
     protected $httpProtocolVersion;
 
     /**
+     * Toggles whether to ignore incomplete events
+     *
+     * @var boolean
+     */
+    protected $ignoreIncompleteEvents = false;
+
+    /**
      * Define which variables can be configured
      *
      * @var array
@@ -213,6 +220,7 @@ class ICal
         'filterDaysBefore',
         'httpUserAgent',
         'skipRecurrence',
+        'ignoreIncompleteEvents'
     );
 
     /**
@@ -697,7 +705,7 @@ class ICal
 
                 foreach ($values as $value) {
                     switch ($line) {
-                        // https://www.kanzaki.com/docs/ical/vtodo.html
+                            // https://www.kanzaki.com/docs/ical/vtodo.html
                         case 'BEGIN:VTODO':
                             if (!is_array($value)) {
                                 $this->todoCount++;
@@ -1283,6 +1291,13 @@ class ICal
 
         if ($events !== array()) {
             foreach ($events as $key => $anEvent) {
+
+                if ($this->ignoreIncompleteEvents && !$this->hasAllRequiredFields($anEvent)) {
+                    unset($events[$key]);
+
+                    continue;
+                }
+
                 foreach (array('DTSTART', 'DTEND', 'RECURRENCE-ID') as $type) {
                     if (isset($anEvent[$type])) {
                         $date = $anEvent["{$type}_array"][1];
@@ -1859,10 +1874,10 @@ class ICal
             // (Or last if we have a -ve {ordwk})
             $bydayDateTime->modify(
                 (($ordwk < 0) ? 'Last' : 'First') .
-                ' ' .
-                $this->weekdays[substr($weekday, -2)] . // e.g. "Monday"
-                ' of ' .
-                $initialDateTime->format('F') // e.g. "June"
+                    ' ' .
+                    $this->weekdays[substr($weekday, -2)] . // e.g. "Monday"
+                    ' of ' .
+                    $initialDateTime->format('F') // e.g. "June"
             );
 
             if ($ordwk < 0) { // -ve {ordwk}
@@ -1947,10 +1962,10 @@ class ICal
             // (Or last if we have a -ve {ordwk})
             $bydayDateTime->modify(
                 (($ordwk < 0) ? 'Last' : 'First') .
-                ' ' .
-                $this->weekdays[substr($weekday, -2)] . // e.g. "Monday"
-                ' of ' . (($ordwk < 0) ? 'December' : 'January') .
-                ' ' . $initialDateTime->format('Y') // e.g. "2018"
+                    ' ' .
+                    $this->weekdays[substr($weekday, -2)] . // e.g. "Monday"
+                    ' of ' . (($ordwk < 0) ? 'December' : 'January') .
+                    ' ' . $initialDateTime->format('Y') // e.g. "2018"
             );
 
             if ($ordwk < 0) { // -ve {ordwk}
@@ -2422,7 +2437,6 @@ class ICal
         }
 
         unset($valid['']);
-
         if (isset($valid[$timeZone]) || in_array($timeZone, timezone_identifiers_list(\DateTimeZone::ALL_WITH_BC))) {
             $this->validIanaTimeZones[] = $timeZone;
 
@@ -2727,5 +2741,18 @@ class ICal
         }
 
         return new \DateTimeZone($this->getDefaultTimeZone());
+    }
+
+    public function hasAllRequiredFields($event)
+    {
+        $requiredFields = ['UID', 'DTSTAMP', 'DTSTART'];
+
+        foreach ($requiredFields as $field) {
+            if (!isset($event[$field])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
