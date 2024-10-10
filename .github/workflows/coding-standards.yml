@@ -51,7 +51,7 @@ jobs:
         if: matrix.php == 8.3
 
       - name: Execute PHPCodeSniffer
-        run: vendor/bin/phpcs -n -s --standard=psr12 src
+        run: vendor/bin/phpcs -n -s --standard=PSR12 src
         if: matrix.php == 8.3
 
       - name: Execute Rector
