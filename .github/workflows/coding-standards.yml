@@ -31,9 +31,21 @@ jobs:
           tools: composer:2.2
           coverage: none
 
+      - name: PHP 5.6 syntax check
+        run: |
+          find . -type f -iname "*.php" ! -name 'ecs.php' ! -name 'rector.php' ! -path 'tests/*' -print0 | xargs -0 -L 1 php -l | (! grep -v "No syntax errors detected")
+          echo $?
+        if: matrix.php == 5.6
+
       - name: Install dependencies for PHP 5.6
         run: composer update --quiet --no-scripts
         if: matrix.php == 5.6
+
+      - name: PHP 7.4+ syntax check
+        run: |
+          find . -type f -iname "*.php" -print0 | xargs -0 -L 1 php -l | (! grep -v "No syntax errors detected")
+          echo $?
+        if: matrix.php >= 7.4
 
       - name: Install dependencies for PHP 7.4+
         run: composer install --quiet --no-scripts
