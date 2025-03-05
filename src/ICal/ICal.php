@@ -559,7 +559,7 @@ class ICal
             $files = is_array($files) ? $files : array($files);
 
             foreach ($files as $file) {
-                if (!is_array($file) && $this->isFileOrUrl($file)) {
+                if (is_string($file) && $this->isFileOrUrl($file)) {
                     $lines = $this->fileOrUrl($file);
                 } else {
                     $lines = is_array($file) ? $file : array($file);
@@ -1356,7 +1356,7 @@ class ICal
         }
 
         $allEventRecurrences = array();
-        $eventKeysToRemove = array();
+        $eventKeysToRemove   = array();
 
         foreach ($events as $key => $anEvent) {
             if (!isset($anEvent['RRULE']) || $anEvent['RRULE'] === '') {
@@ -1380,7 +1380,7 @@ class ICal
             foreach (array_filter(explode(';', $anEvent['RRULE'])) as $s) {
                 list($k, $v) = explode('=', $s);
                 if (in_array($k, array('BYSETPOS', 'BYDAY', 'BYMONTHDAY', 'BYMONTH', 'BYYEARDAY', 'BYWEEKNO'))) {
-                    $rrules[$k] = explode(',', $v);
+                    $rrules[$k] = $v === '' ? array() : explode(',', $v);
                 } else {
                     $rrules[$k] = $v;
                 }
@@ -1422,7 +1422,7 @@ class ICal
             $interval = (empty($rrules['INTERVAL'])) ? 1 : (int) $rrules['INTERVAL'];
 
             // Throw an error if this isn't an integer.
-            if (!is_int($this->defaultSpan)) {
+            if (!is_int($this->defaultSpan)) { // @phpstan-ignore function.alreadyNarrowedType
                 trigger_error('ICal::defaultSpan: User defined value is not an integer', E_USER_NOTICE);
             }
 
@@ -2616,7 +2616,6 @@ class ICal
      *
      * @param  string $value
      * @return boolean
-     * @throws \Exception
      */
     public function isValidDate($value)
     {
