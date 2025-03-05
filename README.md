@@ -1,7 +1,6 @@
 # PHP ICS Parser
 
 [Latest Stable Release](https://packagist.org/packages/johngrogg/ics-parser)
-[Total Downloads](https://packagist.org/packages/johngrogg/ics-parser)
 
 ---
 
