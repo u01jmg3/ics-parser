@@ -1,7 +1,7 @@
 # PHP ICS Parser
 
-[![Latest Stable Release](https://poser.pugx.org/johngrogg/ics-parser/v/stable.png "Latest Stable Release")](https://packagist.org/packages/johngrogg/ics-parser)
-[![Total Downloads](https://poser.pugx.org/johngrogg/ics-parser/downloads.png "Total Downloads")](https://packagist.org/packages/johngrogg/ics-parser)
+[![Latest Stable Release](https://poser.pugx.org/johngrogg/ics-parser/v "Latest Stable Release")](https://packagist.org/packages/johngrogg/ics-parser)
+[![Total Downloads](https://poser.pugx.org/johngrogg/ics-parser/downloads "Total Downloads")](https://packagist.org/packages/johngrogg/ics-parser)
 
 ---
 
@@ -10,7 +10,7 @@
 ### Requirements
  - PHP 5 (≥ 5.6.40)
  - [Valid ICS](https://icalendar.org/validator.html) (`.ics`, `.ical`, `.ifb`) file
- - [IANA](https://www.iana.org/time-zones), [Unicode CLDR](http://cldr.unicode.org/translation/timezones) or [Windows](https://support.microsoft.com/en-ca/help/973627/microsoft-time-zone-index-values) Time Zones
+ - [IANA](https://www.iana.org/time-zones), [Unicode CLDR](https://cldr.unicode.org) or [Windows](https://learn.microsoft.com/en-us/previous-versions/windows/embedded/ms912391(v=winembedded.11)) Time Zones
 
 ### Setup
 
