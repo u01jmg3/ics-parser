@@ -1,7 +1,7 @@
 # PHP ICS Parser
 
-[![Latest Stable Release](https://poser.pugx.org/johngrogg/ics-parser/v/stable.png "Latest Stable Release")](https://packagist.org/packages/johngrogg/ics-parser)
-[![Total Downloads](https://poser.pugx.org/johngrogg/ics-parser/downloads.png "Total Downloads")](https://packagist.org/packages/johngrogg/ics-parser)
+[Latest Stable Release](https://packagist.org/packages/johngrogg/ics-parser)
+[Total Downloads](https://packagist.org/packages/johngrogg/ics-parser)
 
 ---
 
