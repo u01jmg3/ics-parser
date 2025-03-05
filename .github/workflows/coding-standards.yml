@@ -63,5 +63,5 @@ jobs:
         if: matrix.php == 8.3
 
       - name: Execute PHPStan
-        run: vendor/bin/phpstan analyse src
+        run: vendor/bin/phpstan -v analyse src
         if: matrix.php == 8.3
