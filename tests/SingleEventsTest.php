@@ -83,15 +83,15 @@ class SingleEventsTest extends TestCase
         );
     }
 
-    public function assertVEVENT($defaultTimezone, $dtstart, $dtend, $count, $checks)
+    public function assertVEVENT($defaultTimeZone, $dtstart, $dtend, $count, $checks)
     {
-        $options = $this->getOptions($defaultTimezone);
+        $options = $this->getOptions($defaultTimeZone);
 
         $testIcal  = implode(PHP_EOL, $this->getIcalHeader());
         $testIcal .= PHP_EOL;
         $testIcal .= implode(PHP_EOL, $this->formatIcalEvent($dtstart, $dtend));
         $testIcal .= PHP_EOL;
-        $testIcal .= implode(PHP_EOL, $this->getIcalTimezones());
+        $testIcal .= implode(PHP_EOL, $this->getIcalTimeZones());
         $testIcal .= PHP_EOL;
         $testIcal .= implode(PHP_EOL, $this->getIcalFooter());
 
@@ -109,16 +109,16 @@ class SingleEventsTest extends TestCase
                 $events[$check['index']],
                 $check['dateString'],
                 $check['message'],
-                isset($check['timezone']) ? $check['timezone'] : $defaultTimezone
+                isset($check['timezone']) ? $check['timezone'] : $defaultTimeZone
             );
         }
     }
 
-    public function getOptions($defaultTimezone)
+    public function getOptions($defaultTimeZone)
     {
         $options = array(
             'defaultSpan'                 => 2,                // Default value
-            'defaultTimeZone'             => $defaultTimezone, // Default value: UTC
+            'defaultTimeZone'             => $defaultTimeZone, // Default value: UTC
             'defaultWeekStart'            => 'MO',             // Default value
             'disableCharacterReplacement' => false,            // Default value
             'filterDaysAfter'             => null,             // Default value
@@ -161,7 +161,7 @@ class SingleEventsTest extends TestCase
         );
     }
 
-    public function getIcalTimezones()
+    public function getIcalTimeZones()
     {
         return array(
             'BEGIN:VTIMEZONE',
@@ -485,9 +485,9 @@ class SingleEventsTest extends TestCase
         );
     }
 
-    public function assertEventFile($defaultTimezone, $file, $count, $checks)
+    public function assertEventFile($defaultTimeZone, $file, $count, $checks)
     {
-        $options = $this->getOptions($defaultTimezone);
+        $options = $this->getOptions($defaultTimeZone);
 
         date_default_timezone_set('UTC');
 
@@ -502,7 +502,7 @@ class SingleEventsTest extends TestCase
                 $events[$check['index']],
                 $check['dateString'],
                 $check['message'],
-                isset($check['timezone']) ? $check['timezone'] : $defaultTimezone
+                isset($check['timezone']) ? $check['timezone'] : $defaultTimeZone
             );
         }
     }

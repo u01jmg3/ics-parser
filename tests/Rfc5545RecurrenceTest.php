@@ -973,9 +973,9 @@ class Rfc5545RecurrenceTest extends TestCase
         );
     }
 
-    public function assertVEVENT($defaultTimezone, $veventParts, $count, $checks)
+    public function assertVEVENT($defaultTimeZone, $veventParts, $count, $checks)
     {
-        $options = $this->getOptions($defaultTimezone);
+        $options = $this->getOptions($defaultTimeZone);
 
         $testIcal  = implode(PHP_EOL, $this->getIcalHeader());
         $testIcal .= PHP_EOL;
@@ -991,7 +991,7 @@ class Rfc5545RecurrenceTest extends TestCase
         $this->assertCount($count, $events);
 
         foreach ($checks as $check) {
-            $this->assertEvent($events[$check['index']], $check['dateString'], $check['message'], isset($check['timezone']) ? $check['timezone'] : $defaultTimezone);
+            $this->assertEvent($events[$check['index']], $check['dateString'], $check['message'], isset($check['timezone']) ? $check['timezone'] : $defaultTimeZone);
         }
     }
 
@@ -1007,11 +1007,11 @@ class Rfc5545RecurrenceTest extends TestCase
         $this->assertSame($expectedDateString, $event->dtstart, $message . 'dtstart mismatch (timestamp is okay)');
     }
 
-    public function getOptions($defaultTimezone)
+    public function getOptions($defaultTimeZone)
     {
         $options = array(
             'defaultSpan'                 => 2,                // Default value: 2
-            'defaultTimeZone'             => $defaultTimezone, // Default value: UTC
+            'defaultTimeZone'             => $defaultTimeZone, // Default value: UTC
             'defaultWeekStart'            => 'MO',             // Default value
             'disableCharacterReplacement' => false,            // Default value
             'filterDaysAfter'             => null,             // Default value

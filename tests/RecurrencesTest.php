@@ -300,7 +300,7 @@ class RecurrencesTest extends TestCase
         );
     }
 
-    public function testExdatesInDifferentTimezone()
+    public function testExdatesInDifferentTimeZone()
     {
         $checks = array(
             array('index' => 0, 'dateString' => '20170503T190000', 'message' => '1st event: '),
@@ -477,9 +477,9 @@ class RecurrencesTest extends TestCase
         );
     }
 
-    public function assertVEVENT($defaultTimezone, $veventParts, $count, $checks)
+    public function assertVEVENT($defaultTimeZone, $veventParts, $count, $checks)
     {
-        $options = $this->getOptions($defaultTimezone);
+        $options = $this->getOptions($defaultTimeZone);
 
         $testIcal  = implode(PHP_EOL, $this->getIcalHeader());
         $testIcal .= PHP_EOL;
@@ -495,13 +495,13 @@ class RecurrencesTest extends TestCase
         $this->assertCount($count, $events);
 
         foreach ($checks as $check) {
-            $this->assertEvent($events[$check['index']], $check['dateString'], $check['message'], isset($check['timezone']) ? $check['timezone'] : $defaultTimezone);
+            $this->assertEvent($events[$check['index']], $check['dateString'], $check['message'], isset($check['timezone']) ? $check['timezone'] : $defaultTimeZone);
         }
     }
 
-    public function assertEventFile($defaultTimezone, $file, $count, $checks)
+    public function assertEventFile($defaultTimeZone, $file, $count, $checks)
     {
-        $options = $this->getOptions($defaultTimezone);
+        $options = $this->getOptions($defaultTimeZone);
 
         $ical = new ICal($file, $options);
 
@@ -512,7 +512,7 @@ class RecurrencesTest extends TestCase
         $events = $ical->sortEventsWithOrder($events);
 
         foreach ($checks as $check) {
-            $this->assertEvent($events[$check['index']], $check['dateString'], $check['message'], isset($check['timezone']) ? $check['timezone'] : $defaultTimezone);
+            $this->assertEvent($events[$check['index']], $check['dateString'], $check['message'], isset($check['timezone']) ? $check['timezone'] : $defaultTimeZone);
         }
     }
 
@@ -528,11 +528,11 @@ class RecurrencesTest extends TestCase
         $this->assertSame($expectedDateString, $event->dtstart, $message . 'dtstart mismatch (timestamp is okay)');
     }
 
-    public function getOptions($defaultTimezone)
+    public function getOptions($defaultTimeZone)
     {
         $options = array(
             'defaultSpan'                 => 2,                // Default value
-            'defaultTimeZone'             => $defaultTimezone, // Default value: UTC
+            'defaultTimeZone'             => $defaultTimeZone, // Default value: UTC
             'defaultWeekStart'            => 'MO',             // Default value
             'disableCharacterReplacement' => false,            // Default value
             'filterDaysAfter'             => null,             // Default value
