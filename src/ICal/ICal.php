@@ -1594,7 +1594,7 @@ class ICal
                             $clonedDateTime = clone $frequencyRecurringDateTime;
                             $candidateDateTimes[] = $clonedDateTime->setDate(
                                 (int) $frequencyRecurringDateTime->format('Y'),
-                                (int) $frequencyRecurringDateTime->format('m'),
+                                (int) $frequencyRecurringDateTime->format('n'),
                                 $day
                             );
                         }
@@ -1627,7 +1627,7 @@ class ICal
                                 foreach ($monthDays as $day) {
                                     $matchingDays[] = $bymonthRecurringDatetime->setDate(
                                         (int) $frequencyRecurringDateTime->format('Y'),
-                                        (int) $bymonthRecurringDatetime->format('m'),
+                                        (int) $bymonthRecurringDatetime->format('n'),
                                         $day
                                     )->format('z') + 1;
                                 }
@@ -1709,7 +1709,7 @@ class ICal
                 }
 
                 // Move forwards $interval $frequency.
-                $monthPreMove = $frequencyRecurringDateTime->format('m');
+                $monthPreMove = $frequencyRecurringDateTime->format('n');
                 $frequencyRecurringDateTime->modify("{$interval} {$this->frequencyConversion[$frequency]}");
 
                 // As noted in Example #2 on https://www.php.net/manual/en/datetime.modify.php,
@@ -1717,7 +1717,7 @@ class ICal
                 // expect. For instance: January 31st + 1 month == March 3rd (March 2nd on a leap
                 // year.) The following code crudely rectifies this.
                 if ($frequency === 'MONTHLY') {
-                    $monthDiff = $frequencyRecurringDateTime->format('m') - $monthPreMove;
+                    $monthDiff = $frequencyRecurringDateTime->format('n') - $monthPreMove;
 
                     if (($monthDiff > 0 && $monthDiff > $interval) || ($monthDiff < 0 && $monthDiff > $interval - 12)) {
                         $frequencyRecurringDateTime->modify('-1 month');
@@ -1727,7 +1727,7 @@ class ICal
                 // $monthDays is set in the DAILY frequency if the BYMONTHDAY stanza is present in
                 // the RRULE. The variable only needs to be updated when we change months, so we
                 // unset it here, prompting a recreation next iteration.
-                if (isset($monthDays) && $frequencyRecurringDateTime->format('m') !== $monthPreMove) {
+                if (isset($monthDays) && $frequencyRecurringDateTime->format('n') !== $monthPreMove) {
                     unset($monthDays);
                 }
             }
@@ -2077,7 +2077,7 @@ class ICal
             foreach ($monthDays as $day) {
                 $matchingDays[] = $monthDateTime->setDate(
                     (int) $initialDateTime->format('Y'),
-                    (int) $monthDateTime->format('m'),
+                    (int) $monthDateTime->format('n'),
                     $day
                 )->format('z') + 1;
             }
