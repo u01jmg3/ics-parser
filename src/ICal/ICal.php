@@ -2417,7 +2417,9 @@ class ICal
 
         foreach ($tza as $zone) {
             foreach ($zone as $item) {
-                $valid[$item['timezone_id']] = true;
+                if ($item['timezone_id'] !== null) {
+                    $valid[$item['timezone_id']] = true;
+                }
             }
         }
 
