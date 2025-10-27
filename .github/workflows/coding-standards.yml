@@ -59,7 +59,7 @@ jobs:
           composer config allow-plugins.bamarni/composer-bin-plugin true --no-plugins
           composer require bamarni/composer-bin-plugin rector/rector squizlabs/php_codesniffer --dev --quiet --no-scripts
           composer bin easy-coding-standard config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
-          composer bin easy-coding-standard require symplify/easy-coding-standard slevomat/coding-standard --dev --quiet --no-scripts
+          composer bin easy-coding-standard require symplify/easy-coding-standard slevomat/coding-standard:8.22.1 --dev --quiet --no-scripts
         if: matrix.php == 8.3
 
       - name: Execute PHPCodeSniffer
