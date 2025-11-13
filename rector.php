@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\EarlyReturn\Rector\If_\RemoveAlwaysElseRector;
 use Rector\Set\ValueObject\SetList;
 use Rector\ValueObject\PhpVersion;
 
@@ -33,6 +34,11 @@ return RectorConfig::configure()
     ->withPaths(
         array(
             __DIR__ . DIRECTORY_SEPARATOR . 'src',
+        )
+    )
+    ->withRules(
+        array(
+            RemoveAlwaysElseRector::class,
         )
     )
     ->withSkip(

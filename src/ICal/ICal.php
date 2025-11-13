@@ -2503,19 +2503,19 @@ class ICal
     {
         if (function_exists('mb_chr')) {
             return mb_chr($code);
-        } else {
-            if (($code %= 0x200000) < 0x80) {
-                $s = chr($code);
-            } elseif ($code < 0x800) {
-                $s = chr(0xc0 | $code >> 6) . chr(0x80 | $code & 0x3f);
-            } elseif ($code < 0x10000) {
-                $s = chr(0xe0 | $code >> 12) . chr(0x80 | $code >> 6 & 0x3f) . chr(0x80 | $code & 0x3f);
-            } else {
-                $s = chr(0xf0 | $code >> 18) . chr(0x80 | $code >> 12 & 0x3f) . chr(0x80 | $code >> 6 & 0x3f) . chr(0x80 | $code & 0x3f);
-            }
-
-            return $s;
         }
+
+        if (($code %= 0x200000) < 0x80) {
+            $s = chr($code);
+        } elseif ($code < 0x800) {
+            $s = chr(0xc0 | $code >> 6) . chr(0x80 | $code & 0x3f);
+        } elseif ($code < 0x10000) {
+            $s = chr(0xe0 | $code >> 12) . chr(0x80 | $code >> 6 & 0x3f) . chr(0x80 | $code & 0x3f);
+        } else {
+            $s = chr(0xf0 | $code >> 18) . chr(0x80 | $code >> 12 & 0x3f) . chr(0x80 | $code >> 6 & 0x3f) . chr(0x80 | $code & 0x3f);
+        }
+
+        return $s;
     }
 
     /**
@@ -2579,9 +2579,9 @@ class ICal
     {
         if (empty($event['EXDATE_array'])) {
             return array();
-        } else {
-            $exdates = $event['EXDATE_array'];
         }
+
+        $exdates = $event['EXDATE_array'];
 
         $output          = array();
         $currentTimeZone = new \DateTimeZone($this->getDefaultTimeZone());
