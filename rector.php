@@ -72,6 +72,8 @@ return static function (RectorConfig $rectorConfig): void {
             SetList::PHP_80,
             SetList::PHP_81,
             SetList::PHP_82,
+            SetList::PHP_83,
+            SetList::PHP_84,
         )
     );
 
