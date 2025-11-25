@@ -58,20 +58,20 @@ jobs:
         run: |
           composer config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
           composer require rector/rector squizlabs/php_codesniffer symplify/easy-coding-standard slevomat/coding-standard --dev --quiet --no-scripts
-        if: matrix.php == 8.3
+        if: matrix.php == 8.4
 
       - name: Execute PHPCodeSniffer
         run: vendor/bin/phpcs -n -s --standard=PSR12 src
-        if: matrix.php == 8.3
+        if: matrix.php == 8.4
 
       - name: Execute Rector
         run: vendor/bin/rector process src --dry-run
-        if: matrix.php == 8.3
+        if: matrix.php == 8.4
 
       - name: Execute ECS
         run: vendor/bin/ecs check src
-        if: matrix.php == 8.3
+        if: matrix.php == 8.4
 
       - name: Execute PHPStan
         run: vendor/bin/phpstan -v analyse src
-        if: matrix.php == 8.3
+        if: matrix.php == 8.4
