@@ -647,9 +647,7 @@ class ICal
             $this->httpProtocolVersion = $httpProtocolVersion;
         }
 
-        if (is_bool($verifySsl)) {
-            $this->verifySsl = $verifySsl;
-        }
+        $this->verifySsl = $verifySsl;
 
         $this->initFile($url);
 
@@ -2699,7 +2697,7 @@ class ICal
             $options['http']['protocol_version'] = '1.1';
         }
 
-        if (is_bool($this->verifySsl) && is_false($this->verifySsl)) {
+        if ($this->verifySsl === false) {
             $options['ssl']                     = array();
             $options['ssl']['verify_peer']      = false;
             $options['ssl']['verify_peer_name'] = false;
