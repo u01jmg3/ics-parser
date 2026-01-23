@@ -200,6 +200,13 @@ class ICal
     protected $httpProtocolVersion;
 
     /**
+     * Holds the settings to enable or disable Ssl peer verification
+     *
+     * @var bool
+     */
+    protected $verifySsl;
+
+    /**
      * Define which variables can be configured
      *
      * @var array
@@ -618,9 +625,10 @@ class ICal
      * @param  string $userAgent
      * @param  string $acceptLanguage
      * @param  string $httpProtocolVersion
+     * @param  bool   $verifySsl
      * @return ICal
      */
-    public function initUrl($url, $username = null, $password = null, $userAgent = null, $acceptLanguage = null, $httpProtocolVersion = null)
+    public function initUrl($url, $username = null, $password = null, $userAgent = null, $acceptLanguage = null, $httpProtocolVersion = null, $verifySsl = true)
     {
         if (!is_null($username) && !is_null($password)) {
             $this->httpBasicAuth['username'] = $username;
@@ -637,6 +645,10 @@ class ICal
 
         if (!is_null($httpProtocolVersion)) {
             $this->httpProtocolVersion = $httpProtocolVersion;
+        }
+
+        if (is_bool($verifySsl)) {
+            $this->verifySsl = $verifySsl;
         }
 
         $this->initFile($url);
@@ -2685,6 +2697,12 @@ class ICal
             $options['http']['protocol_version'] = $this->httpProtocolVersion;
         } else {
             $options['http']['protocol_version'] = '1.1';
+        }
+
+        if (is_bool($this->verifySsl) && is_false($this->verifySsl)) {
+            $options['ssl']                     = array();
+            $options['ssl']['verify_peer']      = false;
+            $options['ssl']['verify_peer_name'] = false;
         }
 
         $options['http']['header'][] = 'Connection: close';
