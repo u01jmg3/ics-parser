@@ -59,7 +59,7 @@ return RectorConfig::configure()
             Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class,
             Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector::class,
             Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
-            Rector\CodingStyle\Rector\String_\SymplifyQuoteEscapeRector::class,
+            Rector\CodingStyle\Rector\String_\SimplifyQuoteEscapeRector::class,
             Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector::class,
             Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPromotedPropertyRector::class,
             Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class,
@@ -79,6 +79,7 @@ return RectorConfig::configure()
             Rector\Php73\Rector\BooleanOr\IsCountableRector::class,
             Rector\Php74\Rector\Assign\NullCoalescingOperatorRector::class,
             Rector\Php74\Rector\StaticCall\ExportToReflectionFunctionRector::class,
+            Rector\CodingStyle\Rector\ClassLike\NewlineBetweenClassLikeStmtsRector::class,
             Rector\CodingStyle\Rector\ClassConst\RemoveFinalFromConstRector::class, // PHP 8
         )
     );

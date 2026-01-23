@@ -137,8 +137,7 @@ class Event
     /**
      * Creates the Event object
      *
-     * @param  array $data
-     * @return void
+     * @param array $data
      */
     public function __construct(array $data = array())
     {

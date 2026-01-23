@@ -501,9 +501,8 @@ class ICal
     /**
      * Creates the ICal object
      *
-     * @param  mixed $files
-     * @param  array $options
-     * @return void
+     * @param mixed $files
+     * @param array $options
      */
     public function __construct($files = false, array $options = array())
     {
