@@ -202,7 +202,7 @@ class ICal
     /**
      * Holds the settings to enable or disable Ssl peer verification
      *
-     * @var bool
+     * @var boolean
      */
     protected $verifySsl;
 
@@ -619,13 +619,13 @@ class ICal
     /**
      * Initialises lines from a URL
      *
-     * @param  string $url
-     * @param  string $username
-     * @param  string $password
-     * @param  string $userAgent
-     * @param  string $acceptLanguage
-     * @param  string $httpProtocolVersion
-     * @param  bool   $verifySsl
+     * @param  string  $url
+     * @param  string  $username
+     * @param  string  $password
+     * @param  string  $userAgent
+     * @param  string  $acceptLanguage
+     * @param  string  $httpProtocolVersion
+     * @param  boolean $verifySsl
      * @return ICal
      */
     public function initUrl($url, $username = null, $password = null, $userAgent = null, $acceptLanguage = null, $httpProtocolVersion = null, $verifySsl = true)
