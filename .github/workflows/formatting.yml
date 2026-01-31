@@ -25,6 +25,4 @@ jobs:
           node-version: 24
 
       - name: Check formatting in markdown files
-        run: |
-          npm ci --silent
-          npx prettier './**/*.md' --check
+        run: npx prettier './**/*.md' --check
