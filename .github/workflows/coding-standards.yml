@@ -65,11 +65,11 @@ jobs:
         if: matrix.php == 8.4
 
       - name: Execute Rector
-        run: vendor/bin/rector process src --dry-run
+        run: vendor/bin/rector process --dry-run
         if: matrix.php == 8.4
 
       - name: Execute ECS
-        run: vendor/bin/ecs check src
+        run: vendor/bin/ecs check
         if: matrix.php == 8.4
 
       - name: Execute PHPStan

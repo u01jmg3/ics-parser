@@ -78,7 +78,7 @@ use SlevomatCodingStandard\Sniffs\Variables\UnusedVariableSniff;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
 
-// ecs check --fix .
+// ecs check --fix
 
 return static function (ECSConfig $ecsConfig): void {
     $ecsConfig->disableParallel();
@@ -87,6 +87,10 @@ return static function (ECSConfig $ecsConfig): void {
     $ecsConfig->import(SetList::PSR_12);
 
     $ecsConfig->lineEnding("\n");
+
+    $ecsConfig->paths(array(
+        __DIR__ . DIRECTORY_SEPARATOR . 'src',
+    ));
 
     $ecsConfig->skip(array(
         // Fixers
