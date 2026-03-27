@@ -1124,7 +1124,7 @@ class ICal
 
                 $word = '';
                 $inDoubleQuotes = !$inDoubleQuotes;
-            } elseif (!in_array($char, array(';', ':', ',', '=')) || $inDoubleQuotes) {
+            } elseif (!in_array($char, array(';', ':', ',', '='), true) || $inDoubleQuotes) {
                 $word .= $char;
             } else {
                 if ($word !== '') {
@@ -1388,7 +1388,7 @@ class ICal
             $rrules = array();
             foreach (array_filter(explode(';', $anEvent['RRULE'])) as $s) {
                 list($k, $v) = explode('=', $s);
-                if (in_array($k, array('BYSETPOS', 'BYDAY', 'BYMONTHDAY', 'BYMONTH', 'BYYEARDAY', 'BYWEEKNO'))) {
+                if (in_array($k, array('BYSETPOS', 'BYDAY', 'BYMONTHDAY', 'BYMONTH', 'BYYEARDAY', 'BYWEEKNO'), true)) {
                     $rrules[$k] = $v === '' ? array() : explode(',', $v);
                 } else {
                     $rrules[$k] = $v;
@@ -1413,7 +1413,7 @@ class ICal
                 $checkByDays = function ($carry, $weekday) {
                     return $carry && substr($weekday, -2) === $weekday;
                 };
-                if (!in_array($frequency, array('MONTHLY', 'YEARLY'))) {
+                if (!in_array($frequency, array('MONTHLY', 'YEARLY'), true)) {
                     if (is_array($rrules['BYDAY']) && !array_reduce($rrules['BYDAY'], $checkByDays, true)) {
                         trigger_error("ICal::processRecurrences: A {$frequency} RRULE may not contain BYDAY values with numeric prefixes", E_USER_NOTICE);
 
