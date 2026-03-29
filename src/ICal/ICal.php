@@ -961,6 +961,10 @@ class ICal
                     $this->cal[$key1][$key2]["{$keyword}_array"] = array();
                 }
 
+                if (is_string($value) && $keyword === 'DTEND' && strtolower($value) === 'none') {
+                    break;
+                }
+
                 if (is_array($value)) {
                     // Add array of properties to the end
                     $this->cal[$key1][$key2]["{$keyword}_array"][] = $value;

@@ -117,6 +117,18 @@ class RecurrencesTest extends TestCase
         );
     }
 
+    public function testIssue340FromFile()
+    {
+        $this->assertEventFile(
+            'UTC',
+            './tests/ical/issue-340.ics',
+            1,
+            array(
+                array('index' => 0, 'dateString' => '20230112T180000', 'timezone' => 'Europe/Berlin', 'message' => '')
+            )
+        );
+    }
+
     public function testIssue343FromFile()
     {
         $this->assertEventFile(
