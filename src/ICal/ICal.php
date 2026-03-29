@@ -1115,29 +1115,60 @@ class ICal
         // Indeed we only compare the characters , ; : = " which are on a single byte
         $arrayOfChar = str_split($line);
         $inDoubleQuotes = false;
+        $isPropertyValue = false;
+        $isEscaped = false;
 
         foreach ($arrayOfChar as $char) {
-            // Don't stop the word on ; , : = if it is enclosed in double quotes
+            // Handle escaped characters (e.g., \, or \;)
+            if ($isEscaped) {
+                $word .= $char;
+                $isEscaped = false;
+
+                continue;
+            }
+
+            if ($char === '\\') {
+                $word .= $char;
+                $isEscaped = true;
+
+                continue;
+            }
+
             if ($char === '"') {
-                if ($word !== '') {
-                    $words[] = $word;
+                if (!$isPropertyValue) {
+                    // Strip parameter-delimiting quotes (RFC 5545 3.2)
+                    $inDoubleQuotes = !$inDoubleQuotes;
+
+                    continue;
                 }
 
-                $word = '';
-                $inDoubleQuotes = !$inDoubleQuotes;
-            } elseif (!in_array($char, array(';', ':', ',', '='), true) || $inDoubleQuotes) {
+                // Retain literal quotes in property values (Issue #355)
                 $word .= $char;
-            } else {
+            } elseif ($char === ':' && !$inDoubleQuotes && !$isPropertyValue) {
+                // Identify transition to Property Value (the first unquoted colon)
                 if ($word !== '') {
                     $words[] = $word;
                 }
 
                 $words[] = $char;
                 $word = '';
+                $isPropertyValue = true;
+            } elseif (!$isPropertyValue && !$inDoubleQuotes && in_array($char, array(';', ',', '='), true)) {
+                // Handle delimiters outside of quotes (Parameters section ONLY)
+                if ($word !== '') {
+                    $words[] = $word;
+                }
+
+                $words[] = $char;
+                $word = '';
+            } else {
+                $word .= $char;
             }
         }
 
-        $words[] = $word;
+        if ($word !== '') {
+            $words[] = $word;
+        }
 
         return $words;
     }
