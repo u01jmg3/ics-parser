@@ -19,6 +19,7 @@ class ICal
 
     const DATE_TIME_FORMAT        = 'Ymd\THis';
     const DATE_TIME_FORMAT_PRETTY = 'F Y H:i:s';
+    const DEFAULT_USER_AGENT      = 'Mozilla/5.0 (compatible; ICS-Parser; +https://github.com/u01jmg3/ics-parser)';
     const ICAL_DATE_TIME_TEMPLATE = 'TZID=%s:';
     const ISO_8601_WEEK_START     = 'MO';
     const RECURRENCE_EVENT        = 'Generated recurrence event';
@@ -2722,9 +2723,7 @@ class ICal
         }
 
         if (empty($this->httpUserAgent)) {
-            if (mb_stripos($filename, 'outlook.office365.com') !== false) {
-                $options['http']['header'][] = 'User-Agent: A User Agent';
-            }
+            $options['http']['header'][] = 'User-Agent: ' . self::DEFAULT_USER_AGENT;
         }
 
         if (!empty($this->httpProtocolVersion)) {
