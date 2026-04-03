@@ -4,7 +4,7 @@ labels: ["bug-normal"]
 body:
   - type: markdown
     attributes:
-      value: "Before raising an issue, please check the issue has not already been fixed in `dev-master`. You can also search through our [closed issues](../issues?q=is%3Aissue+is%3Aclosed+)."
+      value: "Before raising an issue, please check the issue has not already been fixed in `dev-main`. You can also search through our [closed issues](../issues?q=is%3Aissue+is%3Aclosed+)."
   - type: input
     id: php-version
     attributes:

@@ -19,7 +19,7 @@
     - Add the following dependency to `composer.json`
         - :warning: **Note with Composer the owner is `johngrogg` and not `u01jmg3`**
     - To access the latest stable branch (`v3`) use the following
-        - To access new features you can require [`dev-master`](https://getcomposer.org/doc/articles/aliases.md#branch-alias)
+        - To access new features you can require [`dev-main`](https://getcomposer.org/doc/articles/aliases.md#branch-alias)
 
             ```yaml
             { "require": { "johngrogg/ics-parser": "^3" } }
@@ -35,7 +35,7 @@ composer test
 
 ### How to instantiate the Parser
 
-- Using the example script as a guide, [refer to this code](https://github.com/u01jmg3/ics-parser/blob/master/examples/index.php#L1-L22)
+- Using the example script as a guide, [refer to this code](https://github.com/u01jmg3/ics-parser/blob/main/examples/index.php#L1-L23)
 
 #### What will the parser return?
 

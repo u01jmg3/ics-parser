@@ -17,7 +17,7 @@ try {
         'skipRecurrence'              => false, // Default value
     ));
     // $ical->initFile('ICal.ics');
-    // $ical->initUrl('https://raw.githubusercontent.com/u01jmg3/ics-parser/master/examples/ICal.ics', $username = null, $password = null, $userAgent = null);
+    // $ical->initUrl('https://raw.githubusercontent.com/u01jmg3/ics-parser/main/examples/ICal.ics', $username = null, $password = null, $userAgent = null);
 } catch (\Exception $e) {
     die($e);
 }

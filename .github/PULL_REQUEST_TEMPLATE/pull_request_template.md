@@ -8,6 +8,6 @@
 >     - Using single quotes (`'`) where possible
 >     - Use `PHP_EOL` where possible or default to `\n`
 >     - Using the [1TBS](https://en.wikipedia.org/wiki/Indent_style#Variant:_1TBS_.28OTBS.29) indent style
-> - If a function is added or changed, please remember to update the [API documentation in the README](https://github.com/u01jmg3/ics-parser/blob/master/README.md#api)
+> - If a function is added or changed, please remember to update the [API documentation in the README](https://github.com/u01jmg3/ics-parser/blob/main/README.md#api)
 > - Please include unit tests to verify any new functionality
 >     - Also check that existing tests still pass: `composer test`
