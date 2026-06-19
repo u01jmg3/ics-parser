@@ -1158,7 +1158,7 @@ class ICal
                 $words[] = $char;
                 $word = '';
                 $isPropertyValue = true;
-            } elseif (!$isPropertyValue && !$inDoubleQuotes && in_array($char, array(';', ',', '='), true)) {
+            } elseif (!$inDoubleQuotes && in_array($char, array(';', ',', '='), true)) {
                 // Handle delimiters outside of quotes (Parameters section ONLY)
                 if ($word !== '') {
                     $words[] = $word;
@@ -2404,9 +2404,7 @@ class ICal
 
         $dateInterval = \DateInterval::createFromDateString($interval);
 
-        if ($dateInterval instanceof \DateInterval) {
-            $rangeEnd->add($dateInterval);
-        }
+        $rangeEnd->add($dateInterval);
 
         return $this->eventsFromRange($rangeStart->format('Y-m-d'), $rangeEnd->format('Y-m-d'));
     }
