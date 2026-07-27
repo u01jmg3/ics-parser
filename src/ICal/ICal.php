@@ -1200,10 +1200,11 @@ class ICal
      * Returns a `DateTime` object from an iCal date time format
      *
      * @param  string $icalDate
+     * @param  bool $immutable
      * @return \DateTime|false
      * @throws \Exception
      */
-    public function iCalDateToDateTime($icalDate)
+    public function iCalDateToDateTime($icalDate, $immutable = false)
     {
         /**
          * iCal times may be in 3 formats, (https://www.kanzaki.com/docs/ical/dateTime.html)
@@ -1250,7 +1251,11 @@ class ICal
             $dateFormat .= '\THis';
         }
 
-        return \DateTime::createFromFormat($dateFormat, $dateBasic, $dateTimeZone);
+        if ($immutable === true) {
+            return \DateTimeImmutable::createFromFormat($dateFormat, $dateBasic, $dateTimeZone);
+        } else {
+            return \DateTime::createFromFormat($dateFormat, $dateBasic, $dateTimeZone);
+        }
     }
 
     /**
@@ -2505,9 +2510,10 @@ class ICal
      *
      * @param  string        $date
      * @param  \DateInterval $duration
+     * @param  bool          $immutable
      * @return \DateTime|false
      */
-    protected function parseDuration($date, $duration)
+    protected function parseDuration($date, $duration, $immutable = false)
     {
         $dateTime = date_create($date);
 
@@ -2522,7 +2528,11 @@ class ICal
         $dateTime->modify("{$duration->i} minute");
         $dateTime->modify("{$duration->s} second");
 
-        return $dateTime;
+        if ($immutable == true) {
+            return \DateTimeImmutable::createFromMutable($dateTime);
+        } else {
+            return $dateTime;
+        }
     }
 
     /**
