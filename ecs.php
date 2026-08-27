@@ -110,6 +110,8 @@ return static function (ECSConfig $ecsConfig): void {
 
     $ecsConfig->ruleWithConfiguration(ArraySyntaxFixer::class, array('syntax' => 'long'));
 
+    $ecsConfig->ruleWithConfiguration(ClassDefinitionFixer::class, array('space_before_parenthesis' => true));
+
     $ecsConfig->ruleWithConfiguration(
         YodaStyleFixer::class,
         array(
@@ -141,7 +143,6 @@ return static function (ECSConfig $ecsConfig): void {
             SelfMemberReferenceSniff::class,
             BlankLinesBeforeNamespaceFixer::class,
             CastSpacesFixer::class,
-            ClassDefinitionFixer::class,
             CompactNullableTypehintFixer::class,
             ConstantCaseFixer::class,
             ElseifFixer::class,
