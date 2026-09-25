@@ -76,54 +76,46 @@ use PhpCsFixer\Fixer\Whitespace\TypeDeclarationSpacesFixer;
 use SlevomatCodingStandard\Sniffs\Namespaces\AlphabeticallySortedUsesSniff;
 use SlevomatCodingStandard\Sniffs\Variables\UnusedVariableSniff;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
-use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
+use Symplify\EasyCodingStandard\ValueObject\Option;
 
 // ecs check --fix
 
-return static function (ECSConfig $ecsConfig): void {
-    $ecsConfig->disableParallel();
-
-    // https://github.com/easy-coding-standard/easy-coding-standard/blob/main/config/set/psr12.php
-    $ecsConfig->import(SetList::PSR_12);
-
-    $ecsConfig->lineEnding("\n");
-
-    $ecsConfig->paths(array(
-        __DIR__ . DIRECTORY_SEPARATOR . 'src',
-    ));
-
-    $ecsConfig->skip(array(
-        // Fixers
-        'PhpCsFixer\Fixer\Whitespace\StatementIndentationFixer'        => array('examples/index.php'),
-        'PhpCsFixer\Fixer\Basic\BracesFixer'                           => null,
-        'PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer'          => null,
-        'PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer' => null,
-        'PhpCsFixer\Fixer\Phpdoc\PhpdocScalarFixer'                    => null,
-        'PhpCsFixer\Fixer\Phpdoc\PhpdocSummaryFixer'                   => null,
-        'PhpCsFixer\Fixer\Phpdoc\PhpdocVarWithoutNameFixer'            => null,
-        'PhpCsFixer\Fixer\ReturnNotation\SimplifiedNullReturnFixer'    => null,
-        // Requires PHP 7.1 and above
-        'PhpCsFixer\Fixer\ClassNotation\VisibilityRequiredFixer' => null,
-    ));
-
-    $ecsConfig->ruleWithConfiguration(SpaceAfterNotSniff::class, array('spacing' => 0));
-
-    $ecsConfig->ruleWithConfiguration(ArraySyntaxFixer::class, array('syntax' => 'long'));
-
-    $ecsConfig->ruleWithConfiguration(ClassDefinitionFixer::class, array('space_before_parenthesis' => true));
-
-    $ecsConfig->ruleWithConfiguration(
+return ECSConfig::configure()
+    ->withSpacing(Option::INDENTATION_SPACES, "\n")
+    ->withPreparedSets(true) // github.com/ecsphp/ecs/blob/main/config/set/psr12.php
+    ->withPaths(
+        array(
+            __DIR__ . DIRECTORY_SEPARATOR . 'src',
+        )
+    )
+    ->withSkip(
+        array(
+            // Fixers
+            'PhpCsFixer\Fixer\Whitespace\StatementIndentationFixer'        => array('examples/index.php'),
+            'PhpCsFixer\Fixer\Basic\BracesFixer'                           => null,
+            'PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer'          => null,
+            'PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer' => null,
+            'PhpCsFixer\Fixer\Phpdoc\PhpdocScalarFixer'                    => null,
+            'PhpCsFixer\Fixer\Phpdoc\PhpdocSummaryFixer'                   => null,
+            'PhpCsFixer\Fixer\Phpdoc\PhpdocVarWithoutNameFixer'            => null,
+            'PhpCsFixer\Fixer\ReturnNotation\SimplifiedNullReturnFixer'    => null,
+            // Requires PHP 7.1 and above
+            'PhpCsFixer\Fixer\ClassNotation\VisibilityRequiredFixer' => null,
+        )
+    )
+    ->withConfiguredRule(SpaceAfterNotSniff::class, array('spacing' => 0))
+    ->withConfiguredRule(ArraySyntaxFixer::class, array('syntax' => 'long'))
+    ->withConfiguredRule(ClassDefinitionFixer::class, array('space_before_parenthesis' => true))
+    ->withConfiguredRule(
         YodaStyleFixer::class,
         array(
             'equal'            => false,
             'identical'        => false,
             'less_and_greater' => false,
         )
-    );
-
-    $ecsConfig->ruleWithConfiguration(ListSyntaxFixer::class, array('syntax' => 'long')); // PHP 5.6
-
-    $ecsConfig->ruleWithConfiguration(
+    )
+    ->withConfiguredRule(ListSyntaxFixer::class, array('syntax' => 'long')) // PHP 5.6
+    ->withConfiguredRule(
         BlankLineBeforeStatementFixer::class,
         array(
             'statements' => array(
@@ -134,9 +126,8 @@ return static function (ECSConfig $ecsConfig): void {
                 'try',
             ),
         )
-    );
-
-    $ecsConfig->rules(
+    )
+    ->withRules(
         array(
             AlphabeticallySortedUsesSniff::class,
             UnusedVariableSniff::class,
@@ -207,4 +198,3 @@ return static function (ECSConfig $ecsConfig): void {
             TypeDeclarationSpacesFixer::class,
         )
     );
-};
