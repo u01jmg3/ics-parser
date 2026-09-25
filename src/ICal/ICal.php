@@ -830,7 +830,8 @@ class ICal
             $lastIndex = count($events) - 1;
             $lastEvent = $events[$lastIndex];
 
-            if ((!isset($lastEvent['RRULE']) || $lastEvent['RRULE'] === '') && $this->doesEventStartOutsideWindow($lastEvent)) {
+            // Moved instances must suppress their original dates before the final window filter runs.
+            if (!isset($lastEvent['RECURRENCE-ID']) && (!isset($lastEvent['RRULE']) || $lastEvent['RRULE'] === '') && $this->doesEventStartOutsideWindow($lastEvent)) {
                 $this->eventCount--;
 
                 unset($events[$lastIndex]);
@@ -852,6 +853,8 @@ class ICal
         if ($events !== array()) {
             foreach ($events as $key => $anEvent) {
                 if ($anEvent === null) {
+                    $this->eventCount--;
+
                     unset($events[$key]);
 
                     continue;
