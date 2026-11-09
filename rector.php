@@ -28,7 +28,6 @@ return RectorConfig::configure()
     )
     ->withSkip(
         array(
-            Rector\CodeQuality\Rector\Class_\CompleteDynamicPropertiesRector::class,
             Rector\CodeQuality\Rector\FuncCall\ChangeArrayPushToArrayAssignRector::class,
             Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
             Rector\CodeQuality\Rector\FuncCall\InlineIsAInstanceOfRector::class,
