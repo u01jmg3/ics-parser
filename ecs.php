@@ -100,6 +100,7 @@ return ECSConfig::configure()
             'PhpCsFixer\Fixer\Phpdoc\PhpdocVarWithoutNameFixer'            => null,
             'PhpCsFixer\Fixer\ReturnNotation\SimplifiedNullReturnFixer'    => null,
             // Requires PHP 7.1 and above
+            'PhpCsFixer\Fixer\ClassNotation\ModifierKeywordsFixer'   => null,
             'PhpCsFixer\Fixer\ClassNotation\VisibilityRequiredFixer' => null,
         )
     )
